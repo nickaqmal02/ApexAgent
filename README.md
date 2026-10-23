@@ -4,9 +4,9 @@
 
 ## Demo
 
-https://github.com/user-attachments/assets/simpledemo.mp4
+**Demo video:** [Watch the demo](media/simpledemo.mp4)
 
-**Phase 1 & 2 demo:** Command router + local LLM (Ollama/qwen3:8b) understanding natural language commands.
+Phase 1 & 2: Command router + local LLM (Ollama/qwen3:8b) understanding natural language.
 
 ## What Is This
 
