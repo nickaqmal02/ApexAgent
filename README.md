@@ -5,6 +5,7 @@
 ## Demo
 
 **Demo video:** [Watch the demo](media/simpledemo.mp4)
+![ApexAgent Demo](media/simpledemo.gif)
 
 Phase 1 & 2: Command router + local LLM (Ollama/qwen3:8b) understanding natural language.
 
