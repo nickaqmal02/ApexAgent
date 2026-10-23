@@ -4,7 +4,9 @@
 
 ## Demo
 
-![ApexAgent Demo](media/simpledemo.gif)
+https://github.com/user-attachments/assets/simpledemo.mp4
+
+**Phase 1 & 2 demo:** Command router + local LLM (Ollama/qwen3:8b) understanding natural language commands.
 
 ## What Is This
 
