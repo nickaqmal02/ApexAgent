@@ -2,6 +2,10 @@
 
 > A macOS native voice agent built in Swift. Local LLM inference. Online/offline fallback. 100% terminal-built. One week, hardcore mode.
 
+## Demo
+
+![ApexAgent Demo](media/simpledemo.gif)
+
 ## What Is This
 
 ApexAgent is a personal AI assistant for macOS — think Jarvis, but running entirely on your machine. It listens to your voice, understands natural language, controls your Mac, and speaks back. No cloud dependency required.
