@@ -1,6 +1,38 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 import Foundation
+// TODO:
+// FIXME:
+// !!!: Important: 
+
+// ???: Question: 
+// WARNING:
+// NOTE: 
+
+// MARK: setup the prompt for llm PHASE2
+let systemPrompt = """
+You are ApexAgent, a macOS assistant running locally.
+available tools:
+- open_app: Launch an application. args: {"name": "app name"}
+- quit_app: Quit an application. args: {"name": "app name"}
+- set_volume: Set system volume 0-100. args: {"level": number}
+-battery: Read battery status. No args needed.
+- list_apps: List running  apps. No args needed
+
+If the user wants an action, respond with only this JSON:
+If the user wants an action, respond with ONLY this JSON:
+{"tool": "tool_name", "args": {...}, "reply": "short confirmation"}
+
+If the user is just chatting, respond with:
+{"tool": null, "reply": "your response"}
+"""
+
+let ollamaURL = "http://localhost:1134/api/chat"
+let ollamaModel = "qwen3:8b"
+
+// the shape of the LLM's json responses
+
+
 
 // MARK: COLOR SETUP
 let colorCyan = "\u{001B}[36m"
