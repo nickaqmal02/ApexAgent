@@ -4,7 +4,7 @@
 
 ## Demo
 
-![ApexAgent Demo](media/simpledemo_hq.gif)
+![ApexAgent Demo](media/simpledemo.gif)
 
 ## What Is This
 
