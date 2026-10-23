@@ -27,11 +27,122 @@ If the user is just chatting, respond with:
 {"tool": null, "reply": "your response"}
 """
 
-let ollamaURL = "http://localhost:1134/api/chat"
+let ollamaURL = "http://localhost:11434/api/chat"
 let ollamaModel = "qwen3:8b"
 
 // the shape of the LLM's json responses
+struct LLMResponse: Decodable {
+    let tool: String?
+    let args: [String: String]?
+    let reply: String?
+}
 
+// MARK: Ask Ollama - sends user input to local LLM, gets JSON back
+func askOllama(_ userInput: String) -> LLMResponse? {
+    guard let url = URL(string: ollamaURL) else { return nil }
+
+    let startTime = Date()
+
+    // build the request body
+    let body: [String: Any] = [
+        "model": ollamaModel,
+        "stream": false,
+        "format": "json",
+        "messages": [
+            ["role": "system", "content": systemPrompt],
+            ["role": "user", "content": userInput]
+        ],
+        "options": ["temperature": 0.1]
+    ]
+
+    // CREATE POST request
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.timeoutInterval = 60
+    request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+    // The semaphore - makes aync URLSesson syncrhonous
+    let semaphore = DispatchSemaphore(value: 0)
+    var result: LLMResponse?
+
+    URLSession.shared.dataTask(with: request) { data, response, error in
+        defer { semaphore.signal() }
+        
+        // check for the network errors
+        guard let data = data, error == nil else {
+            print("Network error: \(error?.localizedDescription ?? "unknown")")
+            return
+        }
+
+        //check HTTP status
+        if let httpResponse = response as? HTTPURLResponse,
+            httpResponse.statusCode != 200 {
+                print("Ollama returned HTTP \(httpResponse.statusCode)")
+                return
+            }
+
+        // parse the Ollama's reponse
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                let message = json["message"] as? [String: Any],
+                let content = message["content"] as? String else {
+            print("Can't parse Ollama reponse")
+            return
+        }
+
+        // content is a json string like 
+        // decode it into out LLMResponse struct
+        guard let contentData = content.data(using: .utf8) else { return }
+        result = try? JSONDecoder().decode(LLMResponse.self, from: contentData)
+    }.resume()
+
+    // block here until the network call finishes
+    semaphore.wait()
+
+    let elapsed = Date().timeIntervalSince(startTime)
+    print("Response time: \(String(format: "%.2f", elapsed))s")
+
+    return result
+}
+
+// MARK: Execute llm decision - routes intnet to the right handler
+func executeDecision(_ decision: LLMResponse) {
+    
+    // no tool just conversation
+    guard let tool = decision.tool else {
+        if let reply = decision.reply {
+            print("Agent replies... \(reply)")
+        }
+        return
+    }
+
+    // route to handler
+    switch tool {
+        case "open_app":
+            if let name = decision.args?["name"] {
+                handleOpen(name)
+            }
+        case "quit_app":
+            if let name = decision.args?["name"] {
+                handleQuit(name)
+            }
+    case "set_volume":
+        if let levelStr = decision.args?["level"], let level = Int(levelStr) {
+            handleVolume(level)
+        }
+    case "battery":
+        handleBattery()
+    case "list_apps":
+        handleListApps()
+    default:
+        print("❌ Unknown tool from LLM: \(tool)")
+    }
+    // Print the LLM's reply
+    if let reply = decision.reply {
+        print("🤖 \(reply)")
+    }
+    
+}
 
 
 // MARK: COLOR SETUP
@@ -170,53 +281,31 @@ struct ApexAgent {
                 continue
             }
 
-            // 4 parse
-            let (cmd, args) = parseInput(input)
+            let lower = input.lowercased()
 
-            switch cmd {
-            case "open":
-                guard !args.isEmpty else {
-                    print("Usage: open <appname>")
-                    break
-                }
-                handleOpen(args[0])
-
-            case "quit":
-                guard !args.isEmpty else {
-                    print("Usage: quit <appname>")
-                    break
-                }
-                handleQuit(args[0])
-
-            case "volume":
-                guard !args.isEmpty else {
-                    print("Usage: volume <0-100>")
-                    break
-                }
-
-                // convert "50" to Int
-                if let level = Int(args[0]) {
-                    handleVolume(level)
-                }else{
-                    print("Volume must be a number, not \(args[0])")
-                }
-
-            case "battery":
-                handleBattery()
-            case "list":
-                handleListApps()
-
-            case "help":
+            if lower == "help" {
                 printHelp()
-
-            case "exit":
+                continue
+            }
+            if lower == "exit" || lower == "quit" {
                 print("😊 Goodbye Dude")
                 return
-            default:
-                print("Uknown command: \(cmd). Type 'help' for commands.")
+            }
+
+            //5. everything else sends to local LLM
+            print(" Your Agent thinking dude :) ")
+
+            if let decision = askOllama(input) {
+                executeDecision(decision)
+            } else {
+                print("No reponse from LLM. Is Ollama running ?")
+                print(" Run: ollama serve")
             }
         }
+
+    
     }
+
 
     static func printBanner() {
         print("""
