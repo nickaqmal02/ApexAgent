@@ -2,6 +2,11 @@
 // https://docs.swift.org/swift-book
 import Foundation
 
+// MARK: COLOR SETUP
+let colorCyan = "\u{001B}[36m"
+let colorBold = "\u{001B}[1m"
+let reset = "\u{001B}[0m"
+
 struct Command {
     let name: String
     let description: String
@@ -121,7 +126,7 @@ struct ApexAgent {
         //
         while true {
             //1. Print prompt
-            print("apex> ", terminator: "")
+            print("\(colorCyan)\(colorBold)ApexAgent>\(reset) ", terminator: "")
 
             //2. Read Input ()
             guard let input = readLine()?.trimmingCharacters(in: .whitespacesAndNewlines) else {
