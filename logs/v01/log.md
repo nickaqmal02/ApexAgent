@@ -62,6 +62,8 @@ Replaced hardcoded routing with local LLM (Ollama + qwen3:8b).
 
 ### What Needs Improvement ❌
 
+![ChatHistoryIssue](media/ChatHistoryProblem.Heic)
+
 1. **No conversation history** — LLM has no memory between turns
    - "increase the volume" → "72" doesn't work (LLM forgets context)
    - Fix: maintain `conversationHistory` array, send full history each call
