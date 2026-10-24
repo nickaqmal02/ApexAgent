@@ -11,24 +11,32 @@ import Foundation
 
 // MARK: setup the prompt for llm PHASE2
 let systemPrompt = """
-You are ApexAgent, a macOS assistant running locally.
+You are ApexAgent, a macOS assistant.
+User: Nik, final-year CS student at UPNM. Casual tone, direct, no fluff. Uses vim, terminal-first. Building ApexAgent — a voice-driven macOS agent in Swift.
+
 available tools:
 - open_app: Launch an application. args: {"name": "app name"}
 - quit_app: Quit an application. args: {"name": "app name"}
 - set_volume: Set system volume 0-100. args: {"level": number}
--battery: Read battery status. No args needed.
-- list_apps: List running  apps. No args needed
+- battery: Read battery status. No args needed.
+- list_apps: List running apps. No args needed.
 
-If the user wants an action, respond with only this JSON:
+RULE: When the user asks for an action, DO NOT ask for clarification. Pick a reasonable default and execute. For example, if they say "increase volume" without a number, use 75.
+
 If the user wants an action, respond with ONLY this JSON:
-{"tool": "tool_name", "args": {...}, "reply": "short confirmation"}
+{"tool": "tool_name", "args": {...}, "reply": "short confirmation, casual tone"}
 
 If the user is just chatting, respond with:
-{"tool": null, "reply": "your response"}
+{"tool": null, "reply": "your response, casual tone, reference things you know about Nik"}
 """
 
 let ollamaURL = "http://localhost:11434/api/chat"
 let ollamaModel = "qwen3:8b"
+
+// MARK: Cloud LLM config (phase 3)
+let glmURL = "https://rootsys.cloud/v1/chat/completions"
+// API key is loaded in main() AFTER loadEnv() runs
+nonisolated(unsafe) var glmAPIKey = ""
 
 nonisolated(unsafe) var conversationHistory: [[String: String]] = [] //MARK: this will tell the swift that I know that this is unsafe I will handle this
 let MAX_HISTORY = 10
@@ -154,6 +162,178 @@ func askOllama(_ userInput: String) -> LLMResponse? {
     let elapsed = Date().timeIntervalSince(startTime)
     print("Response time: \(String(format: "%.2f", elapsed))s")
 
+    return result
+}
+
+// MARK: NETWORK CHECKER (PHASE 3)
+// Don't ping DeepSeek with HEAD — it returns 401 (no auth on HEAD).
+// Instead, try a simple URL that doesn't need auth.
+func isOnline() -> Bool {
+    guard let url = URL(string: "https://www.google.com") else { return false }
+    let semaphore = DispatchSemaphore(value: 0)
+    nonisolated(unsafe) var online = false
+
+    var request = URLRequest(url: url)
+    request.httpMethod = "HEAD"
+    request.timeoutInterval = 3
+
+    URLSession.shared.dataTask(with: request) { _, response, error in
+        defer { semaphore.signal() }
+        if error == nil { online = true }
+    }.resume()
+
+    semaphore.wait()
+    return online
+}
+
+// MARK - ASK GLM (CLOUD LLM) - DEEPSEEK API, OPEN-AI COMPATIBLE
+func askGLM(_ userInput: String) -> LLMResponse? {
+    guard let url = URL(string: glmURL) else { return nil }
+
+    let startTime = Date()
+
+    // build messages (same as Ollama - system + history)
+    var messages: [[String: Any]] = [
+        ["role": "system", "content": systemPrompt]
+    ]
+
+    for msg in conversationHistory {
+        messages.append(msg)
+    }
+
+    // MARK: - SETUP THE BODY PARAMETER OF THE MODEL
+    let body: [String: Any] = [
+        "model": "glm-5.2",
+        "stream": false,
+        "think": false,
+        "response_format": ["type": "json_object"],
+        "messages": messages,
+        "temperature": 0.1
+    ]
+
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.setValue("Bearer \(glmAPIKey)", forHTTPHeaderField: "Authorization")
+    request.timeoutInterval = 30
+    request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+    let semaphore = DispatchSemaphore(value: 0)
+    nonisolated(unsafe) var result: LLMResponse?
+    URLSession.shared.dataTask(with: request) { data, response, error in
+        defer { semaphore.signal() }
+        guard let data = data, error == nil else {
+            print("❌ GLM network error: \(error?.localizedDescription ?? "unknown")")
+            return
+        }
+        if let httpResponse = response as? HTTPURLResponse,
+           httpResponse.statusCode != 200 {
+            print("❌ GLM HTTP \(httpResponse.statusCode)")
+            return
+        }
+        // DeepSeek/OpenAI format: {"choices":[{"message":{"content":"..."}}]}
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let choices = json["choices"] as? [[String: Any]],
+              let firstChoice = choices.first,
+              let message = firstChoice["message"] as? [String: Any],
+              let content = message["content"] as? String else {
+            print("❌ Can't parse GLM response")
+            return
+        }
+        // Save to history
+        conversationHistory.append(["role": "assistant", "content": content])
+        // Decode content → LLMResponse (same as Ollama)
+        guard let contentData = content.data(using: .utf8) else { return }
+        do {
+            result = try JSONDecoder().decode(LLMResponse.self, from: contentData)
+        } catch {
+            print("DEBUG GLM: decode failed: \(error)")
+            print("DEBUG GLM: content was: \(content)")
+        }
+    }.resume()
+    semaphore.wait()
+    let elapsed = Date().timeIntervalSince(startTime)
+    print("⏱️ GLM Response time: \(String(format: "%.2f", elapsed))s")
+    return result
+}
+
+// MARK: The Router - picks cloud or local based on connectivity
+func askLLM(_ userInput: String) -> LLMResponse? {
+    // add user message to history (shared by both providers)
+    conversationHistory.append(["role": "user", "content": userInput])
+
+    if conversationHistory.count > MAX_HISTORY {
+        conversationHistory = Array(conversationHistory.suffix(MAX_HISTORY))
+    }
+
+    if isOnline() {
+        print("online -> trying GLM (cloud)")
+        if let decision = askGLM(userInput) {
+            return decision
+        }
+
+        print("GLM failed -> falling back to ollama ( local )")
+    } else {
+        print("offline -> using Ollama [local]")
+    }
+
+    // NOTE: FALLBACK 
+    return askOllamaNoDoubleAdd(userInput)
+}
+
+// MARK: - ASK OLLAMA WITHOUT RE-ADDING USER MESSAGE
+func askOllamaNoDoubleAdd(_ userInput: String) -> LLMResponse? {
+    guard let url = URL(string: ollamaURL) else { return nil }
+    let startTime = Date()
+    var messages: [[String: Any]] = [
+        ["role": "system", "content": systemPrompt]
+    ]
+    for msg in conversationHistory {
+        messages.append(msg)
+    }
+    let body: [String: Any] = [
+        "model": ollamaModel,
+        "stream": false,
+        "think": false,
+        "format": "json",
+        "messages": messages,
+        "options": ["temperature": 0.1]
+    ]
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.timeoutInterval = 60
+    request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+    let semaphore = DispatchSemaphore(value: 0)
+    nonisolated(unsafe) var result: LLMResponse?
+    URLSession.shared.dataTask(with: request) { data, response, error in
+        defer { semaphore.signal() }
+        guard let data = data, error == nil else {
+            print("Network error: \(error?.localizedDescription ?? "unknown")")
+            return
+        }
+        if let httpResponse = response as? HTTPURLResponse,
+           httpResponse.statusCode != 200 {
+            print("Ollama returned HTTP \(httpResponse.statusCode)")
+            return
+        }
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let message = json["message"] as? [String: Any],
+              let content = message["content"] as? String else {
+            print("Can't parse Ollama response")
+            return
+        }
+        conversationHistory.append(["role": "assistant", "content": content])
+        guard let contentData = content.data(using: .utf8) else { return }
+        do {
+            result = try JSONDecoder().decode(LLMResponse.self, from: contentData)
+        } catch {
+            print("DEBUG: decode failed: \(error)")
+            print("DEBUG: content was: \(content)")
+        }
+    }.resume()
+    semaphore.wait()
+    let elapsed = Date().timeIntervalSince(startTime)
+    print("⏱️ Ollama Response time: \(String(format: "%.2f", elapsed))s")
     return result
 }
 
@@ -310,11 +490,33 @@ func printHelp() {
     print()
 }
 
+// NOTE: LOADING ENV METHOD
+func loadEnv() {
+    let envPath = FileManager.default.currentDirectoryPath + "/.env"
+    guard let content = try? String(contentsOfFile: envPath, encoding: .utf8) else { return }
+
+    for line in content.components(separatedBy: "\n") {
+        let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty || trimmed.hasPrefix("#") { continue }
+
+        if let equalsIndex = trimmed.firstIndex(of: "=") {
+            let key = String(trimmed[..<equalsIndex]).trimmingCharacters(in: .whitespaces)
+            let value = String(trimmed[trimmed.index(after: equalsIndex)...])
+                .trimmingCharacters(in: .whitespaces)
+                .replacingOccurrences(of: "\"", with: "")
+
+            setenv(key, value, 1)
+        }
+    }
+}
+
 // MARK: - Main Door when we first run our program
 
 @main
 struct ApexAgent {
     static func main() {
+        loadEnv()
+        glmAPIKey = ProcessInfo.processInfo.environment["GLM_API_KEY"] ?? ""
         printBanner()
 
         // REPL = READ EVALUATE PRINT LOOP
@@ -352,27 +554,21 @@ struct ApexAgent {
             //5. everything else sends to local LLM
             print(" Your Agent thinking dude :) ")
 
-            if let decision = askOllama(input) {
+            if let decision = askLLM(input) {
                 executeDecision(decision)
             } else {
-                print("No reponse from LLM. Is Ollama running ?")
-                print(" Run: ollama serve")
+                print("No reponse from LLM.")
+                print("Check: ollama serve, internet connection or even in .env file")
             }
         }
-
-    
     }
-
-
     static func printBanner() {
         print("""
-
         ╔══════════════════════════════════════╗
         ║          ApexAgent v0.1               ║
         ║   Your Mac, controlled by Swift       ║
         ╚══════════════════════════════════════╝
         Type 'help' for commands. Type 'exit' to quit.
-
         """)
     }
 }
