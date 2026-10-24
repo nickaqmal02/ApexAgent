@@ -9,29 +9,40 @@ import Foundation
 // WARNING:
 // NOTE: 
 
-// MARK: setup the prompt for llm PHASE2
-let systemPrompt = """
-You are ApexAgent, a macOS assistant.
-User: Nik, final-year CS student at UPNM. Casual tone, direct, no fluff. Uses vim, terminal-first. Building ApexAgent — a voice-driven macOS agent in Swift.
-
-available tools:
-- open_app: Launch an application. args: {"name": "app name"}
-- quit_app: Quit an application. args: {"name": "app name"}
-- set_volume: Set system volume 0-100. args: {"level": number}
-- battery: Read battery status. No args needed.
-- list_apps: List running apps. No args needed.
-
-RULE: When the user asks for an action, DO NOT ask for clarification. Pick a reasonable default and execute. For example, if they say "increase volume" without a number, use 75.
-
-If the user wants an action, respond with ONLY this JSON:
-{"tool": "tool_name", "args": {...}, "reply": "short confirmation, casual tone"}
-
-If the user is just chatting, respond with:
-{"tool": null, "reply": "your response, casual tone, reference things you know about Nik"}
-"""
+// MARK: - Load system prompt from text file (Phase 3)
+// Context lives in prompts/system_prompt.txt, not in code.
+// SPM bundles it as a resource accessible via Bundle.module.
+let systemPrompt: String = {
+    // SPM copies the "prompts" folder into the bundle, so the file is at:
+    // ApexAgent_ApexAgent.bundle/prompts/system_prompt.txt
+    // Try multiple paths to be safe
+    let possiblePaths = [
+        "prompts/system_prompt",
+        "system_prompt",
+    ]
+    for path in possiblePaths {
+        if let url = Bundle.module.url(forResource: path, withExtension: "txt"),
+           let content = try? String(contentsOf: url, encoding: .utf8) {
+            print("✅ System prompt loaded (\(content.count) chars) from \(path)")
+            return content
+        }
+    }
+    print("⚠️ system_prompt.txt not found! Using fallback.")
+    return "You are ApexAgent, a macOS assistant. Reply with JSON: {tool, args, reply}"
+}()
 
 let ollamaURL = "http://localhost:11434/api/chat"
-let ollamaModel = "qwen3:8b"
+// Model config — changeable at runtime via commands
+nonisolated(unsafe) var ollamaModel = "qwen3:8b"
+nonisolated(unsafe) var thinkingEnabled = false  // qwen3 "think" parameter
+
+// Available models for /change-model command
+let availableModels = [
+    "qwen3:8b": "8B params, 5GB, ~15 tok/s — good default",
+    "qwen3:4b": "4B params, 2.5GB, ~30 tok/s — faster, less smart",
+    "qwen2.5:3b": "3B params, 2GB, ~40 tok/s — fastest, basic",
+    "llama3.2:3b": "3B params, 2GB, ~40 tok/s — Meta's small model",
+]
 
 // MARK: Cloud LLM config (phase 3)
 let glmURL = "https://rootsys.cloud/v1/chat/completions"
@@ -101,7 +112,7 @@ func askOllama(_ userInput: String) -> LLMResponse? {
     let body: [String: Any] = [
         "model": ollamaModel,
         "stream": false,
-        "think": false,
+        "think": thinkingEnabled,
         "format": "json",
         "messages": messages,
         "options": ["temperature": 0.1]
@@ -202,10 +213,10 @@ func askGLM(_ userInput: String) -> LLMResponse? {
     }
 
     // MARK: - SETUP THE BODY PARAMETER OF THE MODEL
+    // NOTE: GLM/DeepSeek does NOT support "think" parameter — only Ollama/qwen3 does
     let body: [String: Any] = [
         "model": "glm-5.2",
         "stream": false,
-        "think": false,
         "response_format": ["type": "json_object"],
         "messages": messages,
         "temperature": 0.1
@@ -241,13 +252,50 @@ func askGLM(_ userInput: String) -> LLMResponse? {
         }
         // Save to history
         conversationHistory.append(["role": "assistant", "content": content])
+        // Strip markdown code blocks (GLM wraps JSON in ```json ... ```)
+        var cleanContent = content
+        if cleanContent.hasPrefix("```") {
+            if let firstNewline = cleanContent.firstIndex(of: "\n") {
+                cleanContent = String(cleanContent[cleanContent.index(after: firstNewline)...])
+            }
+            if cleanContent.hasSuffix("```") {
+                cleanContent = String(cleanContent.dropLast(3))
+            }
+            cleanContent = cleanContent.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        // GLM sometimes returns TWO JSON objects — only take the first one
+        // Find the first complete JSON object by tracking brace depth
+        if let firstBrace = cleanContent.firstIndex(of: "{") {
+            var depth = 0
+            var inString = false
+            var escape = false
+            var idx = firstBrace
+            while idx < cleanContent.endIndex {
+                let ch = cleanContent[idx]
+                if escape { escape = false; idx = cleanContent.index(after: idx); continue }
+                if ch == "\\" { escape = true; idx = cleanContent.index(after: idx); continue }
+                if ch == "\"" { inString.toggle() }
+                if !inString {
+                    if ch == "{" { depth += 1 }
+                    if ch == "}" {
+                        depth -= 1
+                        if depth == 0 {
+                            // Found the first complete JSON object
+                            cleanContent = String(cleanContent[firstBrace...idx])
+                            break
+                        }
+                    }
+                }
+                idx = cleanContent.index(after: idx)
+            }
+        }
         // Decode content → LLMResponse (same as Ollama)
-        guard let contentData = content.data(using: .utf8) else { return }
+        guard let contentData = cleanContent.data(using: .utf8) else { return }
         do {
             result = try JSONDecoder().decode(LLMResponse.self, from: contentData)
         } catch {
             print("DEBUG GLM: decode failed: \(error)")
-            print("DEBUG GLM: content was: \(content)")
+            print("DEBUG GLM: content was: \(cleanContent)")
         }
     }.resume()
     semaphore.wait()
@@ -293,7 +341,7 @@ func askOllamaNoDoubleAdd(_ userInput: String) -> LLMResponse? {
     let body: [String: Any] = [
         "model": ollamaModel,
         "stream": false,
-        "think": false,
+        "think": thinkingEnabled,
         "format": "json",
         "messages": messages,
         "options": ["temperature": 0.1]
@@ -340,8 +388,8 @@ func askOllamaNoDoubleAdd(_ userInput: String) -> LLMResponse? {
 // MARK: Execute llm decision - routes intnet to the right handler
 func executeDecision(_ decision: LLMResponse) {
     
-    // no tool just conversation
-    guard let tool = decision.tool else {
+    // no tool or empty tool = just conversation
+    guard let tool = decision.tool, !tool.isEmpty else {
         if let reply = decision.reply {
             print("Agent replies... \(reply)")
         }
@@ -367,7 +415,12 @@ func executeDecision(_ decision: LLMResponse) {
     case "list_apps":
         handleListApps()
     default:
-        print("❌ Unknown tool from LLM: \(tool)")
+        // LLM hallucinated a tool — treat as conversation, print reply
+        if let reply = decision.reply {
+            print("🤖 \(reply)")
+        } else {
+            print("❌ LLM hallucinated tool: \(tool). No reply given.")
+        }
     }
     // Print the LLM's reply
     if let reply = decision.reply {
@@ -547,7 +600,51 @@ struct ApexAgent {
             }
             if lower == "clear" {
                 conversationHistory.removeAll()
-                print("Memory cleared.")
+                print("🧠 Memory cleared.")
+                continue
+            }
+            
+            // MARK: Model switching commands
+            if lower.hasPrefix("/model") {
+                let parts = lower.split(separator: " ")
+                if parts.count < 2 {
+                    print("\n📋 Available models:")
+                    for (name, desc) in availableModels.sorted(by: { $0.key < $1.key }) {
+                        let marker = name == ollamaModel ? " ← current" : ""
+                        print("  \(name.padding(toLength: 15, withPad: " ", startingAt: 0)) \(desc)\(marker)")
+                    }
+                    print("\n  Usage: /model <name>")
+                } else {
+                    let newModel = String(parts[1])
+                    if availableModels[newModel] != nil {
+                        ollamaModel = newModel
+                        print("✅ Model changed to \(newModel)")
+                        print("   \(availableModels[newModel] ?? "")")
+                    } else {
+                        print("❌ Unknown model: \(newModel)")
+                        print("   Available: \(availableModels.keys.sorted().joined(separator: ", "))")
+                    }
+                }
+                continue
+            }
+            
+            if lower.hasPrefix("/thinking") {
+                let parts = lower.split(separator: " ")
+                if parts.count < 2 {
+                    print("🧠 Thinking is \(thinkingEnabled ? "ON" : "OFF")")
+                    print("   Usage: /thinking on  or  /thinking off")
+                } else {
+                    let mode = String(parts[1])
+                    if mode == "on" {
+                        thinkingEnabled = true
+                        print("✅ Thinking ON — model will reason before answering (slower)")
+                    } else if mode == "off" {
+                        thinkingEnabled = false
+                        print("✅ Thinking OFF — fast responses (default)")
+                    } else {
+                        print("❌ Usage: /thinking on  or  /thinking off")
+                    }
+                }
                 continue
             }
 
