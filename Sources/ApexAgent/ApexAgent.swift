@@ -20,6 +20,7 @@ let systemPrompt: String = {
         "prompts/system_prompt",
         "system_prompt",
     ]
+
     for path in possiblePaths {
         if let url = Bundle.module.url(forResource: path, withExtension: "txt"),
            let content = try? String(contentsOf: url, encoding: .utf8) {
