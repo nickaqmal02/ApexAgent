@@ -30,11 +30,41 @@ If the user is just chatting, respond with:
 let ollamaURL = "http://localhost:11434/api/chat"
 let ollamaModel = "qwen3:8b"
 
+nonisolated(unsafe) var conversationHistory: [[String: String]] = [] //MARK: this will tell the swift that I know that this is unsafe I will handle this
+let MAX_HISTORY = 10
+
 // the shape of the LLM's json responses
+// args values can be String or Int, so we use a custom decoder
 struct LLMResponse: Decodable {
     let tool: String?
-    let args: [String: String]?
+    let args: [String: AnyCodable]?
     let reply: String?
+}
+
+// Wrapper that accepts both String and Int values from JSON
+enum AnyCodable: Decodable {
+    case string(String)
+    case int(Int)
+    case double(Double)
+    case bool(Bool)
+    
+    var stringValue: String? {
+        switch self {
+        case .string(let s): return s
+        case .int(let i): return String(i)
+        case .double(let d): return String(d)
+        case .bool(let b): return String(b)
+        }
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let s = try? container.decode(String.self) { self = .string(s) }
+        else if let i = try? container.decode(Int.self) { self = .int(i) }
+        else if let d = try? container.decode(Double.self) { self = .double(d) }
+        else if let b = try? container.decode(Bool.self) { self = .bool(b) }
+        else { self = .string("") }
+    }
 }
 
 // MARK: Ask Ollama - sends user input to local LLM, gets JSON back
@@ -43,15 +73,29 @@ func askOllama(_ userInput: String) -> LLMResponse? {
 
     let startTime = Date()
 
+    // Adding user's message to history BEFORE sending
+    conversationHistory.append(["role": "user", "content": userInput])
+
+    // trim history if too long (keep only last max history messages)
+    if conversationHistory.count > MAX_HISTORY {
+        conversationHistory = Array(conversationHistory.suffix(MAX_HISTORY))
+    }
+
+    // BUILD MESSAGES: SYSTEM PROMPT + FULL CONVERSATION HISTORY
+    var messages: [[String: Any]] = [
+        ["role": "system", "content": systemPrompt]
+    ]
+
+    for msg in conversationHistory {
+        messages.append(msg)
+    }
     // build the request body
     let body: [String: Any] = [
         "model": ollamaModel,
         "stream": false,
+        "think": false,
         "format": "json",
-        "messages": [
-            ["role": "system", "content": systemPrompt],
-            ["role": "user", "content": userInput]
-        ],
+        "messages": messages,
         "options": ["temperature": 0.1]
     ]
 
@@ -64,7 +108,7 @@ func askOllama(_ userInput: String) -> LLMResponse? {
 
     // The semaphore - makes aync URLSesson syncrhonous
     let semaphore = DispatchSemaphore(value: 0)
-    var result: LLMResponse?
+    nonisolated(unsafe) var result: LLMResponse? // WARNING: fixing the swiftt 6 warning
 
     URLSession.shared.dataTask(with: request) { data, response, error in
         defer { semaphore.signal() }
@@ -92,8 +136,16 @@ func askOllama(_ userInput: String) -> LLMResponse? {
 
         // content is a json string like 
         // decode it into out LLMResponse struct
-        guard let contentData = content.data(using: .utf8) else { return }
-        result = try? JSONDecoder().decode(LLMResponse.self, from: contentData)
+        guard let contentData = content.data(using: .utf8) else { 
+            print("DEBUG: can't convert content to Data")
+            return 
+        }
+        do {
+            result = try JSONDecoder().decode(LLMResponse.self, from: contentData)
+        } catch {
+            print("DEBUG: decode failed: \(error)")
+            print("DEBUG: content was: \(content)")
+        }
     }.resume()
 
     // block here until the network call finishes
@@ -119,15 +171,15 @@ func executeDecision(_ decision: LLMResponse) {
     // route to handler
     switch tool {
         case "open_app":
-            if let name = decision.args?["name"] {
+            if let name = decision.args?["name"]?.stringValue {
                 handleOpen(name)
             }
         case "quit_app":
-            if let name = decision.args?["name"] {
+            if let name = decision.args?["name"]?.stringValue {
                 handleQuit(name)
             }
     case "set_volume":
-        if let levelStr = decision.args?["level"], let level = Int(levelStr) {
+        if let levelStr = decision.args?["level"]?.stringValue, let level = Int(levelStr) {
             handleVolume(level)
         }
     case "battery":
@@ -290,6 +342,11 @@ struct ApexAgent {
             if lower == "exit" || lower == "quit" {
                 print("😊 Goodbye Dude")
                 return
+            }
+            if lower == "clear" {
+                conversationHistory.removeAll()
+                print("Memory cleared.")
+                continue
             }
 
             //5. everything else sends to local LLM
