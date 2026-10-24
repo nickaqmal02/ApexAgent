@@ -228,8 +228,10 @@ func askGLM(_ userInput: String) -> LLMResponse? {
     request.setValue("Bearer \(glmAPIKey)", forHTTPHeaderField: "Authorization")
     request.timeoutInterval = 30
     request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
     let semaphore = DispatchSemaphore(value: 0)
     nonisolated(unsafe) var result: LLMResponse?
+
     URLSession.shared.dataTask(with: request) { data, response, error in
         defer { semaphore.signal() }
         guard let data = data, error == nil else {
