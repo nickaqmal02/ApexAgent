@@ -220,7 +220,7 @@ func askGLM(_ userInput: String) -> LLMResponse? {
         "stream": false,
         "response_format": ["type": "json_object"],
         "messages": messages,
-        "temperature": 0.1
+        "temperature": 0.5
     ]
 
     var request = URLRequest(url: url)
@@ -293,6 +293,7 @@ func askGLM(_ userInput: String) -> LLMResponse? {
             }
         }
         // Decode content → LLMResponse (same as Ollama)
+        cleanContent = cleanContent.replacingOccurrences(of: "\n", with: "\\n")
         guard let contentData = cleanContent.data(using: .utf8) else { return }
         do {
             result = try JSONDecoder().decode(LLMResponse.self, from: contentData)
@@ -301,8 +302,10 @@ func askGLM(_ userInput: String) -> LLMResponse? {
             print("DEBUG GLM: content was: \(cleanContent)")
         }
     }.resume()
+
     semaphore.wait()
     let elapsed = Date().timeIntervalSince(startTime)
+
     print("⏱️ GLM Response time: \(String(format: "%.2f", elapsed))s")
     return result
 }
@@ -462,28 +465,6 @@ let commandRegistry: [Command] = [
     Command(name: "help", description: "Show this help", usage: "help", category: .utility),
     Command(name: "exit", description: "Quit the ApexAgent", usage: "exit", category: .utility),
 ]
-
-// MARK: Shell runner section
-
-func runShell(_ command: String, args: [String] = []) -> String{
-    let task = Process()
-    task.executableURL = URL(fileURLWithPath: command)
-    task.arguments = args
-
-    let pipe = Pipe()
-    task.standardOutput = pipe
-    task.standardError = pipe
-
-    do {
-        try task.run()
-        task.waitUntilExit()
-
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        return String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-    } catch {
-        return "Error: \(error.localizedDescription)"
-    }
-}
 
 // MARK: - COMMAND HANDLERS
 func handleOpen(_ appName: String) {
