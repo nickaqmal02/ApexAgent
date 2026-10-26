@@ -3,51 +3,101 @@ import AVFoundation
 
 // MARK: Voice Layer (phase 4)
 
-// MARK: Audio Engine is the heart of the voice pipeline
 nonisolated(unsafe) let audioEngine = AVAudioEngine()
 
-// NOTE: WEB SOCKET CONNECTION TO DEEPGRAM
 @available(macOS 10.15, *)
 nonisolated(unsafe) var webSocketTask: URLSessionWebSocketTask?
 
 @available(macOS 10.15, *)
 func startVoiceRecognition() {
-    // 1. set up deepgram websocket url
-    let urlString = "wss://api.deepgram.com/v1/listen?model=nova-2&language=en&keywords=ApexAgent:2,Spotify:2,jev:2"
-    guard let url = URL(string: urlString) else { return }
+    // 1. set up deepgram websocket url 
+    // Using nova-2 (default model)
+    let urlString = "wss://api.deepgram.com/v1/listen?model=nova-2&language=en&encoding=linear16&sample_rate=16000&keywords=ApexAgent:2,Spotify:2,jev:2"
+    
+    guard let url = URL(string: urlString) else {
+        print("❌ Invalid URL")
+        return
+    }
 
     // 2. read the api key from the environment
     let deepgramKey = ProcessInfo.processInfo.environment["DEEPGRAM_API_KEY"] ?? ""
-
+    if deepgramKey.isEmpty {
+        print("⚠️ DEEPGRAM_API_KEY is missing from environment!")
+    } else {
+        print("✅ Deepgram key loaded (\(deepgramKey.count) chars)")
+    }
+    
     // 3. create the websocket request
     var request = URLRequest(url: url)
     request.setValue("Token \(deepgramKey)", forHTTPHeaderField: "Authorization")
 
     // 4. start the websocket
-    webSocketTask = URLSession.shared.webSocketTask(with: request)
+    let config = URLSessionConfiguration.default
+    config.waitsForConnectivity = true
+    let session = URLSession(configuration: config)
+    
+    webSocketTask = session.webSocketTask(with: request)
     webSocketTask?.resume()
+    print("🔗 WebSocket connecting...")
+    Thread.sleep(forTimeInterval: 0.5)
 
     receiveTranscript()
 
     // 5. tap the microphone
     let inputNode = audioEngine.inputNode
-    let recordingFormat = inputNode.outputFormat(forBus: 0)
-
-    // NOTE: EVERYTIME THE MIC PRODUCES AUDIO, RUN THIS CLOSURE
-    inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { buffer, time in
-        // Convert the audio buffer to raw bytes
-        let audioBufferList = buffer.audioBufferList
-        let audioData = withUnsafeBytes(of: audioBufferList) { Data($0) }
-
-        // 7. Send the raw bytes to deepgram over websocket
-        webSocketTask?.send(.data(audioData)) { error in
+    let sourceFormat = inputNode.outputFormat(forBus: 0)
+    
+    // Create the target format: 16kHz, Int16, Mono (what Deepgram needs)
+    guard let destinationFormat = AVAudioFormat(
+        commonFormat: .pcmFormatInt16,
+        sampleRate: 16000,
+        channels: 1,
+        interleaved: false
+    ) else {
+        print("❌ Can't create destination format")
+        return
+    }
+    
+    // Create the converter (this handles the 44100→16000 downsample)
+    guard let converter = AVAudioConverter(from: sourceFormat, to: destinationFormat) else {
+        print("❌ Can't create audio converter")
+        return
+    }
+    
+    inputNode.installTap(onBus: 0, bufferSize: 1024, format: sourceFormat) { buffer, time in
+        // Get the Float32 audio samples from the mic
+        guard let channelData = buffer.floatChannelData?[0] else { return }
+        let frameLength = Int(buffer.frameLength)
+        
+        // Downsample from 44100Hz to 16000Hz manually
+        // Take every Nth sample (44100/16000 ≈ 2.756)
+        let downsampleRatio = sourceFormat.sampleRate / 16000.0
+        let downsampledCount = Int(Double(frameLength) / downsampleRatio)
+        
+        // Convert Float32 to Int16 with gain boost
+        var int16Data = Data(count: downsampledCount * 2)
+        int16Data.withUnsafeMutableBytes { int16Bytes in
+            let int16Buffer = int16Bytes.bindMemory(to: Int16.self)
+            let gainBoost: Float = 20.0  // Boost the quiet mic
+            
+            for i in 0..<downsampledCount {
+                let sourceIndex = Int(Double(i) * downsampleRatio)
+                if sourceIndex < frameLength {
+                    let boostedSample = max(-1.0, min(1.0, channelData[sourceIndex] * gainBoost))
+                    int16Buffer[i] = Int16(boostedSample * 32767.0)
+                }
+            }
+        }
+        
+        // Send to Deepgram
+        webSocketTask?.send(.data(int16Data)) { error in
             if let error = error {
-                print("❌ WebSocket send error: \(error)")
+                print("❌ WebSocket send error: \(error.localizedDescription)")
             }
         }
     }
-
-    // 5. Prepare and start the engine
+    
+    // 6. Prepare and start the engine
     do {
         audioEngine.prepare()
         try audioEngine.start()
@@ -82,7 +132,7 @@ func receiveTranscript() {
                    let channel = json["channel"] as? [String: Any],
                    let alternative = channel["alternatives"] as? [[String: Any]],
                    let transcript = alternative.first?["transcript"] as? String {
-
+                    
                     // Check if it's a final transcript
                     if let isFinal = json["is_final"] as? Bool, isFinal {
                         if !transcript.isEmpty {
@@ -92,7 +142,19 @@ func receiveTranscript() {
                     }
                 }
             case .string(let text):
-                print("Received text: \(text)")
+                // Parse string as JSON too (Deepgram sometimes sends strings)
+                if let data = text.data(using: .utf8),
+                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let channel = json["channel"] as? [String: Any],
+                   let alternative = channel["alternatives"] as? [[String: Any]],
+                   let transcript = alternative.first?["transcript"] as? String {
+                    
+                    if let isFinal = json["is_final"] as? Bool, isFinal {
+                        if !transcript.isEmpty {
+                            print("\n🗣️ You said: \(transcript)")
+                        }
+                    }
+                }
             @unknown default:
                 break
             }
@@ -101,7 +163,7 @@ func receiveTranscript() {
             receiveTranscript()
 
         case .failure(let error):
-            print("❌ WebSocket receive error: \(error)")
+            print("❌ WebSocket receive error: \(error.localizedDescription)")
         }
     }
 }

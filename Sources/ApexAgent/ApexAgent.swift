@@ -81,11 +81,9 @@ struct ApexAgent {
             if lower == "/mic" {
                 if #available(macOS 10.15, *) {
                     startVoiceRecognition()
-                    print("Press Enter to stop mic.. ")
+                    print("Press ENTER to stop mic...")
                     _ = readLine()
                     stopVoiceRecognition()
-                } else {
-                    print(" Voice recognition requires macOS 10.15 or newer")
                 }
                 continue
             }
