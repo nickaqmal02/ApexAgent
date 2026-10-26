@@ -77,7 +77,18 @@ struct ApexAgent {
                 print("🧠 Memory cleared.")
                 continue
             }
-            
+
+            if lower == "/mic" {
+                if #available(macOS 10.15, *) {
+                    startVoiceRecognition()
+                    print("Press Enter to stop mic.. ")
+                    _ = readLine()
+                    stopVoiceRecognition()
+                } else {
+                    print(" Voice recognition requires macOS 10.15 or newer")
+                }
+                continue
+            }
             // MARK: Model switching commands
             if lower.hasPrefix("/model") {
                 let parts = lower.split(separator: " ")

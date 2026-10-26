@@ -1,5 +1,6 @@
 # ApexAgent
 
+
 > A macOS native voice agent built in Swift. Local LLM inference. Online/offline fallback. 100% terminal-built. One week, hardcore mode.
 
 ## Demo
