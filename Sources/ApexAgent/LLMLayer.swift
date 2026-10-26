@@ -340,6 +340,7 @@ func askOllamaNoDoubleAdd(_ userInput: String) -> LLMResponse? {
         "messages": messages,
         "options": ["temperature": 0.1]
     ]
+
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -420,5 +421,4 @@ func executeDecision(_ decision: LLMResponse) {
     if let reply = decision.reply {
         print("🤖 \(reply)")
     }
-    
 }
