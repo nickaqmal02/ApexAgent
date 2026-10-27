@@ -1,5 +1,8 @@
 import Foundation
 
+// THE FIFO QUEUE FOR THE LLM BRAIN
+let brainQueue = DispatchQueue(label: "com.apexagent.brain")
+
 let systemPrompt: String = {
     // SPM copies the "prompts" folder into the bundle, so the file is at:
     // ApexAgent_ApexAgent.bundle/prompts/system_prompt.txt
@@ -298,31 +301,47 @@ func askGLM(_ userInput: String) -> LLMResponse? {
     return result
 }
 
+// NOTE: WE USE ROUTER FIFO - PICKS CLOUD OR LOCAL BASED ON CONNECTIVITY
 // MARK: The Router - picks cloud or local based on connectivity
-func askLLM(_ userInput: String) -> LLMResponse? {
-    // add user message to history (shared by both providers)
-    conversationHistory.append(["role": "user", "content": userInput])
+func askLLM(_ userInput: String, completion: @escaping @Sendable (LLMResponse?) -> Void) {
+    brainQueue.async {
+     // add user message to history (shared by both providers)
+        conversationHistory.append(["role": "user", "content": userInput])
 
-    if conversationHistory.count > MAX_HISTORY {
-        conversationHistory = Array(conversationHistory.suffix(MAX_HISTORY))
-    }
-
-    if isOnline() {
-        print("online -> trying GLM (cloud)")
-        if let decision = askGLM(userInput) {
-            return decision
+        if conversationHistory.count > MAX_HISTORY {
+            conversationHistory = Array(conversationHistory.suffix(MAX_HISTORY))
         }
 
-        print("GLM failed -> falling back to ollama ( local )")
-    } else {
-        print("offline -> using Ollama [local]")
-    }
+        var result: LLMResponse? = nil
 
-    // NOTE: FALLBACK 
-    return askOllamaNoDoubleAdd(userInput)
+        if isOnline() {
+            print("online -> trying GLM (cloud)")
+            result = askGLM(userInput)
+            if result == nil {
+                print("GLM failed -> falling back to Ollama (local)")
+            }
+        } else {
+            print("offline -> using Ollama [local]")
+        }
+        
+        if result == nil {
+            result = askOllama(userInput)
+        }
+
+        // execute the decision on main thread
+        if let decision = result {
+            DispatchQueue.global().async {
+                executeDecision(decision)
+            }
+        } else {
+            print("No response from LLM")
+        }
+        // return result via completion handler
+        completion(result)
+    }
 }
 
-// MARK: - ASK OLLAMA WITHOUT RE-ADDING USER MESSAGE
+// MARK: - ASK OLLAMA WITHOUT llamaE-ADDING USER MESSAGE
 func askOllamaNoDoubleAdd(_ userInput: String) -> LLMResponse? {
     guard let url = URL(string: ollamaURL) else { return nil }
     let startTime = Date()
@@ -387,6 +406,9 @@ func executeDecision(_ decision: LLMResponse) {
     guard let tool = decision.tool, !tool.isEmpty else {
         if let reply = decision.reply {
             print("Agent replies... \(reply)")
+            if #available(macOS 10.14, *) {
+                speak(reply)
+            }
         }
         return
     }
@@ -409,6 +431,8 @@ func executeDecision(_ decision: LLMResponse) {
         handleBattery()
     case "list_apps":
         handleListApps()
+    case "open_kitty":
+        handleKittyWindow()
     default:
         // LLM hallucinated a tool — treat as conversation, print reply
         if let reply = decision.reply {
@@ -417,8 +441,11 @@ func executeDecision(_ decision: LLMResponse) {
             print("❌ LLM hallucinated tool: \(tool). No reply given.")
         }
     }
-    // Print the LLM's reply
+    // Print and SPEAK the LLM's reply
     if let reply = decision.reply {
         print("🤖 \(reply)")
+        if #available(macOS 10.14, *) {
+            speak(reply)
+        }
     }
 }

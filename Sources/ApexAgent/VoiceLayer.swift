@@ -8,6 +8,13 @@ nonisolated(unsafe) let audioEngine = AVAudioEngine()
 @available(macOS 10.15, *)
 nonisolated(unsafe) var webSocketTask: URLSessionWebSocketTask?
 
+
+nonisolated(unsafe) var micMuted: Bool = false
+
+func setMicMuted(_ muted: Bool) {
+    micMuted = muted
+}
+
 @available(macOS 10.15, *)
 func startVoiceRecognition() {
     // 1. set up deepgram websocket url 
@@ -39,38 +46,45 @@ func startVoiceRecognition() {
     webSocketTask = session.webSocketTask(with: request)
     webSocketTask?.resume()
     print("🔗 WebSocket connecting...")
-    Thread.sleep(forTimeInterval: 0.5)
-
+    
+    // 5. Wait for the socket to ACTUALLY connect using a semaphore
+    // This blocks the main thread until the ping succeeds, guaranteeing the socket is open.
+    let connectSemaphore = DispatchSemaphore(value: 0)
+    nonisolated(unsafe) var didConnect = false
+    
+    webSocketTask?.sendPing { error in
+        if let error = error {
+            print("❌ WebSocket failed to connect: \(error.localizedDescription)")
+        } else {
+            didConnect = true
+        }
+        connectSemaphore.signal()
+    }
+    
+    // Wait up to 3 seconds for the ping to complete
+    if connectSemaphore.wait(timeout: .now() + 3) == .timedOut {
+        print("❌ WebSocket connection timed out.")
+        return
+    }
+    
+    if !didConnect {
+        return
+    }
+    
+    print("✅ WebSocket connected!")
     receiveTranscript()
 
-    // 5. tap the microphone
+    // 6. tap the microphone
     let inputNode = audioEngine.inputNode
     let sourceFormat = inputNode.outputFormat(forBus: 0)
     
-    // Create the target format: 16kHz, Int16, Mono (what Deepgram needs)
-    guard let destinationFormat = AVAudioFormat(
-        commonFormat: .pcmFormatInt16,
-        sampleRate: 16000,
-        channels: 1,
-        interleaved: false
-    ) else {
-        print("❌ Can't create destination format")
-        return
-    }
-    
-    // Create the converter (this handles the 44100→16000 downsample)
-    guard let converter = AVAudioConverter(from: sourceFormat, to: destinationFormat) else {
-        print("❌ Can't create audio converter")
-        return
-    }
-    
     inputNode.installTap(onBus: 0, bufferSize: 1024, format: sourceFormat) { buffer, time in
+        if micMuted { return }
         // Get the Float32 audio samples from the mic
         guard let channelData = buffer.floatChannelData?[0] else { return }
         let frameLength = Int(buffer.frameLength)
         
         // Downsample from 44100Hz to 16000Hz manually
-        // Take every Nth sample (44100/16000 ≈ 2.756)
         let downsampleRatio = sourceFormat.sampleRate / 16000.0
         let downsampledCount = Int(Double(frameLength) / downsampleRatio)
         
@@ -97,7 +111,7 @@ func startVoiceRecognition() {
         }
     }
     
-    // 6. Prepare and start the engine
+    // 7. Prepare and start the engine
     do {
         audioEngine.prepare()
         try audioEngine.start()
@@ -127,33 +141,10 @@ func receiveTranscript() {
         case .success(let message):
             switch message {
             case .data(let data):
-                // Parse the deepgram JSON
-                if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                   let channel = json["channel"] as? [String: Any],
-                   let alternative = channel["alternatives"] as? [[String: Any]],
-                   let transcript = alternative.first?["transcript"] as? String {
-                    
-                    // Check if it's a final transcript
-                    if let isFinal = json["is_final"] as? Bool, isFinal {
-                        if !transcript.isEmpty {
-                            print("\n🗣️ You said: \(transcript)")
-                            // TODO: SEND THIS TRANSCRIPT TO ASK LLM
-                        }
-                    }
-                }
+                processDeepgramJSON(data)
             case .string(let text):
-                // Parse string as JSON too (Deepgram sometimes sends strings)
-                if let data = text.data(using: .utf8),
-                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                   let channel = json["channel"] as? [String: Any],
-                   let alternative = channel["alternatives"] as? [[String: Any]],
-                   let transcript = alternative.first?["transcript"] as? String {
-                    
-                    if let isFinal = json["is_final"] as? Bool, isFinal {
-                        if !transcript.isEmpty {
-                            print("\n🗣️ You said: \(transcript)")
-                        }
-                    }
+                if let data = text.data(using: .utf8) {
+                    processDeepgramJSON(data)
                 }
             @unknown default:
                 break
@@ -165,5 +156,34 @@ func receiveTranscript() {
         case .failure(let error):
             print("❌ WebSocket receive error: \(error.localizedDescription)")
         }
+    }
+}
+
+// Helper function to parse the JSON and route the transcript
+@available(macOS 10.15, *)
+func processDeepgramJSON(_ data: Data) {
+    guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+          let channel = json["channel"] as? [String: Any],
+          let alternative = channel["alternatives"] as? [[String: Any]],
+          let transcript = alternative.first?["transcript"] as? String else {
+        return
+    }
+    
+    if transcript.isEmpty { return }
+    
+    let isFinal = (json["is_final"] as? Bool ?? false)
+    
+    if isFinal {
+        print("\n🗣️ You said: \(transcript)")
+        print("🧠 Processing...")
+        
+        // RUN LLM ON A BACKGROUND THREAD SO WE DON'T BLOCK THE WEBSOCKET
+        // NOTE: RUN LLM VIA THE FIFO QUEUE
+        askLLM(transcript) { _ in }
+    } else {
+        // PARTIAL transcript — print it inline so you see it live
+        // \r returns to the start of the line, overwriting the previous partial
+        print("\r🎤 Hearing: \(transcript)                   ", terminator: "")
+        FileHandle.standardOutput.write(Data())
     }
 }

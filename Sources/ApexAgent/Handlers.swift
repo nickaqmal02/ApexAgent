@@ -41,5 +41,13 @@ func handleListApps() {
     print(" \(result)")
 }
 
+// MARK: - Kitty Terminal Handler (Nik's personal tool)
+func handleKittyWindow() {
+    // kitty --single-instance opens a new OS window in the running kitty instance
+    // (if kitty isn't running, it just launches it fresh)
+    _ = runShell("/opt/homebrew/bin/kitty", args: ["--single-instance", "--directory", NSHomeDirectory()])
+    print(" Kitty window opened")
+}
+
 
 

@@ -134,11 +134,15 @@ struct ApexAgent {
             //5. everything else sends to local LLM
             print(" Your Agent thinking dude :) ")
 
-            if let decision = askLLM(input) {
-                executeDecision(decision)
-            } else {
-                print("No reponse from LLM.")
-                print("Check: ollama serve, internet connection or even in .env file")
+            // TEXT INPUT ALSO GOES THROUGH THE FIFO QUEUE
+            askLLM(input) { decision in
+                if let decision = decision {
+                    DispatchQueue.main.async {
+                        executeDecision(decision)
+                    }
+                } else {
+                    print(" No response from LLM.")
+                }
             }
         }
     }
