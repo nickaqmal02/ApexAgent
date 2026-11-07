@@ -423,24 +423,31 @@ func executeDecision(_ decision: LLMResponse) {
             if let name = decision.args?["name"]?.stringValue {
                 handleQuit(name)
             }
-    case "set_volume":
-        if let levelStr = decision.args?["level"]?.stringValue, let level = Int(levelStr) {
-            handleVolume(level)
+        case "set_volume":
+            if let levelStr = decision.args?["level"]?.stringValue, let level = Int(levelStr) {
+                handleVolume(level)
+            }
+        case "audio_device":
+            if let device = decision.args?["device"]?.stringValue,
+                let type = decision.args?["type"]?.stringValue {
+                    handleAudioDevice(device, type: type)
+                }
+        case "list_audio_devices":
+            listAudioDevices()
+        case "battery":
+            handleBattery()
+        case "list_apps":
+            handleListApps()
+        case "open_kitty":
+            handleKittyWindow()
+        default:
+            // LLM hallucinated a tool — treat as conversation, print reply
+            if let reply = decision.reply {
+                print("🤖 \(reply)")
+            } else {
+                print("❌ LLM hallucinated tool: \(tool). No reply given.")
+            }
         }
-    case "battery":
-        handleBattery()
-    case "list_apps":
-        handleListApps()
-    case "open_kitty":
-        handleKittyWindow()
-    default:
-        // LLM hallucinated a tool — treat as conversation, print reply
-        if let reply = decision.reply {
-            print("🤖 \(reply)")
-        } else {
-            print("❌ LLM hallucinated tool: \(tool). No reply given.")
-        }
-    }
     // Print and SPEAK the LLM's reply
     if let reply = decision.reply {
         print("🤖 \(reply)")

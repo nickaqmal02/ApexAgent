@@ -49,5 +49,47 @@ func handleKittyWindow() {
     print(" Kitty window opened")
 }
 
+// MARK: - Audio Device Handler (demo setup)
+func handleAudioDevice(_ device: String, type: String) {
+    // Try exact match first
+    var result = runShell("/opt/homebrew/bin/SwitchAudioSource",
+                          args: ["-t", type, "-s", device])
+
+    // Verify the switch actually happened
+    let current = runShell("/opt/homebrew/bin/SwitchAudioSource",
+                           args: ["-c", "-t", type])
+
+    if !current.contains(device) {
+        // Exact match failed — try fuzzy match against available devices
+        let devices = runShell("/opt/homebrew/bin/SwitchAudioSource",
+                               args: ["-a", "-t", type])
+        let deviceList = devices.split(separator: "\n").map { String($0) }
+
+        let match = deviceList.first { d in
+            d.lowercased().contains(device.lowercased()) ||
+            device.lowercased().contains(d.lowercased().split(separator: " ").first ?? "")
+        }
+
+        if let matched = match {
+            result = runShell("/opt/homebrew/bin/SwitchAudioSource",
+                              args: ["-t", type, "-s", matched])
+            print("🎚️ Switched \(type) to: \(matched)")
+        } else {
+            print("❌ Couldn't find device '\(device)'. Available \(type) devices:")
+            print(devices)
+        }
+    } else {
+        print("🎚️ \(result)")
+    }
+}
+
+func listAudioDevices() {
+    let inputs = runShell("/opt/homebrew/bin/SwitchAudioSource", args: ["-a", "-t", "input"])
+    let outputs = runShell("/opt/homebrew/bin/SwitchAudioSource", args: ["-a", "-t", "output"])
+    print("Input: \(inputs)")
+    print("Outputs: \(outputs)")
+}
+
+
 
 
