@@ -172,6 +172,8 @@ func askOllama(_ userInput: String) -> LLMResponse? {
 // Don't ping DeepSeek with HEAD — it returns 401 (no auth on HEAD).
 // Instead, try a simple URL that doesn't need auth.
 func isOnline() -> Bool {
+    let forceOffline: Book = ProcessInfo.environment["APEX_FORCE_OFFLINE" == "1"]
+    if forceOffline { return false }
     guard let url = URL(string: "https://www.google.com") else { return false }
     let semaphore = DispatchSemaphore(value: 0)
     nonisolated(unsafe) var online = false
