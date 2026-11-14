@@ -1,6 +1,12 @@
 # ApexAgent
 
 
+```
+# this can be use to run on local model from ollama
+APEX_FORCE_OFFLINE=1 swift run
+
+```
+
 > A macOS native voice agent built in Swift. Local LLM inference. Online/offline fallback. 100% terminal-built. One week, hardcore mode.
 
 ## Demo
