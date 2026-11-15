@@ -1,0 +1,64 @@
+PASS | 'open spotify'                         expect=open_app           got={"tool": "open_app", "args": {"name": "Spotify"}, "reply": "Spotify open."}
+PASS | 'open spotify'                         expect=open_app           got={"tool": "open_app", "args": {"name": "Spotify"}, "reply": "Spotify open."}
+PASS | 'open spotify'                         expect=open_app           got={"tool": "open_app", "args": {"name": "Spotify"}, "reply": "Spotify open."}
+PASS | 'launch safari'                        expect=open_app           got={"tool": "open_app", "args": {"name": "Safari"}, "reply": "Safari launched."}
+PASS | 'launch safari'                        expect=open_app           got={"tool": "open_app", "args": {"name": "Safari"}, "reply": "Safari launched."}
+PASS | 'launch safari'                        expect=open_app           got={"tool": "open_app", "args": {"name": "Safari"}, "reply": "Safari launched."}
+PASS | 'open the calculator'                  expect=open_app           got={"tool": "open_app", "args": {"name": "Calculator"}, "reply": "Calculator open."}
+PASS | 'open the calculator'                  expect=open_app           got={"tool": "open_app", "args": {"name": "Calculator"}, "reply": "Calculator open."}
+PASS | 'open the calculator'                  expect=open_app           got={"tool": "open_app", "args": {"name": "Calculator"}, "reply": "Calculator open."}
+PASS | 'quit chrome'                          expect=quit_app           got={"tool": "quit_app", "args": {"name": "Chrome"}, "reply": "Chrome quit."}
+PASS | 'quit chrome'                          expect=quit_app           got={"tool": "quit_app", "args": {"name": "Chrome"}, "reply": "Chrome quit."}
+PASS | 'quit chrome'                          expect=quit_app           got={"tool": "quit_app", "args": {"name": "Chrome"}, "reply": "Chrome quit."}
+PASS | 'set volume to 30'                     expect=set_volume         got={"tool": "set_volume", "args": {"level": 30}, "reply": "Volume set to 30."}
+PASS | 'set volume to 30'                     expect=set_volume         got={"tool": "set_volume", "args": {"level": 30}, "reply": "Volume set to 30."}
+PASS | 'set volume to 30'                     expect=set_volume         got={"tool": "set_volume", "args": {"level": 30}, "reply": "Volume set to 30."}
+PASS | 'turn the volume down to 20'           expect=set_volume         got={"tool": "set_volume", "args": {"level": 20}, "reply": "Volume set to 20."}
+PASS | 'turn the volume down to 20'           expect=set_volume         got={"tool": "set_volume", "args": {"level": 20}, "reply": "Volume set to 20."}
+PASS | 'turn the volume down to 20'           expect=set_volume         got={"tool": "set_volume", "args": {"level": 20}, "reply": "Volume set to 20."}
+PASS | 'increase volume'                      expect=set_volume         got={"tool": "set_volume", "args": {"level": 75}, "reply": "Volume up to 75."}
+PASS | 'increase volume'                      expect=set_volume         got={"tool": "set_volume", "args": {"level": 75}, "reply": "Volume up to 75."}
+PASS | 'increase volume'                      expect=set_volume         got={"tool": "set_volume", "args": {"level": 75}, "reply": "Volume up to 75."}
+PASS | "what's my battery"                    expect=battery            got={"tool": "battery", "args": {}, "reply": "Checking battery..."}
+PASS | "what's my battery"                    expect=battery            got={"tool": "battery", "args": {}, "reply": "Checking battery..."}
+PASS | "what's my battery"                    expect=battery            got={"tool": "battery", "args": {}, "reply": "Checking battery..."}
+PASS | 'list the running apps'                expect=list_apps          got={"tool": "list_apps", "args": {}, "reply": "Listing running apps..."}
+PASS | 'list the running apps'                expect=list_apps          got={"tool": "list_apps", "args": {}, "reply": "Listing running apps..."}
+PASS | 'list the running apps'                expect=list_apps          got={"tool": "list_apps", "args": {}, "reply": "Listing running apps..."}
+PASS | 'open a new terminal'                  expect=open_kitty         got={"tool": "open_kitty", "args": {}, "reply": "New terminal opened."}
+PASS | 'open a new terminal'                  expect=open_kitty         got={"tool": "open_kitty", "args": {}, "reply": "New terminal opened."}
+PASS | 'open a new terminal'                  expect=open_kitty         got={"tool": "open_kitty", "args": {}, "reply": "New terminal opened."}
+PASS | 'switch my mic to the earpods'         expect=audio_device       got={"tool": "audio_device", "args": {"device": "EarPods Microphone", "type": "input"}, "reply": "Switched mic to 
+PASS | 'switch my mic to the earpods'         expect=audio_device       got={"tool": "audio_device", "args": {"device": "EarPods Microphone", "type": "input"}, "reply": "Switched mic to 
+PASS | 'switch my mic to the earpods'         expect=audio_device       got={"tool": "audio_device", "args": {"device": "EarPods Microphone", "type": "input"}, "reply": "Switched mic to 
+PASS | 'list audio devices'                   expect=list_audio_devices got={"tool": "list_audio_devices", "args": {}, "reply": "Listing audio devices..."}
+PASS | 'list audio devices'                   expect=list_audio_devices got={"tool": "list_audio_devices", "args": {}, "reply": "Listing audio devices..."}
+PASS | 'list audio devices'                   expect=list_audio_devices got={"tool": "list_audio_devices", "args": {}, "reply": "Listing audio devices..."}
+PASS | 'who are you'                          expect=None               got={"tool": null, "reply": "I'm ApexAgent, your voice-driven macOS assistant. I help you with coding, apps, and s
+PASS | 'who are you'                          expect=None               got={"tool": null, "reply": "I'm ApexAgent, your voice-driven macOS assistant. I help you with coding, apps, and s
+PASS | 'who are you'                          expect=None               got={"tool": null, "reply": "I'm ApexAgent, your voice-driven macOS assistant. I help you with coding, apps, and s
+PASS | 'hi nik'                               expect=None               got={"tool": null, "reply": "hey, what's up? working on the agent again?"}
+PASS | 'hi nik'                               expect=None               got={"tool": null, "reply": "hey, what's up? working on the agent again?"}
+PASS | 'hi nik'                               expect=None               got={"tool": null, "reply": "hey, what's up? working on the agent again?"}
+PASS | 'who am i'                             expect=None               got={"tool": null, "reply": "You're Nik, a final-year CS student at UPNM with a CGPA of 3.79. You're building an A
+PASS | 'who am i'                             expect=None               got={"tool": null, "reply": "You're Nik, a final-year CS student at UPNM with a CGPA of 3.79. You're building an A
+PASS | 'who am i'                             expect=None               got={"tool": null, "reply": "You're Nik, a final-year CS student at UPNM with a CGPA of 3.79. You're building an A
+FAIL | 'close the window'                     expect=None               got={"tool": "quit_app", "args": {"name": "Window"}, "reply": "Closing the window."}
+FAIL | 'close the window'                     expect=None               got={"tool": "quit_app", "args": {"name": "Window"}, "reply": "Closing the window."}
+FAIL | 'close the window'                     expect=None               got={"tool": "quit_app", "args": {"name": "Window"}, "reply": "Closing the window."}
+PASS | 'click the lego'                       expect=None               got={"tool": null, "reply": "Lego? You mean the brick or the model? Either way, I can't click it. You're on a Mac,
+PASS | 'click the lego'                       expect=None               got={"tool": null, "reply": "Lego? You mean the brick or the app? Either way, I can't click for you. You'll have t
+PASS | 'click the lego'                       expect=None               got={"tool": null, "reply": "Lego? You mean the brick or the model? Either way, I can't click it. You're on a Mac,
+PASS | 'send an email to bob'                 expect=None               got={"tool": null, "reply": "I can't send emails. You'll have to handle that yourself, Nik."}
+PASS | 'send an email to bob'                 expect=None               got={"tool": null, "reply": "I can't send emails. You'll have to handle that yourself, Nik."}
+PASS | 'send an email to bob'                 expect=None               got={"tool": null, "reply": "I can't send emails. You'll have to handle that yourself, Nik."}
+PASS | 'restart my mac'                       expect=None               got={"tool": null, "reply": "Nik, I can't restart your Mac directly, but you can do it by holding the power button
+PASS | 'restart my mac'                       expect=None               got={"tool": null, "reply": "Nik, I can't restart your Mac. You gotta do it manually. But hey, if you need help wi
+PASS | 'restart my mac'                       expect=None               got={"tool": null, "reply": "You know I can't restart your Mac. But I can help you with anything else. What's up?"
+PASS | "what's the weather"                   expect=None               got={"tool": null, "reply": "I don't check the weather, but you can use the Weather app. Need help opening it?"}
+PASS | "what's the weather"                   expect=None               got={"tool": null, "reply": "I don't check the weather, but you can use the Weather app. Need help opening it?"}
+PASS | "what's the weather"                   expect=None               got={"tool": null, "reply": "I don't check the weather, but you can use the Weather app. Need help opening it?"}
+---
+model=qwen3:8b runs=60
+valid_json=100% tool_match=95% args_match=100%
+latency median=1.51s max=2.95s

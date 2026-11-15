@@ -1,0 +1,22 @@
+[
+  {"input": "open spotify", "tool": "open_app", "args": {"name": "spotify"}},
+  {"input": "launch safari", "tool": "open_app", "args": {"name": "safari"}},
+  {"input": "open the calculator", "tool": "open_app", "args": {"name": "calculator"}},
+  {"input": "quit chrome", "tool": "quit_app", "args": {"name": "chrome"}},
+  {"input": "set volume to 30", "tool": "set_volume", "args": {"level": 30}},
+  {"input": "turn the volume down to 20", "tool": "set_volume", "args": {"level": 20}},
+  {"input": "increase volume", "tool": "set_volume", "args": {}},
+  {"input": "what's my battery", "tool": "battery", "args": {}},
+  {"input": "list the running apps", "tool": "list_apps", "args": {}},
+  {"input": "open a new terminal", "tool": "open_kitty", "args": {}},
+  {"input": "switch my mic to the earpods", "tool": "audio_device", "args": {"device": "EarPods Microphone", "type": "input"}},
+  {"input": "list audio devices", "tool": "list_audio_devices", "args": {}},
+  {"input": "who are you", "tool": null, "args": {}},
+  {"input": "hi nik", "tool": null, "args": {}},
+  {"input": "who am i", "tool": null, "args": {}},
+  {"input": "close the window", "tool": null, "args": {}},
+  {"input": "click the lego", "tool": null, "args": {}},
+  {"input": "send an email to bob", "tool": null, "args": {}},
+  {"input": "restart my mac", "tool": null, "args": {}},
+  {"input": "what's the weather", "tool": null, "args": {}}
+]
