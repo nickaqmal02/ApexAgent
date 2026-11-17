@@ -57,6 +57,9 @@ struct ApexAgent {
                 continue
             }
 
+            let record: TraceRecord = TraceRecord(requestId: "test-1", stage: "test", model: "none", route: "offline", durationMs: 1.0, input: "test", output: nil)
+            logTrace(record)
+
             // 3. We shall handle empty input
             if input.isEmpty {
                 continue
@@ -135,6 +138,7 @@ struct ApexAgent {
             print(" Your Agent thinking dude :) ")
 
             // TEXT INPUT ALSO GOES THROUGH THE FIFO QUEUE
+
             askLLM(input) { decision in
                 if let decision = decision {
                     DispatchQueue.main.async {
