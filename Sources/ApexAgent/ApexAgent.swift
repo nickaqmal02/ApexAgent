@@ -57,9 +57,6 @@ struct ApexAgent {
                 continue
             }
 
-            let record: TraceRecord = TraceRecord(requestId: "test-1", stage: "test", model: "none", route: "offline", durationMs: 1.0, input: "test", output: nil)
-            logTrace(record)
-
             // 3. We shall handle empty input
             if input.isEmpty {
                 continue

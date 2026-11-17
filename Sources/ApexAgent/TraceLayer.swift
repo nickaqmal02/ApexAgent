@@ -23,9 +23,8 @@ func logTrace(_ record: TraceRecord){
 
         if !FileManager.default.fileExists(atPath: logPath) {
             FileManager.default.createFile(atPath: logPath, contents: Data())
-            print("created")
         } else {
-            print("exists")
+            
         }
         
         // step 4: saves a record and™ add one record's bytes to the end of an exisiting files
