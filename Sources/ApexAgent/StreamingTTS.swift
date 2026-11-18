@@ -165,7 +165,7 @@ private func finishStream(_ state: StreamState) {
     state.lock.unlock()
 
     print("🔊 streaming TTS: first chunk \(Int(firstMs)) ms, played out at \(Int(totalMs)) ms")
-    logTrace(TraceRecord(requestId: currentRequestId, stage: "tts_first_chunk", model: "deepgram-aura-2-stream", route: "online", durationMs: firstMs, input: nil, output: nil))
-    logTrace(TraceRecord(requestId: currentRequestId, stage: "tts_stream_total", model: "deepgram-aura-2-stream", route: "online", durationMs: totalMs, input: nil, output: nil))
+    logTrace(TraceRecord(requestId: speechRequestId, stage: "tts_first_chunk", model: "deepgram-aura-2-stream", route: "online", durationMs: firstMs, input: nil, output: nil))
+    logTrace(TraceRecord(requestId: speechRequestId, stage: "tts_stream_total", model: "deepgram-aura-2-stream", route: "online", durationMs: totalMs, input: nil, output: nil))
     state.done.signal()
 }

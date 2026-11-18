@@ -1,13 +1,101 @@
 # ApexAgent
 
-
-```
-# this can be use to run on local model from ollama
-APEX_FORCE_OFFLINE=1 swift run
-
-```
-
 > A macOS native voice agent built in Swift. Local LLM inference. Online/offline fallback. 100% terminal-built. One week, hardcore mode.
+
+## How to Use
+
+### 1. Set up once
+
+Requirements: macOS 13 or later, Swift (the Command Line Tools are enough, no Xcode needed).
+For offline use, also [Ollama](https://ollama.com) with the model pulled: `ollama pull qwen3:8b`.
+
+Create a `.env` file in this folder (it is read at startup and never committed):
+
+```
+DEEPSEEK_API_KEY=your-deepseek-key     # the cloud LLM (online)
+DEEPGRAM_API_KEY=your-deepgram-key     # cloud speech-to-text and the natural voice (online)
+```
+
+Build:
+
+```
+swift build
+```
+
+The first time you use the mic, macOS asks for **Microphone** permission (and, for the Apple mic mode,
+**Speech Recognition**). Allow both for the terminal app you run it from (kitty, Terminal, iTerm).
+Screenshots ask for **Screen Recording** the first time, and dark mode asks to control **System Events**.
+
+### 2. Run it
+
+Always run from this folder, so it finds `.env`:
+
+```
+swift run
+```
+
+You get a typed prompt (`ApexAgent>`) and the notch animation at the top of the screen.
+Type a request, or turn on the mic:
+
+| Type this | What it does |
+|---|---|
+| any request, e.g. `open spotify and play music` | sends it to the agent |
+| `/mic` | starts listening; press **Enter** to stop the mic |
+| `help` | lists the built-in commands |
+| `clear` | forgets the conversation so far |
+| `/model` / `/model qwen3:4b` | lists or switches the local (Ollama) model |
+| `/thinking on` / `/thinking off` | lets the local model reason first (slower) |
+| `exit` | closes ApexAgent (saying "exit" or "quit ApexAgent" by voice works too) |
+
+### 3. Choose the mode (environment variables)
+
+Put these in front of `swift run`. They can be combined.
+
+| Variable | Effect | Example |
+|---|---|---|
+| `APEX_STT=apple` | **Apple on-device mic**: Apple's speech recognition on your Mac instead of Deepgram. No audio leaves the Mac, and it was more accurate on quiet, noisy speech in our tests; about 0.7 s slower to respond. | `APEX_STT=apple swift run` |
+| `APEX_FORCE_OFFLINE=1` | Local brain: uses Ollama (qwen3:8b) instead of the cloud LLM, and the built-in macOS voice instead of Deepgram's. | `APEX_FORCE_OFFLINE=1 swift run` |
+| `APEX_VOICE_PROCESSING=1` | Turns on macOS noise suppression and echo cancellation for the mic. | `APEX_VOICE_PROCESSING=1 swift run` |
+| `APEX_NOTCH=0` | No notch animation, terminal only. | `APEX_NOTCH=0 swift run` |
+
+Common setups:
+
+```
+swift run                                          # default: Deepgram mic + DeepSeek + Deepgram voice
+APEX_STT=apple swift run                           # Apple mic (recommended if you get misheard)
+APEX_STT=apple APEX_FORCE_OFFLINE=1 swift run      # fully on-device: Apple mic + Ollama + macOS voice
+```
+
+Then type `/mic` and talk.
+
+### 4. What you can say
+
+- **Apps:** "open Safari", "quit Spotify" (the app must be named; "close the window" does nothing on purpose)
+- **Music:** "play music", "pause", "next song", "previous song"
+- **Web:** "open YouTube", "search YouTube for lofi", "search Netflix for Avatar"
+- **Mac:** "set volume to 40", "what's my battery", "what time is it", "take a screenshot",
+  "lock the screen", "turn on dark mode", "set a timer for 10 minutes", "new terminal"
+- **Shortcuts:** "run take a break" (any of your Shortcuts, by its exact name)
+- **Several steps at once:** "open Spotify and play music",
+  "check my battery and if it's below 50 percent turn on dark mode".
+  It does one step at a time, checks the real result, then does the next (at most 5 steps).
+  If you pause after "and", it waits up to 2.5 s for the rest of the sentence.
+
+It will not do what it has no tool for (send messages, delete files) and says so instead of pretending.
+
+### 5. Tests, evals and logs
+
+```
+./scripts/test.sh                              # unit tests (exit phrases, unfinished commands)
+python3 evals/hallucination/run.py 0.1 2       # wrong-tool / false-claim rate on 21 requests
+python3 evals/agent_loop/run_loop.py 2         # 12 multi-step tasks through the agent loop (tools simulated)
+```
+
+Every request is timed in `logs/latency.jsonl` (one JSON line per stage: speech-to-text, LLM, each
+agent step, first audio). It contains what you said, so `logs/*.jsonl` is in `.gitignore`.
+
+After editing `Sources/ApexAgent/prompts/system_prompt.txt`, run `swift build` again: the prompt is
+bundled into the app at build time.
 
 ## Demo
 
@@ -29,16 +117,16 @@ Built from scratch in Swift. No Xcode. No tutorials. Just `vim` + `swift build` 
 │                      ApexAgent                           │
 │                                                          │
 │   Voice Input (STT)                                     │
-│     ├─ Online:  Deepgram Flux (streaming WebSocket)      │
-│     └─ Offline: Apple Speech framework (on-device)      │
+│     ├─ Default:        Deepgram nova-2 (WebSocket)       │
+│     └─ APEX_STT=apple: Apple Speech (on-device)          │
 │             ↓                                            │
-│   Intent Understanding (LLM)                            │
-│     ├─ Online:  GLM API (cloud)                         │
+│   Intent Understanding (LLM) + agent loop (≤ 5 steps)   │
+│     ├─ Online:  DeepSeek (OpenAI-compatible API)        │
 │     └─ Offline: Ollama + Qwen3 8B (local)               │
 │             ↓                                            │
-│   Tool Execution                                         │
-│     ├─ Process (shell commands: open, quit, volume)     │
-│     └─ Accessibility API (click UI elements in apps)    │
+│   Tool Execution (guarded)                               │
+│     └─ Shell + AppleScript: apps, music, web, volume,   │
+│        timer, screenshot, lock, dark mode, Shortcuts    │
 │             ↓                                            │
 │   Voice Output (TTS)                                    │
 │     ├─ Online:  Deepgram Aura-2 (natural voice)          │

@@ -278,9 +278,46 @@ func applyVoiceProcessingIfEnabled(_ inputNode: AVAudioInputNode) {
     }
 }
 
+// A command that ends in "and" / "then" is not finished: a short pause mid-sentence
+// ("open spotify and … play music") made the recognizer send two separate commands.
+// Hold the first part and join it with the next final, or send it alone after holdUnfinishedMs.
+let holdUnfinishedMs: Int = 2500
+let unfinishedQueue: DispatchQueue = DispatchQueue(label: "com.apexagent.unfinished")
+nonisolated(unsafe) var pendingTranscript: String = ""
+nonisolated(unsafe) var pendingFlush: DispatchWorkItem? = nil
+
+func isUnfinishedCommand(_ text: String) -> Bool {
+    let words = text.lowercased().split(whereSeparator: { !$0.isLetter && $0 != "'" })
+    guard let last = words.last else { return false }
+    return ["and", "then", "also", "plus"].contains(String(last))
+}
+
 // Shared by both recognizers: log the transcript, handle a spoken exit, otherwise send it to the LLM.
 // sinceLastPartialMs is the wait between the recognizer's last partial update and this final text.
 func handleFinalTranscript(_ transcript: String, engine: String, sinceLastPartialMs: Double) {
+    unfinishedQueue.async {
+        pendingFlush?.cancel()
+        pendingFlush = nil
+        let joined: String = pendingTranscript.isEmpty ? transcript : "\(pendingTranscript) \(transcript)"
+        if isUnfinishedCommand(joined) {
+            pendingTranscript = joined
+            print("\n⏸️ Holding unfinished command: \(joined)")
+            let flush = DispatchWorkItem {
+                let text: String = pendingTranscript
+                pendingTranscript = ""
+                pendingFlush = nil
+                if !text.isEmpty { sendFinalTranscript(text, engine: engine, sinceLastPartialMs: -1) }
+            }
+            pendingFlush = flush
+            unfinishedQueue.asyncAfter(deadline: .now() + .milliseconds(holdUnfinishedMs), execute: flush)
+            return
+        }
+        pendingTranscript = ""
+        sendFinalTranscript(joined, engine: engine, sinceLastPartialMs: sinceLastPartialMs)
+    }
+}
+
+func sendFinalTranscript(_ transcript: String, engine: String, sinceLastPartialMs: Double) {
     print("\n🗣️ You said: \(transcript)")
     print("🧠 Processing...")
 

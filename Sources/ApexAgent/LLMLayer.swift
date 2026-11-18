@@ -50,6 +50,16 @@ struct LLMResponse: Decodable {
     let tool: String?
     let args: [String: AnyCodable]?
     let reply: String?
+    // Agent loop: false = more steps follow, so ApexAgent sends back the tool result and asks again.
+    // Missing counts as done, so a forgetful model ends the turn instead of looping.
+    let done: AnyCodable?
+
+    var isDone: Bool { (done?.stringValue ?? "true").lowercased() != "false" }
+    // Same tool with the same args twice in a row means the loop is stuck
+    var stepKey: String {
+        let argText: String = (args ?? [:]).sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value.stringValue ?? "")" }.joined(separator: ",")
+        return "\(tool ?? "null")(\(argText))"
+    }
 }
 
 // Wrapper that accepts both String and Int values from JSON
@@ -336,18 +346,111 @@ func askLLM(_ userInput: String, completion: @escaping @Sendable (LLMResponse?) 
             result = askOllama(userInput)
         }
 
-        // execute the decision on main thread
+        logTrace(TraceRecord(requestId: currentRequestId, stage: "llm", model: online ? "deepseek-chat" : ollamaModel, route: online ? "online" : "offline", durationMs: msSince(llmStart), input: userInput, output: result?.reply))
+
         if let decision = result {
-            DispatchQueue.global().async {
-                executeDecision(decision)
-            }
+            // Runs on brainQueue: the next request waits until this task is finished,
+            // so two loops never write to conversationHistory at the same time
+            runAgentLoop(first: decision, online: online, startedAt: llmStart)
         } else {
             print("No response from LLM")
             setAgentState(restingAgentState())
         }
-        logTrace(TraceRecord(requestId: currentRequestId, stage: "llm", model: online ? "deepseek-chat" : ollamaModel, route: online ? "online" : "offline", durationMs: msSince(llmStart), input: userInput, output: result?.reply))
         // return result via completion handler
         completion(result)
+    }
+}
+
+// MARK: - Agent loop
+// One step = the LLM picks one tool, runTool runs it through its guard, and the REAL result
+// ("Battery 30%, discharging.", "I can't open X.") goes back to the LLM, which picks the next step.
+// It stops when the LLM says done, after maxAgentSteps, or when it repeats the same step.
+let maxAgentSteps: Int = 5
+
+func runAgentLoop(first: LLMResponse, online: Bool, startedAt: UInt64) {
+    var decision: LLMResponse = first
+    var previousKey: String? = nil
+    var steps: Int = 0
+    var lastOutcome: ToolOutcome? = nil
+    var observations: [String] = []   // every real result this turn, in order
+
+    while true {
+        // No tool: the LLM is talking or summing up. That is the final reply.
+        guard let tool = decision.tool, !tool.isEmpty else {
+            finishTurn(decision.reply, steps: steps, startedAt: startedAt, reason: "answer")
+            return
+        }
+        // Stuck: the same step again would repeat an action, so stop and report the last real result
+        if decision.stepKey == previousKey {
+            print("🔁 loop: same step twice (\(decision.stepKey)); stopping")
+            finishTurn(lastOutcome?.observation, steps: steps, startedAt: startedAt, reason: "stuck")
+            return
+        }
+
+        steps += 1
+        let stepStart: UInt64 = DispatchTime.now().uptimeNanoseconds
+        let outcome: ToolOutcome = runTool(decision)
+        print("🧩 step \(steps): \(decision.stepKey) → \(outcome.observation)")
+        setAgentState(.acting(outcome.observation))
+        logTrace(TraceRecord(requestId: currentRequestId, stage: "agent_step", model: tool, route: online ? "online" : "offline", durationMs: msSince(stepStart), input: decision.stepKey, output: outcome.observation))
+
+        // Last step: speak what really happened (refusal or real result) before the LLM's own words
+        observations.append(outcome.observation)
+        if decision.isDone {
+            // One step: as before. Several steps: say every real result, so an earlier step
+            // (the time, before the battery) is not lost behind the last one.
+            let reply: String? = steps > 1
+                ? observations.joined(separator: " ")
+                : outcome.refusal ?? outcome.toolReply ?? decision.reply
+            finishTurn(reply, steps: steps, startedAt: startedAt, reason: "done")
+            return
+        }
+        if steps >= maxAgentSteps {
+            finishTurn("I stopped after \(maxAgentSteps) steps. \(outcome.observation)", steps: steps, startedAt: startedAt, reason: "budget")
+            return
+        }
+
+        // Feed the real result back and ask for the next step
+        conversationHistory.append(["role": "user", "content": "RESULT: \(outcome.observation)"])
+        previousKey = decision.stepKey
+        lastOutcome = outcome
+
+        let next: LLMResponse? = askNextStep(online: online)
+        guard let nextDecision = next else {
+            print("No response from LLM mid-task; stopping")
+            finishTurn(outcome.observation, steps: steps, startedAt: startedAt, reason: "llm_failed")
+            return
+        }
+        decision = nextDecision
+    }
+}
+
+// One more LLM call inside a task. The history already holds the request and every RESULT.
+func askNextStep(online: Bool) -> LLMResponse? {
+    let stepStart: UInt64 = DispatchTime.now().uptimeNanoseconds
+    var result: LLMResponse? = online ? askGLM("") : nil
+    if result == nil {
+        result = askOllamaNoDoubleAdd("")
+    }
+    logTrace(TraceRecord(requestId: currentRequestId, stage: "llm_step", model: online ? "deepseek-chat" : ollamaModel, route: online ? "online" : "offline", durationMs: msSince(stepStart), input: nil, output: result?.stepKey))
+    return result
+}
+
+// End of a turn: speak once (off brainQueue, like before), or go back to rest if there is nothing to say
+func finishTurn(_ reply: String?, steps: Int, startedAt: UInt64, reason: String) {
+    logTrace(TraceRecord(requestId: currentRequestId, stage: "agent_loop", model: reason, route: "steps=\(steps)", durationMs: msSince(startedAt), input: currentUserInput, output: reply))
+    guard let text = reply, !text.isEmpty else {
+        DispatchQueue.global().asyncAfter(deadline: .now() + 1.5) {
+            setAgentState(restingAgentState())
+        }
+        return
+    }
+    print("🤖 \(text)")
+    let requestId: String = currentRequestId   // captured now: by the time audio plays, a new turn may have started
+    DispatchQueue.global().async {
+        if #available(macOS 10.14, *) {
+            speak(text, requestId: requestId)
+        }
     }
 }
 
@@ -418,40 +521,6 @@ struct ToolOutcome {
     var ran: Bool { refusal == nil && (toolReply != nil || actionLabel != nil) }
     // The truth about this step, in words: never the LLM's own claim
     var observation: String { refusal ?? toolReply ?? actionLabel ?? "Nothing ran." }
-}
-
-// MARK: Execute llm decision - routes intent to the right handler, then speaks
-func executeDecision(_ decision: LLMResponse) {
-
-    // no tool or empty tool = just conversation
-    guard let tool = decision.tool, !tool.isEmpty else {
-        if let reply = decision.reply {
-            print("Agent replies... \(reply)")
-            if #available(macOS 10.14, *) {
-                speak(reply)
-            }
-        }
-        return
-    }
-
-    let outcome: ToolOutcome = runTool(decision)
-
-    // Show what happened in the notch; the spoken reply that follows keeps this label on screen
-    if let label = outcome.refusal ?? outcome.toolReply ?? outcome.actionLabel {
-        setAgentState(.acting(label))
-    }
-    // Print and SPEAK the reply: the refusal if the guard rejected the tool, otherwise the LLM's reply
-    if let reply = outcome.refusal ?? outcome.toolReply ?? decision.reply {
-        print("🤖 \(reply)")
-        if #available(macOS 10.14, *) {
-            speak(reply)
-        }
-    } else {
-        // Nothing to say: leave the action on screen briefly, then go back to rest
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1.5) {
-            setAgentState(restingAgentState())
-        }
-    }
 }
 
 // MARK: Run one tool through its guard. No speaking, no state changes: it only acts and reports.

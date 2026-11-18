@@ -1,0 +1,434 @@
+[
+ {
+  "id": "spotify_play",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 2918,
+  "reason": "done",
+  "spoken": "Play on Spotify.",
+  "trace": [
+   "open_app(name=Spotify) -> Opened Spotify.",
+   "media_control(action=play,app=Spotify) -> Play on Spotify."
+  ]
+ },
+ {
+  "id": "spotify_play",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 2150,
+  "reason": "done",
+  "spoken": "Play on Spotify.",
+  "trace": [
+   "open_app(name=Spotify) -> Opened Spotify.",
+   "media_control(action=play,app=Spotify) -> Play on Spotify."
+  ]
+ },
+ {
+  "id": "lofi_timer",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 1652,
+  "reason": "done",
+  "spoken": "Timer set for 1500 seconds.",
+  "trace": [
+   "open_url(url=https://www.youtube.com/results?search_query=lofi) -> Opened https://www.youtube.com/results?search_query=lofi.",
+   "set_timer(seconds=1500) -> Timer set for 1500 seconds."
+  ]
+ },
+ {
+  "id": "lofi_timer",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 1562,
+  "reason": "done",
+  "spoken": "Timer set for 1500 seconds.",
+  "trace": [
+   "open_url(url=https://www.youtube.com/results?search_query=lofi) -> Opened https://www.youtube.com/results?search_query=lofi.",
+   "set_timer(seconds=1500) -> Timer set for 1500 seconds."
+  ]
+ },
+ {
+  "id": "dark_screenshot",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 984,
+  "reason": "done",
+  "spoken": "Screenshot saved to your Desktop.",
+  "trace": [
+   "dark_mode(mode=on) -> Dark mode on.",
+   "screenshot() -> Screenshot saved to your Desktop."
+  ]
+ },
+ {
+  "id": "dark_screenshot",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 1740,
+  "reason": "done",
+  "spoken": "Screenshot saved to your Desktop.",
+  "trace": [
+   "dark_mode(mode=on) -> Dark mode on.",
+   "screenshot() -> Screenshot saved to your Desktop."
+  ]
+ },
+ {
+  "id": "volume_next",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": true,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 1536,
+  "reason": "done",
+  "spoken": "Next on Spotify.",
+  "trace": [
+   "set_volume(level=30) -> Volume 30.",
+   "media_control(action=next,app=Spotify) -> Next on Spotify."
+  ]
+ },
+ {
+  "id": "volume_next",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": true,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 2450,
+  "reason": "done",
+  "spoken": "Next on Spotify.",
+  "trace": [
+   "set_volume(level=30) -> Volume 30.",
+   "media_control(action=next,app=Spotify) -> Next on Spotify."
+  ]
+ },
+ {
+  "id": "calc_time",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 1545,
+  "reason": "done",
+  "spoken": "It's 10:42 PM.",
+  "trace": [
+   "open_app(name=Calculator) -> Opened Calculator.",
+   "get_time() -> It's 10:42 PM."
+  ]
+ },
+ {
+  "id": "calc_time",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 1926,
+  "reason": "done",
+  "spoken": "It's 10:42 PM.",
+  "trace": [
+   "open_app(name=Calculator) -> Opened Calculator.",
+   "get_time() -> It's 10:42 PM."
+  ]
+ },
+ {
+  "id": "kitty_notes",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 1930,
+  "reason": "done",
+  "spoken": "Kitty closed, Notes open.",
+  "trace": [
+   "quit_app(name=kitty) -> Quit kitty.",
+   "open_app(name=Notes) -> Opened Notes."
+  ]
+ },
+ {
+  "id": "kitty_notes",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 1439,
+  "reason": "done",
+  "spoken": "Kitty closed, Notes open.",
+  "trace": [
+   "quit_app(name=kitty) -> Quit kitty.",
+   "open_app(name=Notes) -> Opened Notes."
+  ]
+ },
+ {
+  "id": "three_steps",
+  "passed": true,
+  "steps_done": 3,
+  "steps_needed": 3,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 3,
+  "llm_ms": 2572,
+  "reason": "done",
+  "spoken": "Spotify playing, volume at 40.",
+  "trace": [
+   "open_app(name=Spotify) -> Opened Spotify.",
+   "media_control(action=play,app=Spotify) -> Play on Spotify.",
+   "set_volume(level=40) -> Volume 40."
+  ]
+ },
+ {
+  "id": "three_steps",
+  "passed": true,
+  "steps_done": 3,
+  "steps_needed": 3,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 3,
+  "llm_ms": 2450,
+  "reason": "done",
+  "spoken": "Spotify playing, volume at 40.",
+  "trace": [
+   "open_app(name=Spotify) -> Opened Spotify.",
+   "media_control(action=play,app=Spotify) -> Play on Spotify.",
+   "set_volume(level=40) -> Volume 40."
+  ]
+ },
+ {
+  "id": "battery_if",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 2174,
+  "reason": "done",
+  "spoken": "Dark mode on.",
+  "trace": [
+   "battery() -> Battery 30%, discharging.",
+   "dark_mode(mode=on) -> Dark mode on."
+  ]
+ },
+ {
+  "id": "battery_if",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 2011,
+  "reason": "done",
+  "spoken": "Dark mode on.",
+  "trace": [
+   "battery() -> Battery 30%, discharging.",
+   "dark_mode(mode=on) -> Dark mode on."
+  ]
+ },
+ {
+  "id": "spotify_if_running",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 3,
+  "llm_ms": 3408,
+  "reason": "done",
+  "spoken": "Play on Spotify.",
+  "trace": [
+   "list_apps() -> Running apps: Finder, kitty, Safari.",
+   "open_app(name=Spotify) -> Opened Spotify.",
+   "media_control(action=play,app=Spotify) -> Play on Spotify."
+  ]
+ },
+ {
+  "id": "spotify_if_running",
+  "passed": true,
+  "steps_done": 2,
+  "steps_needed": 2,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 3,
+  "llm_ms": 2805,
+  "reason": "done",
+  "spoken": "Play on Spotify.",
+  "trace": [
+   "list_apps() -> Running apps: Finder, kitty, Safari.",
+   "open_app(name=Spotify) -> Opened Spotify.",
+   "media_control(action=play,app=Spotify) -> Play on Spotify."
+  ]
+ },
+ {
+  "id": "stop_delete",
+  "passed": true,
+  "steps_done": 1,
+  "steps_needed": 1,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 1057,
+  "reason": "answer",
+  "spoken": "Safari's open. Can't delete folders though \u2014 no tool for that.",
+  "trace": [
+   "open_app(name=Safari) -> Opened Safari."
+  ]
+ },
+ {
+  "id": "stop_delete",
+  "passed": true,
+  "steps_done": 1,
+  "steps_needed": 1,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 1583,
+  "reason": "answer",
+  "spoken": "Safari's open. Can't delete folders though \u2014 no tool for that.",
+  "trace": [
+   "open_app(name=Safari) -> Opened Safari."
+  ]
+ },
+ {
+  "id": "stop_window",
+  "passed": true,
+  "steps_done": 1,
+  "steps_needed": 1,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 2028,
+  "reason": "done",
+  "spoken": "Spotify's up. Can't close my own window though \u2014 say exit.",
+  "trace": [
+   "quit_app(name=ApexAgent) -> I didn't quit ApexAgent. Say the app name you want to quit.",
+   "open_app(name=Spotify) -> Opened Spotify."
+  ]
+ },
+ {
+  "id": "stop_window",
+  "passed": true,
+  "steps_done": 1,
+  "steps_needed": 1,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 2229,
+  "reason": "done",
+  "spoken": "Spotify's up. Can't close my own window though \u2014 say exit.",
+  "trace": [
+   "quit_app(name=ApexAgent) -> I didn't quit ApexAgent. Say the app name you want to quit.",
+   "open_app(name=Spotify) -> Opened Spotify."
+  ]
+ },
+ {
+  "id": "stop_send",
+  "passed": true,
+  "steps_done": 1,
+  "steps_needed": 1,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 1855,
+  "reason": "answer",
+  "spoken": "Screenshot saved to Desktop. Can't send it to Bob though, no messaging tool.",
+  "trace": [
+   "screenshot() -> Screenshot saved to your Desktop."
+  ]
+ },
+ {
+  "id": "stop_send",
+  "passed": true,
+  "steps_done": 1,
+  "steps_needed": 1,
+  "forbidden": false,
+  "extra": false,
+  "promise": false,
+  "impossible_claim": false,
+  "calls": 2,
+  "llm_ms": 1863,
+  "reason": "answer",
+  "spoken": "Screenshot saved to Desktop. Can't send it to Bob though \u2014 no messaging tool.",
+  "trace": [
+   "screenshot() -> Screenshot saved to your Desktop."
+  ]
+ }
+]

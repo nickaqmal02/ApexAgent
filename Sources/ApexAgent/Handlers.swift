@@ -141,7 +141,7 @@ func handleTimer(seconds: Int) -> String {
     let duration: Int = max(1, min(seconds, 3 * 60 * 60))   // 1 s to 3 h
     DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(duration)) {
         _ = runShell("/usr/bin/osascript", args: ["-e", "display notification \"Your timer is done\" with title \"ApexAgent\" sound name \"Glass\""])
-        speak("Your timer is done.")
+        speak("Your timer is done.", requestId: "timer")
     }
     let text: String = duration % 60 == 0
         ? "\(duration / 60) minute\(duration / 60 == 1 ? "" : "s")"

@@ -16,8 +16,11 @@ let deepgramTTSURL = "https://api.deepgram.com/v1/speak?model=aura-2-apollo-en"
 let speechQueue: DispatchQueue = DispatchQueue(label: "com.apexagent.speech")
 
 @available(macOS 10.14, *)
-func speak(_ text: String) {
+// requestId: the turn this reply belongs to. Callers that speak later (off the brain queue)
+// must capture it when the reply is made, not when the audio starts.
+func speak(_ text: String, requestId: String = currentRequestId) {
     speechQueue.sync {
+        speechRequestId = requestId
         let startedAt: Double = Date().timeIntervalSince1970
         print(String(format: "▶ speak start %.2f: %@", startedAt.truncatingRemainder(dividingBy: 1000), String(text.prefix(40))))
         setAgentState(.speaking(text, acted: false))
@@ -55,7 +58,7 @@ func speakWithDeepgram(_ text: String) {
     }
     // Make the fallback visible: which reply, and that the streaming path gave no audio
     print("↩️ streaming gave no audio, falling back to full-file download")
-    logTrace(TraceRecord(requestId: currentRequestId, stage: "tts_fallback", model: "deepgram-aura-2", route: "online", durationMs: 0, input: nil, output: text))
+    logTrace(TraceRecord(requestId: speechRequestId, stage: "tts_fallback", model: "deepgram-aura-2", route: "online", durationMs: 0, input: nil, output: text))
     // Fallback: download the full MP3, then play it
     guard let url = URL(string: deepgramTTSURL) else {
         speakWithLocal(text)
@@ -104,7 +107,7 @@ func speakWithDeepgram(_ text: String) {
     semaphore.wait()
     
     // tts_fetch = time from request to full MP3 download (the gap before any sound)
-    logTrace(TraceRecord(requestId: currentRequestId, stage: "tts_fetch", model: "deepgram-aura-2", route: "online", durationMs: msSince(ttsStart), input: nil, output: nil))
+    logTrace(TraceRecord(requestId: speechRequestId, stage: "tts_fetch", model: "deepgram-aura-2", route: "online", durationMs: msSince(ttsStart), input: nil, output: nil))
     // If we got audio data, play it
     if let data = audioData {
         playAudioData(data)
@@ -138,7 +141,7 @@ func playAudioData(_ data: Data) {
         
         playbackSemaphore.wait()
         // tts_play = how long the audio itself played (length, not latency)
-        logTrace(TraceRecord(requestId: currentRequestId, stage: "tts_play", model: "deepgram-aura-2", route: "online", durationMs: msSince(playStart), input: nil, output: nil))
+        logTrace(TraceRecord(requestId: speechRequestId, stage: "tts_play", model: "deepgram-aura-2", route: "online", durationMs: msSince(playStart), input: nil, output: nil))
     } catch {
         print("⚠️ Failed to play audio: \(error)")
     }

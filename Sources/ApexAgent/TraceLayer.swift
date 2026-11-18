@@ -14,8 +14,11 @@ struct TraceRecord: Codable {
 
 let traceQueue: DispatchQueue = DispatchQueue(label: "com.apexagent.trace")
 
-// One ID per user turn, set in askLLM and read by the TTS timers.
+// One ID per user turn, set in askLLM.
 nonisolated(unsafe) var currentRequestId: String = "none"
+// The turn whose reply is being spoken right now. Speech can still be playing after the
+// next turn has started (and changed currentRequestId), so the TTS timers read this one.
+nonisolated(unsafe) var speechRequestId: String = "none"
 
 func msSince(_ start: UInt64) -> Double {
     return Double(DispatchTime.now().uptimeNanoseconds - start) / 1_000_000
