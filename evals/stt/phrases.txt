@@ -1,0 +1,10 @@
+exit
+exit this application
+quit this application
+please exit this application
+what's my battery
+open spotify
+set the volume to thirty
+open the calculator
+close the window
+list the running apps

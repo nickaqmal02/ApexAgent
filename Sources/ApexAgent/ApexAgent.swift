@@ -43,7 +43,7 @@ func loadEnv() {
 struct ApexAgent {
     static func main() {
         loadEnv()
-        glmAPIKey = ProcessInfo.processInfo.environment["GLM_API_KEY"] ?? ""
+        glmAPIKey = ProcessInfo.processInfo.environment["DEEPSEEK_API_KEY"] ?? ""
         printBanner()
 
         // REPL = READ EVALUATE PRINT LOOP
@@ -136,15 +136,7 @@ struct ApexAgent {
 
             // TEXT INPUT ALSO GOES THROUGH THE FIFO QUEUE
 
-            askLLM(input) { decision in
-                if let decision = decision {
-                    DispatchQueue.main.async {
-                        executeDecision(decision)
-                    }
-                } else {
-                    print(" No response from LLM.")
-                }
-            }
+            askLLM(input) { _ in }
         }
     }
     static func printBanner() {

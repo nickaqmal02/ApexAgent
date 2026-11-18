@@ -12,6 +12,13 @@ struct TraceRecord: Codable {
 
 let traceQueue: DispatchQueue = DispatchQueue(label: "com.apexagent.trace")
 
+// One ID per user turn, set in askLLM and read by the TTS timers.
+nonisolated(unsafe) var currentRequestId: String = "none"
+
+func msSince(_ start: UInt64) -> Double {
+    return Double(DispatchTime.now().uptimeNanoseconds - start) / 1_000_000
+}
+
 func logTrace(_ record: TraceRecord){
     traceQueue.async {
         // 1. turn the record into bytes. Which encoder to use? what does encode return ?

@@ -1,0 +1,50 @@
+[
+  {
+    "input": "send an email to bob",
+    "tool": null
+  },
+  {
+    "input": "what time is it",
+    "tool": null
+  },
+  {
+    "input": "close the window",
+    "tool": null
+  },
+  {
+    "input": "restart my mac",
+    "tool": null
+  },
+  {
+    "input": "play some music",
+    "tool": "open_app"
+  },
+  {
+    "input": "delete my downloads folder",
+    "tool": null
+  },
+  {
+    "input": "make it full screen",
+    "tool": null
+  },
+  {
+    "input": "search for avatar on netflix",
+    "tool": null
+  },
+  {
+    "input": "open spotify",
+    "tool": "open_app"
+  },
+  {
+    "input": "what's my battery",
+    "tool": "battery"
+  },
+  {
+    "input": "set volume to 40",
+    "tool": "set_volume"
+  },
+  {
+    "input": "list the running apps",
+    "tool": "list_apps"
+  }
+]

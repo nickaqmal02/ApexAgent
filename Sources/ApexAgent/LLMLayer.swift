@@ -37,7 +37,7 @@ let availableModels = [
 ]
 
 // MARK: Cloud LLM config (phase 3)
-let glmURL = "https://rootsys.cloud/v1/chat/completions"
+let glmURL = "https://api.deepseek.com/v1/chat/completions"  // DeepSeek, OpenAI-compatible path
 // API key is loaded in main() AFTER loadEnv() runs
 nonisolated(unsafe) var glmAPIKey = ""
 
@@ -209,11 +209,12 @@ func askGLM(_ userInput: String) -> LLMResponse? {
     // MARK: - SETUP THE BODY PARAMETER OF THE MODEL
     // NOTE: GLM/DeepSeek does NOT support "think" parameter — only Ollama/qwen3 does
     let body: [String: Any] = [
-        "model": "glm-5.2",
+        "model": "deepseek-chat",
         "stream": false,
         "response_format": ["type": "json_object"],
         "messages": messages,
-        "temperature": 0.5
+        "temperature": 0.1,
+        "max_tokens": 150
     ]
 
     var request = URLRequest(url: url)
@@ -307,6 +308,9 @@ func askGLM(_ userInput: String) -> LLMResponse? {
 // MARK: The Router - picks cloud or local based on connectivity
 func askLLM(_ userInput: String, completion: @escaping @Sendable (LLMResponse?) -> Void) {
     brainQueue.async {
+        let llmStart: UInt64 = DispatchTime.now().uptimeNanoseconds
+        currentUserInput = userInput
+        currentRequestId = UUID().uuidString
      // add user message to history (shared by both providers)
         conversationHistory.append(["role": "user", "content": userInput])
 
@@ -316,11 +320,12 @@ func askLLM(_ userInput: String, completion: @escaping @Sendable (LLMResponse?) 
 
         var result: LLMResponse? = nil
 
-        if isOnline() {
-            print("online -> trying GLM (cloud)")
+        let online: Bool = isOnline()
+        if online {
+            print("online -> trying cloud LLM")
             result = askGLM(userInput)
             if result == nil {
-                print("GLM failed -> falling back to Ollama (local)")
+                print("cloud LLM failed -> falling back to Ollama (local)")
             }
         } else {
             print("offline -> using Ollama [local]")
@@ -338,6 +343,7 @@ func askLLM(_ userInput: String, completion: @escaping @Sendable (LLMResponse?) 
         } else {
             print("No response from LLM")
         }
+        logTrace(TraceRecord(requestId: currentRequestId, stage: "llm", model: online ? "deepseek-chat" : ollamaModel, route: online ? "online" : "offline", durationMs: msSince(llmStart), input: userInput, output: result?.reply))
         // return result via completion handler
         completion(result)
     }
@@ -415,15 +421,28 @@ func executeDecision(_ decision: LLMResponse) {
         return
     }
 
+    // set when the guard rejects the tool, so the refusal is spoken instead of the LLM's claim
+    var refusal: String? = nil
+
     // route to handler
     switch tool {
         case "open_app":
             if let name = decision.args?["name"]?.stringValue {
-                handleOpen(name)
+                if nameAppearsInInput(name) && installedAppExists(name) {
+                    handleOpen(name)
+                } else {
+                    refusal = "I can't open \(name). Say the app name you want."
+                    print("🛡️ guard: no installed app named \(name); nothing opened")
+                }
             }
         case "quit_app":
             if let name = decision.args?["name"]?.stringValue {
-                handleQuit(name)
+                if nameAppearsInInput(name) && runningAppExists(name) {
+                    handleQuit(name)
+                } else {
+                    refusal = "I didn't quit \(name). Say the app name you want to quit."
+                    print("🛡️ guard: no running app named \(name); nothing quit")
+                }
             }
         case "set_volume":
             if let levelStr = decision.args?["level"]?.stringValue, let level = Int(levelStr) {
@@ -450,8 +469,8 @@ func executeDecision(_ decision: LLMResponse) {
                 print("❌ LLM hallucinated tool: \(tool). No reply given.")
             }
         }
-    // Print and SPEAK the LLM's reply
-    if let reply = decision.reply {
+    // Print and SPEAK the reply: the refusal if the guard rejected the tool, otherwise the LLM's reply
+    if let reply = refusal ?? decision.reply {
         print("🤖 \(reply)")
         if #available(macOS 10.14, *) {
             speak(reply)

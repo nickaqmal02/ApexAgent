@@ -1,7 +1,14 @@
-<?xml version="1.0" encoding="UTF-8">
-<plist>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
 <dict>
+    <key>CFBundleIdentifier</key>
+    <string>local.apexagent</string>
+    <key>CFBundleName</key>
+    <string>ApexAgent</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>ApexAgent needs microphone access to hear your voice command</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>ApexAgent uses on-device speech recognition to understand your voice commands</string>
 </dict>
 </plist>

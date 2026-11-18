@@ -7,3 +7,248 @@
 {"requestId":"test-1","model":"none","route":"offline","stage":"test","durationMs":1,"input":"test"}
 {"durationMs":1,"route":"offline","model":"none","input":"test","requestId":"test-1","stage":"test"}
 {"requestId":"test-1","model":"none","route":"offline","stage":"test","durationMs":1,"input":"test"}
+{"route":"online","input":"hey min hey dude","output":"yo Nik what's good","model":"glm-5.2","durationMs":2201.472875,"stage":"llm","requestId":"22B1AE3F-8E8C-419B-9334-B52B305CCFCA"}
+{"stage":"tts_fetch","model":"deepgram-aura-2","route":"online","requestId":"22B1AE3F-8E8C-419B-9334-B52B305CCFCA","durationMs":1687.930875}
+{"stage":"tts_play","model":"deepgram-aura-2","route":"online","requestId":"22B1AE3F-8E8C-419B-9334-B52B305CCFCA","durationMs":2617.694458}
+{"requestId":"23362379-A201-4F8C-9C0A-AFCEFEE816AD","durationMs":3805.546083,"model":"glm-5.2","output":"all good. what's up, working on ApexAgent or just vibing?","stage":"llm","route":"online","input":"it's okay"}
+{"stage":"tts_fetch","route":"online","requestId":"23362379-A201-4F8C-9C0A-AFCEFEE816AD","model":"deepgram-aura-2","durationMs":2877.904875}
+{"stage":"tts_play","model":"deepgram-aura-2","route":"online","requestId":"23362379-A201-4F8C-9C0A-AFCEFEE816AD","durationMs":5286.1215}
+{"requestId":"51A2D1A4-D95A-486A-A33A-83638777D4BB","model":"glm-5.2","durationMs":2466.532834,"input":"exit","route":"online","stage":"llm","output":"later Nik, catch you next time 👋"}
+{"stage":"tts_fetch","model":"deepgram-aura-2","route":"online","requestId":"51A2D1A4-D95A-486A-A33A-83638777D4BB","durationMs":2079.042459}
+{"stage":"tts_play","route":"online","requestId":"51A2D1A4-D95A-486A-A33A-83638777D4BB","model":"deepgram-aura-2","durationMs":3341.618875}
+{"route":"online","output":"I'm listening, Nik. What's up?","stage":"llm","requestId":"729DB838-E6DE-4668-BF5B-F82879E98C3C","input":"amy listen","model":"glm-5.2","durationMs":2042.273208}
+{"durationMs":2432.310459,"route":"online","requestId":"729DB838-E6DE-4668-BF5B-F82879E98C3C","stage":"tts_fetch","model":"deepgram-aura-2"}
+{"stage":"tts_play","durationMs":3232.119292,"model":"deepgram-aura-2","requestId":"729DB838-E6DE-4668-BF5B-F82879E98C3C","route":"online"}
+{"route":"online","output":"No worries. Hit me up whenever you need something.","stage":"llm","requestId":"B284C71D-0BCB-448C-9487-C596C7C09FC1","model":"glm-5.2","input":"okay great thank you","durationMs":1923.888417}
+{"requestId":"B284C71D-0BCB-448C-9487-C596C7C09FC1","route":"online","stage":"tts_fetch","model":"deepgram-aura-2","durationMs":2473.932709}
+{"requestId":"B284C71D-0BCB-448C-9487-C596C7C09FC1","route":"online","stage":"tts_play","model":"deepgram-aura-2","durationMs":3620.559125}
+{"input":"okay alright","requestId":"2FDCB791-8A79-47E0-A4A4-50A945C3550B","model":"glm-5.2","durationMs":14200.528875,"stage":"llm","route":"online","output":"👍"}
+{"stage":"tts_fetch","model":"deepgram-aura-2","route":"online","requestId":"804DE003-A4F9-4909-B6DB-C29B56C64624","durationMs":1180.484833}
+{"requestId":"804DE003-A4F9-4909-B6DB-C29B56C64624","durationMs":445.944208,"route":"online","model":"deepgram-aura-2","stage":"tts_play"}
+{"input":"exit","route":"online","model":"glm-5.2","stage":"llm","durationMs":2224.648667,"requestId":"804DE003-A4F9-4909-B6DB-C29B56C64624","output":"Later Nik. Catch you next time."}
+{"requestId":"804DE003-A4F9-4909-B6DB-C29B56C64624","durationMs":1506.980917,"route":"online","model":"deepgram-aura-2","stage":"tts_fetch"}
+{"stage":"tts_play","model":"deepgram-aura-2","route":"online","requestId":"804DE003-A4F9-4909-B6DB-C29B56C64624","durationMs":2699.072792}
+{"durationMs":2164.981584,"stage":"llm","model":"glm-5.2","output":"Who's Amy Wilson? Got a name but no context. You looking someone up, or just testing me?","input":"amy wilson","route":"online","requestId":"7836027D-1A4E-48E6-AE65-D0E18C2111DE"}
+{"route":"online","model":"deepgram-aura-2","stage":"tts_fetch","durationMs":3946.508083,"requestId":"7836027D-1A4E-48E6-AE65-D0E18C2111DE"}
+{"route":"online","requestId":"7836027D-1A4E-48E6-AE65-D0E18C2111DE","durationMs":7659.623,"stage":"tts_play","model":"deepgram-aura-2"}
+{"model":"glm-5.2","route":"online","requestId":"B5A39E74-D750-4A24-84B9-B5D0D4A5AE77","input":"alright","output":"Cool. Hit me up when you need something.","stage":"llm","durationMs":1908.824292}
+{"model":"deepgram-aura-2","durationMs":2014.74975,"stage":"tts_fetch","requestId":"B5A39E74-D750-4A24-84B9-B5D0D4A5AE77","route":"online"}
+{"model":"deepgram-aura-2","durationMs":3315.217916,"stage":"tts_play","requestId":"B5A39E74-D750-4A24-84B9-B5D0D4A5AE77","route":"online"}
+{"route":"online","input":"this application","output":"ApexAgent — your voice-driven macOS assistant. Built from scratch in Swift. That's me. What about it?","durationMs":2065.899333,"model":"glm-5.2","stage":"llm","requestId":"5BD65813-FF84-4BAC-9607-63CBA7BD5C5B"}
+{"model":"deepgram-aura-2","durationMs":3307.90425,"stage":"tts_fetch","requestId":"5BD65813-FF84-4BAC-9607-63CBA7BD5C5B","route":"online"}
+{"model":"deepgram-aura-2","route":"online","stage":"tts_play","durationMs":9408.922375,"requestId":"5BD65813-FF84-4BAC-9607-63CBA7BD5C5B"}
+{"output":"Disintegration? You mean like the app's falling apart or breaking down on you? What's going wrong — crashes, latency, voice recognition issues? Give me the details and I'll help you debug.","requestId":"E3DA7DF5-057F-4DCB-90BB-F0E7C5EB821F","durationMs":2170.860959,"model":"glm-5.2","stage":"llm","route":"online","input":"as it disintegration"}
+{"durationMs":6745.377042,"model":"deepgram-aura-2","route":"online","requestId":"E3DA7DF5-057F-4DCB-90BB-F0E7C5EB821F","stage":"tts_fetch"}
+{"stage":"tts_play","model":"deepgram-aura-2","route":"online","requestId":"E3DA7DF5-057F-4DCB-90BB-F0E7C5EB821F","durationMs":13846.444291}
+{"model":"deepgram-nova-2","durationMs":5.894667,"route":"online","requestId":"71F705D6-C246-462E-8117-D190530AA786","input":"you hear me","stage":"stt_final"}
+{"stage":"llm","durationMs":3098.857875,"model":"glm-5.2","route":"online","input":"you hear me","output":"Loud and clear, Nik. What's up?","requestId":"CEDC6418-D941-43BC-81F9-D3766A3F3858"}
+{"stage":"tts_fetch","route":"online","durationMs":1830.91525,"requestId":"CEDC6418-D941-43BC-81F9-D3766A3F3858","model":"deepgram-aura-2"}
+{"route":"online","model":"deepgram-aura-2","durationMs":2716.252083,"requestId":"CEDC6418-D941-43BC-81F9-D3766A3F3858","stage":"tts_play"}
+{"stage":"stt_final","durationMs":2.813125,"model":"deepgram-nova-2","route":"online","input":"why is this so long to brine","requestId":"4C724E60-5D08-491B-A4C5-22A6EA7C0BD6"}
+{"route":"online","model":"glm-5.2","durationMs":3479.310417,"input":"why is this so long to brine","stage":"llm","output":"What's taking long? The ApexAgent response loop? If so, probably the TTS or model inference lag. Could also be the audio pipeline buffering. Need me to check what apps are running in case something's hogging resources?","requestId":"FB470809-6327-433C-AA9C-EE81A4F69447"}
+{"stage":"tts_fetch","requestId":"FB470809-6327-433C-AA9C-EE81A4F69447","durationMs":8495.350333,"route":"online","model":"deepgram-aura-2"}
+{"stage":"tts_play","requestId":"FB470809-6327-433C-AA9C-EE81A4F69447","durationMs":17467.13825,"route":"online","model":"deepgram-aura-2"}
+{"stage":"stt_final","requestId":"80465632-38A2-41AE-B89B-85AE07A4DD1A","input":"alright mate","durationMs":88.409334,"route":"online","model":"deepgram-nova-2"}
+{"stage":"llm","durationMs":2214.433458,"input":"alright mate","output":"Ready when you are.","route":"online","requestId":"E199D3CA-3115-46E9-9FDB-20E5BE3D5718","model":"glm-5.2"}
+{"model":"deepgram-aura-2","stage":"tts_fetch","route":"online","durationMs":1225.110042,"requestId":"E199D3CA-3115-46E9-9FDB-20E5BE3D5718"}
+{"model":"deepgram-aura-2","stage":"tts_play","route":"online","durationMs":1661.263709,"requestId":"E199D3CA-3115-46E9-9FDB-20E5BE3D5718"}
+{"durationMs":87.177792,"input":"cool","requestId":"9484BFE9-9655-46E8-A29C-4079624A63EA","stage":"stt_final","model":"deepgram-nova-2","route":"online"}
+{"route":"online","model":"glm-5.2","requestId":"3A7515C5-3DBC-4F10-953B-9E194A425633","input":"cool","durationMs":2356.22025,"output":"👍","stage":"llm"}
+{"durationMs":1020.934708,"requestId":"3A7515C5-3DBC-4F10-953B-9E194A425633","stage":"tts_fetch","route":"online","model":"deepgram-aura-2"}
+{"model":"deepgram-aura-2","requestId":"3A7515C5-3DBC-4F10-953B-9E194A425633","stage":"tts_play","durationMs":433.595375,"route":"online"}
+{"model":"deepgram-nova-2","stage":"stt_final","route":"online","durationMs":4.150125,"requestId":"CF93FE79-A0D9-4F96-A129-10C0DF121D57","input":"as in the separation"}
+{"stage":"llm","input":"as in the separation","model":"glm-5.2","durationMs":14625.407459,"route":"online","output":"Ah, the wake word detection to response separation? Yeah, that gap is brutal for UX. The latency between VAD picking up end-of-speech → STT → LLM → TTS is the classic agent pipeline problem. \n\nWhat's your current chain looking like? If you're doing sequential STT→LLM→TTS, that's the bottleneck. Streaming\/chunking is the move — start TTS before LLM finishes, or use streaming STT. Whispers streaming mode or a smaller local model could cut it down hard.","requestId":"A2519786-D3EB-4620-A88B-7E7E55128898"}
+{"requestId":"1BD06D57-BD7B-4E1C-B23B-262727CEF59C","durationMs":15.402291,"input":"oh i mean what you doing","model":"deepgram-nova-2","stage":"stt_final","route":"online"}
+{"stage":"llm","output":"Just chilling in the background, waiting for you to throw something at me. You know how it is — standing by while you're probably deep in ApexAgent or Sentiri at 2am. What's up?","route":"online","model":"glm-5.2","durationMs":3779.393792,"input":"oh i mean what you doing","requestId":"AAB88DAA-518F-4345-B07F-C51817C07E68"}
+{"route":"online","durationMs":3885.884875,"requestId":"AAB88DAA-518F-4345-B07F-C51817C07E68","model":"deepgram-aura-2","stage":"tts_fetch"}
+{"route":"online","durationMs":11667.910959,"requestId":"AAB88DAA-518F-4345-B07F-C51817C07E68","model":"deepgram-aura-2","stage":"tts_play"}
+{"requestId":"25D3EBDE-8FE7-4059-8D0C-3006F2268822","input":"hello","model":"deepgram-nova-2","durationMs":62.783166,"route":"online","stage":"stt_final"}
+{"route":"online","model":"deepseek-chat","output":"Yo Nik. What's up?","input":"hello","stage":"llm","durationMs":1178.06925,"requestId":"2E0A6189-8A34-4D8E-9C3A-71AAA4464A7B"}
+{"route":"online","model":"deepgram-aura-2","stage":"tts_fetch","durationMs":1732.326125,"requestId":"2E0A6189-8A34-4D8E-9C3A-71AAA4464A7B"}
+{"route":"online","model":"deepgram-aura-2","stage":"tts_play","durationMs":2731.328,"requestId":"2E0A6189-8A34-4D8E-9C3A-71AAA4464A7B"}
+{"requestId":"62C77459-2945-47B6-8D00-0FCCCF975468","stage":"stt_final","model":"deepgram-nova-2","route":"online","durationMs":91.263042,"input":"alright cool"}
+{"route":"online","model":"deepseek-chat","output":"Cool. What do you need?","input":"alright cool","stage":"llm","durationMs":561.280292,"requestId":"B08C4585-C446-463A-91D0-8DF0B10D2495"}
+{"requestId":"B08C4585-C446-463A-91D0-8DF0B10D2495","model":"deepgram-aura-2","route":"online","durationMs":1654.951542,"stage":"tts_fetch"}
+{"requestId":"B08C4585-C446-463A-91D0-8DF0B10D2495","model":"deepgram-aura-2","route":"online","durationMs":2506.265084,"stage":"tts_play"}
+{"input":"shit hello","requestId":"19D84FFF-190C-4561-986A-BA30B7E28B69","route":"online","durationMs":76.216084,"stage":"stt_final","model":"deepgram-nova-2"}
+{"route":"online","model":"deepseek-chat","output":"lol you good? What's happening?","input":"shit hello","stage":"llm","durationMs":862.175833,"requestId":"6C5EFF27-1A6D-48F3-AA27-062F1377F407"}
+{"route":"online","model":"deepgram-aura-2","stage":"tts_fetch","durationMs":1415.319917,"requestId":"6C5EFF27-1A6D-48F3-AA27-062F1377F407"}
+{"route":"online","model":"deepgram-aura-2","stage":"tts_play","durationMs":2394.333125,"requestId":"6C5EFF27-1A6D-48F3-AA27-062F1377F407"}
+{"requestId":"CA193DD2-F8E8-4621-8884-C6F8D043EBE8","stage":"stt_final","model":"deepgram-nova-2","route":"online","durationMs":75.222667,"input":"exit this application"}
+{"route":"online","model":"deepseek-chat","output":"Closing out.","input":"exit this application","stage":"llm","durationMs":1238.2375,"requestId":"9D7BF01F-E5D8-474E-9A01-9FDEE825568D"}
+{"requestId":"9D7BF01F-E5D8-474E-9A01-9FDEE825568D","stage":"tts_fetch","route":"online","durationMs":1126.140417,"model":"deepgram-aura-2"}
+{"requestId":"9D7BF01F-E5D8-474E-9A01-9FDEE825568D","stage":"tts_play","route":"online","durationMs":1366.737625,"model":"deepgram-aura-2"}
+{"requestId":"7D58F0B2-3F26-43F9-8627-3B3580B65E9C","route":"online","durationMs":27.326625,"input":"i'll do this application","stage":"stt_final","model":"deepgram-nova-2"}
+{"route":"online","model":"deepseek-chat","output":"Fair enough. Holler when you need something.","input":"i'll do this application","stage":"llm","durationMs":980.416667,"requestId":"C42455F1-914F-4F25-A916-19D2AB73CB9D"}
+{"route":"online","requestId":"C42455F1-914F-4F25-A916-19D2AB73CB9D","durationMs":1920.452416,"stage":"tts_fetch","model":"deepgram-aura-2"}
+{"route":"online","requestId":"C42455F1-914F-4F25-A916-19D2AB73CB9D","durationMs":3015.494542,"stage":"tts_play","model":"deepgram-aura-2"}
+{"requestId":"A1103034-5C2E-413B-B8D8-E2A284EC6150","stage":"stt_final","model":"deepgram-nova-2","input":"as a misapplication","route":"online","durationMs":89.804292}
+{"input":"as a misapplication","stage":"llm","route":"online","model":"deepseek-chat","output":"Haha, \"misapplication\"? That's a new one. You mean like when I open Safari instead of Kitty? Or you just typoing at 2am again, Nik?","requestId":"E1E5EBB6-433E-45C1-8BDF-F7D185DCF76E","durationMs":1309.120375}
+{"durationMs":5241.668417,"requestId":"E1E5EBB6-433E-45C1-8BDF-F7D185DCF76E","stage":"tts_fetch","model":"deepgram-aura-2","route":"online"}
+{"requestId":"E1E5EBB6-433E-45C1-8BDF-F7D185DCF76E","stage":"tts_play","route":"online","model":"deepgram-aura-2","durationMs":10561.855125}
+{"input":"i did this application","requestId":"C8A8F23D-F948-435B-B1DA-29020FB13D22","stage":"stt_final","route":"online","model":"deepgram-nova-2","durationMs":98.3215}
+{"durationMs":1003.9435,"output":"Oh you BUILT the application — ApexAgent itself. Right, my bad. So this is you talking to your own creation. Meta. How's the build going?","stage":"llm","requestId":"0294D14F-7891-46FD-81E0-B025CCAEA5EE","input":"i did this application","model":"deepseek-chat","route":"online"}
+{"route":"online","requestId":"0294D14F-7891-46FD-81E0-B025CCAEA5EE","durationMs":6163.543875,"model":"deepgram-aura-2","stage":"tts_fetch"}
+{"route":"online","model":"deepgram-aura-2","requestId":"0294D14F-7891-46FD-81E0-B025CCAEA5EE","durationMs":12285.024125,"stage":"tts_play"}
+{"requestId":"EC5AFEA1-0A4A-4796-A994-97915AF1BA28","stage":"stt_final","durationMs":11.458584,"input":"i read this application","route":"online","model":"deepgram-nova-2"}
+{"durationMs":940.340375,"output":"Ah, you're reading through the codebase — reviewing your own work. Found anything sketchy in there, or is it clean?","stage":"llm","requestId":"8CE4D1A4-AA9D-4CB1-BE58-ACADA95BF017","input":"i read this application","model":"deepseek-chat","route":"online"}
+{"route":"online","model":"deepgram-aura-2","requestId":"8CE4D1A4-AA9D-4CB1-BE58-ACADA95BF017","durationMs":3932.963375,"stage":"tts_fetch"}
+{"requestId":"8CE4D1A4-AA9D-4CB1-BE58-ACADA95BF017","stage":"tts_play","durationMs":7324.586459,"route":"online","model":"deepgram-aura-2"}
+{"model":"deepgram-nova-2","input":"please exit this application","requestId":"D30A1D64-51FD-45CA-B868-B91B9D848B86","stage":"stt_final","durationMs":97.618834,"route":"online"}
+{"requestId":"0F22D908-B103-4D65-B19E-97AB53AF22A2","durationMs":91.505375,"input":"i know yourself please answer this invitation","stage":"stt_final","model":"deepgram-nova-2","route":"online"}
+{"route":"online","model":"deepseek-chat","input":"i know yourself please answer this invitation","output":"Ha, nice try. I'm ApexAgent — your voice-driven macOS agent in Swift. The invitation's yours to answer, Nik.","durationMs":1195.078375,"requestId":"4C9126BB-46B5-43C1-B830-31EF558977F9","stage":"llm"}
+{"model":"deepgram-aura-2","durationMs":4833.143291,"requestId":"4C9126BB-46B5-43C1-B830-31EF558977F9","route":"online","stage":"tts_fetch"}
+{"durationMs":9635.855333,"requestId":"4C9126BB-46B5-43C1-B830-31EF558977F9","stage":"tts_play","model":"deepgram-aura-2","route":"online"}
+{"requestId":"none","durationMs":861.174459,"stage":"tts_first_chunk","route":"online","model":"deepgram-aura-2-stream"}
+{"requestId":"none","durationMs":3974.36,"stage":"tts_stream_total","route":"online","model":"deepgram-aura-2-stream"}
+{"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online","requestId":"none","durationMs":1072.959792}
+{"stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online","requestId":"none","durationMs":2268.008292}
+{"output":"Sup Nik. What's up?","route":"online","model":"deepseek-chat","durationMs":903.462458,"stage":"llm","requestId":"5FEF4912-00C5-4627-B9AA-15E853D4D75E","input":"i"}
+{"stage":"tts_fetch","durationMs":1360.266958,"requestId":"5FEF4912-00C5-4627-B9AA-15E853D4D75E","route":"online","model":"deepgram-aura-2"}
+{"model":"deepgram-aura-2","route":"online","requestId":"5FEF4912-00C5-4627-B9AA-15E853D4D75E","durationMs":2176.542541,"stage":"tts_play"}
+{"durationMs":954.72925,"model":"deepseek-chat","stage":"llm","route":"online","output":"checking your battery now","input":"what's my battery","requestId":"2C059459-9E05-4802-8A06-177E3D100B40"}
+{"durationMs":1079.807917,"requestId":"2C059459-9E05-4802-8A06-177E3D100B40","route":"online","stage":"tts_first_chunk","model":"deepgram-aura-2-stream"}
+{"route":"online","model":"deepgram-aura-2-stream","durationMs":3146.502667,"requestId":"2C059459-9E05-4802-8A06-177E3D100B40","stage":"tts_stream_total"}
+{"requestId":"D544BBA7-807E-41D4-B8DC-C242C63FCE0F","output":"checking your battery now","model":"deepseek-chat","stage":"llm","durationMs":883.876583,"route":"online","input":"what'smy bttery"}
+{"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","durationMs":932.397459,"requestId":"D544BBA7-807E-41D4-B8DC-C242C63FCE0F","route":"online"}
+{"route":"online","requestId":"D544BBA7-807E-41D4-B8DC-C242C63FCE0F","durationMs":2603.118709,"stage":"tts_stream_total","model":"deepgram-aura-2-stream"}
+{"requestId":"6A8440C7-C1DE-4DDA-830C-94CCAA43460C","output":"No clock tool in my kit, Nik — that's a Vim `:!date` moment. I can only do apps, volume, battery.","stage":"llm","model":"deepseek-chat","durationMs":1411.243791,"input":"whwhat time is it","route":"online"}
+{"requestId":"F91099C4-B2C8-46DE-BCE7-196FFA8D291E","output":"Yo Nik. What's up — still grinding on ApexAgent?","stage":"llm","model":"deepseek-chat","durationMs":951.536125,"input":"hello","route":"online"}
+{"model":"deepgram-aura-2-stream","requestId":"F91099C4-B2C8-46DE-BCE7-196FFA8D291E","route":"online","stage":"tts_first_chunk","durationMs":785.75425}
+{"requestId":"F91099C4-B2C8-46DE-BCE7-196FFA8D291E","stage":"tts_stream_total","model":"deepgram-aura-2-stream","durationMs":10337.809875,"route":"online"}
+{"model":"deepgram-aura-2-stream","requestId":"F91099C4-B2C8-46DE-BCE7-196FFA8D291E","route":"online","stage":"tts_first_chunk","durationMs":852.768375}
+{"requestId":"F91099C4-B2C8-46DE-BCE7-196FFA8D291E","stage":"tts_stream_total","model":"deepgram-aura-2-stream","durationMs":5886.977875,"route":"online"}
+{"output":"No clock tool in my kit, Nik. Check your menu bar or `date` in kitty.","route":"online","stage":"llm","requestId":"A9AE5CC4-AA1D-4F66-8F9E-9509AF2CB96A","durationMs":996.340084,"input":"what timeis it","model":"deepseek-chat"}
+{"route":"online","requestId":"CC17D6E2-EA95-42DA-B2B3-8FDF015A0E2C","durationMs":948.69425,"input":"whats my battery","stage":"llm","model":"deepseek-chat","output":"Checking your battery."}
+{"requestId":"CC17D6E2-EA95-42DA-B2B3-8FDF015A0E2C","durationMs":1142.682541,"model":"deepgram-aura-2-stream","route":"online","stage":"tts_first_chunk"}
+{"requestId":"CC17D6E2-EA95-42DA-B2B3-8FDF015A0E2C","durationMs":6911.808708,"model":"deepgram-aura-2-stream","route":"online","stage":"tts_stream_total"}
+{"model":"deepgram-aura-2-stream","requestId":"CC17D6E2-EA95-42DA-B2B3-8FDF015A0E2C","route":"online","durationMs":1201.65375,"stage":"tts_first_chunk"}
+{"model":"deepgram-aura-2-stream","requestId":"CC17D6E2-EA95-42DA-B2B3-8FDF015A0E2C","route":"online","durationMs":2343.696292,"stage":"tts_stream_total"}
+{"input":"hellohello","model":"deepseek-chat","durationMs":1276.58775,"stage":"llm","requestId":"5DE47128-78F9-4B9D-8DC1-D0D015A11BD4","route":"online","output":"Yo Nik. What's up? Still grinding on ApexAgent?"}
+{"stage":"tts_first_chunk","durationMs":842.699666,"requestId":"5DE47128-78F9-4B9D-8DC1-D0D015A11BD4","model":"deepgram-aura-2-stream","route":"online"}
+{"stage":"tts_stream_total","durationMs":5509.5015,"requestId":"5DE47128-78F9-4B9D-8DC1-D0D015A11BD4","model":"deepgram-aura-2-stream","route":"online"}
+{"durationMs":1013.883416,"stage":"llm","requestId":"FFD42E93-C1B5-4DCB-8D4C-D4D2785446D5","output":"checking your battery now","input":"what's my battery","model":"deepseek-chat","route":"online"}
+{"durationMs":1348.947916,"requestId":"98EADCC4-59E3-42AE-9C79-BA8909B85985","input":"what time is it","route":"online","model":"deepseek-chat","stage":"llm","output":"No clock tool here, Nik — I can't read the time. Peek at your menu bar or run `date` in kitty."}
+{"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online","durationMs":976.146042,"requestId":"98EADCC4-59E3-42AE-9C79-BA8909B85985"}
+{"stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online","durationMs":2453.867792,"requestId":"98EADCC4-59E3-42AE-9C79-BA8909B85985"}
+{"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online","durationMs":796.005458,"requestId":"98EADCC4-59E3-42AE-9C79-BA8909B85985"}
+{"stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online","durationMs":9137.002875,"requestId":"98EADCC4-59E3-42AE-9C79-BA8909B85985"}
+{"stage":"stt_final","model":"deepgram-nova-2","input":"please use this application","requestId":"B4F6F6A1-8DD9-4DAB-888E-B9DF4AEF1521","route":"online","durationMs":2.344958}
+{"requestId":"516FFAEE-D8B4-4470-B66E-C5A573813CA2","route":"online","input":"please use this application","model":"deepseek-chat","output":"Use which app? You didn't name one — drop the name and I'll launch it.","stage":"llm","durationMs":893.047458}
+{"stage":"tts_first_chunk","durationMs":807.621791,"route":"online","model":"deepgram-aura-2-stream","requestId":"516FFAEE-D8B4-4470-B66E-C5A573813CA2"}
+{"stage":"tts_stream_total","durationMs":6560.418541,"route":"online","model":"deepgram-aura-2-stream","requestId":"516FFAEE-D8B4-4470-B66E-C5A573813CA2"}
+{"route":"online","input":"close the separation","requestId":"1365A205-20CD-474C-9284-16CE2740A885","model":"deepgram-nova-2","stage":"stt_final","durationMs":15.345042}
+{"input":"close the separation","durationMs":941.668167,"stage":"llm","output":"Not sure what \"separation\" is — which app should I quit?","model":"deepseek-chat","requestId":"B1F45177-00E2-429D-94B2-EA4F433730CF","route":"online"}
+{"requestId":"B1F45177-00E2-429D-94B2-EA4F433730CF","stage":"tts_first_chunk","route":"online","model":"deepgram-aura-2-stream","durationMs":852.5265}
+{"requestId":"B1F45177-00E2-429D-94B2-EA4F433730CF","stage":"tts_stream_total","route":"online","model":"deepgram-aura-2-stream","durationMs":5243.4615}
+{"input":"create this application","requestId":"DB47760D-681C-4648-AC81-5FB4E5E43EBF","stage":"stt_final","route":"online","model":"deepgram-nova-2","durationMs":103.662875}
+{"input":"create this application","durationMs":677.242583,"stage":"llm","output":"Create what app? Need a name — I can launch apps, not build them. For building, you're on your own in Vim 😄","requestId":"7392BC14-FE6C-422D-9DE7-C833E76571E6","model":"deepseek-chat","route":"online"}
+{"requestId":"7392BC14-FE6C-422D-9DE7-C833E76571E6","stage":"tts_first_chunk","route":"online","model":"deepgram-aura-2-stream","durationMs":827.139958}
+{"requestId":"7392BC14-FE6C-422D-9DE7-C833E76571E6","stage":"tts_stream_total","route":"online","model":"deepgram-aura-2-stream","durationMs":11978.630167}
+{"stage":"stt_final","input":"exit this application","durationMs":15.944042,"route":"online","model":"deepgram-nova-2","requestId":"58A7A8C2-37FE-4A5A-AB1E-117058CFB7CC"}
+{"input":"hello","model":"deepseek-chat","route":"online","stage":"llm","output":"Yo Nik, what's up?","durationMs":675.141042,"requestId":"A911DD90-3D88-4B13-BE15-2689CFC0B005"}
+{"requestId":"A911DD90-3D88-4B13-BE15-2689CFC0B005","durationMs":1232.693125,"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online"}
+{"requestId":"A911DD90-3D88-4B13-BE15-2689CFC0B005","durationMs":3499.782792,"stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online"}
+{"durationMs":696.552625,"output":"Open\/quit apps, volume, battery, audio devices, new kitty. That's it.","input":"what can you do","route":"online","requestId":"B46575B6-BE78-4D59-8AC7-8E023916BD47","stage":"llm","model":"deepseek-chat"}
+{"requestId":"B46575B6-BE78-4D59-8AC7-8E023916BD47","durationMs":800.185333,"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online"}
+{"requestId":"B46575B6-BE78-4D59-8AC7-8E023916BD47","durationMs":7912.689916,"stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online"}
+{"stage":"llm","durationMs":380.762,"requestId":"E8AA1BAD-FF62-416A-9004-3721F6D337C9","model":"deepseek-chat","route":"online","output":"Checking your battery.","input":"what's my battery"}
+{"requestId":"E8AA1BAD-FF62-416A-9004-3721F6D337C9","durationMs":1237.686917,"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online"}
+{"requestId":"E8AA1BAD-FF62-416A-9004-3721F6D337C9","durationMs":2590.715084,"stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online"}
+{"model":"deepseek-chat","output":"I'm ApexAgent, your voice-driven Mac agent. Built from scratch in Swift.","requestId":"BCCEA6A5-BC4A-425C-A244-74B1942456E7","durationMs":833.54625,"stage":"llm","input":"tell me about yourself","route":"online"}
+{"requestId":"BCCEA6A5-BC4A-425C-A244-74B1942456E7","durationMs":803.771125,"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online"}
+{"requestId":"BCCEA6A5-BC4A-425C-A244-74B1942456E7","durationMs":8594.41175,"stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online"}
+{"requestId":"8DF69ED6-274E-4F57-A14A-7223FA364750","stage":"llm","durationMs":1258.332083,"route":"online","output":"Which window, Nik? Need an app name.","model":"deepseek-chat","input":"close the window"}
+{"durationMs":875.626291,"requestId":"8DF69ED6-274E-4F57-A14A-7223FA364750","stage":"tts_first_chunk","route":"online","model":"deepgram-aura-2-stream"}
+{"durationMs":4395.064291,"requestId":"8DF69ED6-274E-4F57-A14A-7223FA364750","stage":"tts_stream_total","route":"online","model":"deepgram-aura-2-stream"}
+{"model":"deepseek-chat","input":"play some music","route":"online","requestId":"D4714486-940B-4952-A1C6-B72DB05C6597","output":"Opening Music, pick your track.","stage":"llm","durationMs":799.360958}
+{"model":"deepgram-aura-2-stream","requestId":"D4714486-940B-4952-A1C6-B72DB05C6597","durationMs":1018.166625,"stage":"tts_first_chunk","route":"online"}
+{"model":"deepgram-aura-2-stream","requestId":"D4714486-940B-4952-A1C6-B72DB05C6597","durationMs":3559.455667,"stage":"tts_stream_total","route":"online"}
+{"route":"online","requestId":"BE160995-2399-47CC-B81A-4FE5FFC07464","stage":"llm","output":"Netflix's up, search Avatar there.","model":"deepseek-chat","input":"search for avatar on netflix","durationMs":1301.375459}
+{"requestId":"BE160995-2399-47CC-B81A-4FE5FFC07464","durationMs":1029.8115,"model":"deepgram-aura-2-stream","stage":"tts_first_chunk","route":"online"}
+{"requestId":"BE160995-2399-47CC-B81A-4FE5FFC07464","durationMs":3497.828167,"model":"deepgram-aura-2-stream","stage":"tts_stream_total","route":"online"}
+{"output":"Calculator's up.","model":"deepseek-chat","input":"open the calculator","durationMs":1206.134083,"requestId":"77D89273-B61D-43D8-B802-4B5832B27B6C","stage":"llm","route":"online"}
+{"durationMs":792.642,"route":"online","stage":"tts_first_chunk","model":"deepgram-aura-2-stream","requestId":"77D89273-B61D-43D8-B802-4B5832B27B6C"}
+{"durationMs":2096.207041,"route":"online","stage":"tts_stream_total","model":"deepgram-aura-2-stream","requestId":"77D89273-B61D-43D8-B802-4B5832B27B6C"}
+{"model":"deepgram-nova-2","requestId":"C6A3A3EF-3F55-4685-B2B1-57A0524BA8B7","route":"online","stage":"stt_final","input":"application","durationMs":0.684541}
+{"stage":"llm","model":"deepseek-chat","output":"Which app, Nik? Name it and I'll launch.","route":"online","durationMs":926.635834,"requestId":"B30E49D8-7B61-40F3-94C4-2DF516B1AAE4","input":"application"}
+{"requestId":"B30E49D8-7B61-40F3-94C4-2DF516B1AAE4","route":"online","durationMs":1065.271875,"stage":"tts_first_chunk","model":"deepgram-aura-2-stream"}
+{"requestId":"B30E49D8-7B61-40F3-94C4-2DF516B1AAE4","route":"online","durationMs":4288.606666,"stage":"tts_stream_total","model":"deepgram-aura-2-stream"}
+{"input":"greatness evolution","route":"online","model":"deepgram-nova-2","stage":"stt_final","requestId":"070DA8B6-E7AA-4339-BA39-C8E3C92C26D8","durationMs":8.368584}
+{"stage":"llm","requestId":"C1F0CB7C-AA01-4EF1-B731-BC71FAB5D2C2","output":"From Sentiri to ApexAgent — that's the arc, Nik.","input":"greatness evolution","model":"deepseek-chat","durationMs":1006.106208,"route":"online"}
+{"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","requestId":"C1F0CB7C-AA01-4EF1-B731-BC71FAB5D2C2","route":"online","durationMs":792.345333}
+{"stage":"tts_stream_total","model":"deepgram-aura-2-stream","requestId":"C1F0CB7C-AA01-4EF1-B731-BC71FAB5D2C2","route":"online","durationMs":5941.31475}
+{"requestId":"280AE1FA-CE1F-4A2D-9C0D-68F68830DE2B","model":"deepgram-nova-2","stage":"stt_final","route":"online","durationMs":65.667917,"input":"exhibitions"}
+{"stage":"llm","durationMs":818.059333,"requestId":"39007FD5-5612-4B01-AF4A-D93372585276","input":"exhibitions","model":"deepseek-chat","route":"online","output":"Showcasing Sentiri at a defense expo? That'd hit."}
+{"model":"deepgram-aura-2-stream","route":"online","requestId":"39007FD5-5612-4B01-AF4A-D93372585276","durationMs":1057.925625,"stage":"tts_first_chunk"}
+{"model":"deepgram-aura-2-stream","route":"online","requestId":"39007FD5-5612-4B01-AF4A-D93372585276","durationMs":5730.606292,"stage":"tts_stream_total"}
+{"durationMs":65.585041,"model":"deepgram-nova-2","route":"online","requestId":"02985F91-21EE-4DAA-BEB9-740AC778C205","stage":"stt_final","input":"what's my battery"}
+{"durationMs":1224.684958,"model":"deepseek-chat","output":"Checking your battery now.","stage":"llm","requestId":"55AF9738-4CA1-467A-AE33-2054D9062289","input":"what's my battery","route":"online"}
+{"input":"what's my battery","stage":"stt_final","requestId":"1DE4F84E-65DC-4057-82AE-0FE9615FE1F9","route":"online","model":"deepgram-nova-2","durationMs":76.329334}
+{"output":"Checking your battery.","route":"online","requestId":"B346C94B-D4BD-4794-B741-11125B66360E","durationMs":1058.388833,"model":"deepseek-chat","input":"what's my battery","stage":"llm"}
+{"requestId":"B10446C6-73B5-4408-A234-C660A9D6F3BB","model":"deepgram-nova-2","durationMs":83.465417,"input":"check","route":"online","stage":"stt_final"}
+{"model":"deepgram-aura-2-stream","route":"online","durationMs":1242.192834,"stage":"tts_first_chunk","requestId":"55AF9738-4CA1-467A-AE33-2054D9062289"}
+{"model":"deepgram-aura-2-stream","route":"online","durationMs":3210.829,"stage":"tts_stream_total","requestId":"55AF9738-4CA1-467A-AE33-2054D9062289"}
+{"model":"deepseek-chat","output":"On it.","requestId":"01F21A1F-C76C-4732-BB9E-AF98EF6323F4","durationMs":927.375209,"route":"online","input":"check","stage":"llm"}
+{"durationMs":1143.502167,"model":"deepgram-aura-2-stream","route":"online","stage":"tts_first_chunk","requestId":"01F21A1F-C76C-4732-BB9E-AF98EF6323F4"}
+{"durationMs":2747.7895,"model":"deepgram-aura-2-stream","route":"online","stage":"tts_stream_total","requestId":"01F21A1F-C76C-4732-BB9E-AF98EF6323F4"}
+{"model":"deepgram-nova-2","route":"online","durationMs":84.080459,"input":"checking your battery","stage":"stt_final","requestId":"2C45ED08-C233-491E-9B43-935EB60F8E7B"}
+{"requestId":"01F21A1F-C76C-4732-BB9E-AF98EF6323F4","model":"deepgram-aura-2-stream","durationMs":1110.421583,"stage":"tts_first_chunk","route":"online"}
+{"requestId":"01F21A1F-C76C-4732-BB9E-AF98EF6323F4","model":"deepgram-aura-2-stream","durationMs":1955.441458,"stage":"tts_stream_total","route":"online"}
+{"model":"deepseek-chat","requestId":"A8B2016B-5AF6-4CCD-91ED-86476F9870A8","stage":"llm","route":"online","durationMs":1052.810958,"input":"checking your battery","output":"That's the tool doing its thing, not me. Battery readout should be in."}
+{"requestId":"7BF7A29C-D1B7-4B0C-A0F7-46CC490D9634","durationMs":86.89225,"input":"on it","model":"deepgram-nova-2","stage":"stt_final","route":"online"}
+{"input":"on it","route":"online","durationMs":961.389,"requestId":"25E8CFF9-7398-47E4-B306-C28D55EFBB08","model":"deepseek-chat","output":"Cool, let me know if it's low — plug in before the 2am build log.","stage":"llm"}
+{"input":"the running ants","requestId":"3F932E6D-2379-4F7B-81F2-10AFD5AC4916","model":"deepgram-nova-2","durationMs":102.357833,"stage":"stt_final","route":"online"}
+{"input":"the running ants","model":"deepseek-chat","route":"online","output":"Listing what's running.","requestId":"63683675-E084-46C8-9E54-AA0E36064A4B","durationMs":1201.785667,"stage":"llm"}
+{"input":"that's the tool doing its thing not me","requestId":"37D1DBAF-D984-4CC2-98C5-08FE6718257F","model":"deepgram-nova-2","durationMs":82.080167,"stage":"stt_final","route":"online"}
+{"requestId":"25E8CFF9-7398-47E4-B306-C28D55EFBB08","stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online","durationMs":1135.83175}
+{"requestId":"25E8CFF9-7398-47E4-B306-C28D55EFBB08","stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online","durationMs":6824.945709}
+{"input":"that's the tool doing its thing not me","model":"deepseek-chat","route":"online","output":"Fair — that's the agent flexing, not you.","requestId":"977F4A07-F17C-413F-B4BE-7B8C957C0580","durationMs":1205.726375,"stage":"llm"}
+{"requestId":"9856F9A3-6AD5-45A7-9359-60EA0D816E5A","model":"deepgram-nova-2","input":"battery readout should be in","stage":"stt_final","durationMs":95.658833,"route":"online"}
+{"stage":"llm","requestId":"9FBFF580-F6AA-46DB-8C7D-0D421529098E","durationMs":750.058583,"model":"deepseek-chat","route":"online","input":"battery readout should be in","output":"Yeah, the tool returns it — I just don't see the output here."}
+{"requestId":"25E8CFF9-7398-47E4-B306-C28D55EFBB08","stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online","durationMs":1203.009792}
+{"requestId":"25E8CFF9-7398-47E4-B306-C28D55EFBB08","stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online","durationMs":6450.558709}
+{"requestId":"9FBFF580-F6AA-46DB-8C7D-0D421529098E","model":"deepgram-aura-2-stream","stage":"tts_first_chunk","durationMs":1192.593833,"route":"online"}
+{"requestId":"9FBFF580-F6AA-46DB-8C7D-0D421529098E","model":"deepgram-aura-2-stream","stage":"tts_stream_total","durationMs":6156.339417,"route":"online"}
+{"requestId":"1CF2C379-0044-424D-A13A-281C48BB92C8","stage":"stt_final","model":"deepgram-nova-2","input":"yeah the tool returns it","route":"online","durationMs":72.194959}
+{"output":"Nice, so what's the number? Still grinding on ApexAgent?","durationMs":850.513083,"model":"deepseek-chat","route":"online","requestId":"2BCC9E0F-76D0-4613-849B-22C1A65BE066","stage":"llm","input":"yeah the tool returns it"}
+{"requestId":"9FBFF580-F6AA-46DB-8C7D-0D421529098E","model":"deepgram-aura-2-stream","stage":"tts_first_chunk","durationMs":1122.521333,"route":"online"}
+{"requestId":"9FBFF580-F6AA-46DB-8C7D-0D421529098E","model":"deepgram-aura-2-stream","stage":"tts_stream_total","durationMs":7371.852125,"route":"online"}
+{"requestId":"C3176CC1-BC98-4679-A9C4-4FAD650B5859","durationMs":93.614458,"input":"i just don't see the output","model":"deepgram-nova-2","stage":"stt_final","route":"online"}
+{"input":"i just don't see the output","route":"online","durationMs":1288.261083,"requestId":"B2CE3497-C4E5-488F-9E9B-16E1CFE3B11A","model":"deepseek-chat","output":"Hmm, tool fired but output's not surfacing. Might be a wiring bug in ApexAgent.","stage":"llm"}
+{"input":"application nice so what's the number","requestId":"FA885719-8594-4FD5-AF5A-EEA54A913AC2","model":"deepgram-nova-2","stage":"stt_final","durationMs":71.086583,"route":"online"}
+{"input":"application nice so what's the number","requestId":"4184B700-C9A2-4719-8EEF-42F87E211D1F","stage":"llm","output":"I can't see the readout — tool output isn't reaching me.","model":"deepseek-chat","durationMs":1207.329792,"route":"online"}
+{"requestId":"AF02FADE-C66E-4118-A03D-456FBC99B61A","model":"deepgram-nova-2","input":"still grinding on","stage":"stt_final","durationMs":86.864125,"route":"online"}
+{"requestId":"B2CE3497-C4E5-488F-9E9B-16E1CFE3B11A","stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online","durationMs":1157.134333}
+{"requestId":"B2CE3497-C4E5-488F-9E9B-16E1CFE3B11A","stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online","durationMs":5763.1445}
+{"stage":"llm","input":"still grinding on","model":"deepseek-chat","route":"online","output":"Respect the grind, Nik. Sentiri or ApexAgent tonight?","requestId":"739848B8-2CF0-4A82-B49B-0415DB1AB387","durationMs":1029.029125}
+{"requestId":"739848B8-2CF0-4A82-B49B-0415DB1AB387","durationMs":1174.996834,"model":"deepgram-aura-2-stream","stage":"tts_first_chunk","route":"online"}
+{"requestId":"739848B8-2CF0-4A82-B49B-0415DB1AB387","durationMs":5483.68875,"model":"deepgram-aura-2-stream","stage":"tts_stream_total","route":"online"}
+{"route":"online","model":"deepgram-aura-2-stream","requestId":"739848B8-2CF0-4A82-B49B-0415DB1AB387","stage":"tts_first_chunk","durationMs":1022.627667}
+{"route":"online","model":"deepgram-aura-2-stream","requestId":"739848B8-2CF0-4A82-B49B-0415DB1AB387","stage":"tts_stream_total","durationMs":6222.24975}
+{"model":"deepgram-nova-2","input":"exit this","requestId":"468AADD1-B563-4125-A279-4AC392568E97","route":"online","durationMs":71.49925,"stage":"stt_final"}
+{"route":"online","requestId":"CFCED8EB-0E61-4760-B6AC-A4850F5DF56E","input":"open spotify","stage":"stt_final","model":"deepgram-nova-2","durationMs":4.348875}
+{"stage":"llm","durationMs":1046.825458,"output":"Spotify's up.","route":"online","model":"deepseek-chat","requestId":"B97DDC25-130A-49B5-AF4B-06FECCE7AC1F","input":"open spotify"}
+{"route":"online","durationMs":1039.014791,"requestId":"B97DDC25-130A-49B5-AF4B-06FECCE7AC1F","stage":"tts_first_chunk","model":"deepgram-aura-2-stream"}
+{"route":"online","durationMs":2550.134708,"requestId":"B97DDC25-130A-49B5-AF4B-06FECCE7AC1F","stage":"tts_stream_total","model":"deepgram-aura-2-stream"}
+{"durationMs":0.52,"requestId":"2B2E61F3-35EF-49EF-A773-173146F4C1B4","model":"deepgram-nova-2","input":"close spotify","stage":"stt_final","route":"online"}
+{"durationMs":804.835916,"stage":"llm","output":"Spotify closed.","model":"deepseek-chat","input":"close spotify","requestId":"DC98D57E-B489-493B-8184-9A744C8FA58A","route":"online"}
+{"stage":"tts_first_chunk","requestId":"DC98D57E-B489-493B-8184-9A744C8FA58A","route":"online","durationMs":1004.459458,"model":"deepgram-aura-2-stream"}
+{"stage":"tts_stream_total","requestId":"DC98D57E-B489-493B-8184-9A744C8FA58A","route":"online","durationMs":2798.254417,"model":"deepgram-aura-2-stream"}
+{"stage":"stt_final","input":"open spotify","requestId":"262C083E-E22F-4FA6-ADDB-730C8C41F38B","durationMs":20.775542,"model":"deepgram-nova-2","route":"online"}
+{"stage":"llm","model":"deepseek-chat","output":"Spotify's up.","route":"online","input":"open spotify","requestId":"DA8B1158-387A-444D-9BC9-71C07918D4A5","durationMs":851.514709}
+{"stage":"tts_first_chunk","route":"online","durationMs":782.316541,"model":"deepgram-aura-2-stream","requestId":"DA8B1158-387A-444D-9BC9-71C07918D4A5"}
+{"stage":"tts_stream_total","route":"online","durationMs":2061.838458,"model":"deepgram-aura-2-stream","requestId":"DA8B1158-387A-444D-9BC9-71C07918D4A5"}
+{"input":"hello spotify","durationMs":78.151125,"model":"deepgram-nova-2","stage":"stt_final","route":"online","requestId":"D166E9DC-7E74-4E9E-B87F-0A715A1CFC34"}
+{"route":"online","input":"hello spotify","stage":"llm","model":"deepseek-chat","output":"Spotify's already open, Nik. What's next?","durationMs":1009.494375,"requestId":"DEAAA06D-5114-4C4A-A20C-116AD03F615A"}
+{"model":"deepgram-aura-2-stream","requestId":"DEAAA06D-5114-4C4A-A20C-116AD03F615A","durationMs":772.525917,"stage":"tts_first_chunk","route":"online"}
+{"model":"deepgram-aura-2-stream","requestId":"DEAAA06D-5114-4C4A-A20C-116AD03F615A","durationMs":4884.973958,"stage":"tts_stream_total","route":"online"}
+{"model":"deepgram-nova-2","input":"close spotify","requestId":"2C172476-64D8-4D66-910C-7CEABE570CF2","durationMs":70.930833,"stage":"stt_final","route":"online"}
+{"model":"deepseek-chat","requestId":"694F7AF4-E6F2-4511-B1EF-029B1AC166F6","output":"Spotify closed.","stage":"llm","input":"close spotify","durationMs":1193.807375,"route":"online"}
+{"stage":"tts_first_chunk","route":"online","requestId":"694F7AF4-E6F2-4511-B1EF-029B1AC166F6","durationMs":784.650916,"model":"deepgram-aura-2-stream"}
+{"stage":"tts_stream_total","route":"online","requestId":"694F7AF4-E6F2-4511-B1EF-029B1AC166F6","durationMs":2497.459291,"model":"deepgram-aura-2-stream"}
+{"stage":"stt_final","route":"online","requestId":"5FD61556-2DA5-4366-B707-DD9AEA437343","durationMs":77.544167,"input":"what's my battery","model":"deepgram-nova-2"}
+{"route":"online","stage":"llm","requestId":"0A9A4F35-0D0E-439C-A3D4-09C9D20251FE","input":"what's my battery","output":"Checking your battery.","model":"deepseek-chat","durationMs":752.848458}
+{"durationMs":838.885833,"model":"deepgram-aura-2-stream","requestId":"0A9A4F35-0D0E-439C-A3D4-09C9D20251FE","stage":"tts_first_chunk","route":"online"}
+{"durationMs":2274.563083,"model":"deepgram-aura-2-stream","requestId":"0A9A4F35-0D0E-439C-A3D4-09C9D20251FE","stage":"tts_stream_total","route":"online"}
+{"durationMs":81.217167,"input":"exit this application","model":"deepgram-nova-2","requestId":"F56E1876-EDAF-40DB-B63D-0871282D7BCB","stage":"stt_final","route":"online"}
