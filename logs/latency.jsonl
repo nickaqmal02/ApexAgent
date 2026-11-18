@@ -252,3 +252,72 @@
 {"durationMs":838.885833,"model":"deepgram-aura-2-stream","requestId":"0A9A4F35-0D0E-439C-A3D4-09C9D20251FE","stage":"tts_first_chunk","route":"online"}
 {"durationMs":2274.563083,"model":"deepgram-aura-2-stream","requestId":"0A9A4F35-0D0E-439C-A3D4-09C9D20251FE","stage":"tts_stream_total","route":"online"}
 {"durationMs":81.217167,"input":"exit this application","model":"deepgram-nova-2","requestId":"F56E1876-EDAF-40DB-B63D-0871282D7BCB","stage":"stt_final","route":"online"}
+{"model":"apple-ondevice","requestId":"ACE90690-F100-46F4-814E-1CC29EB204C4","stage":"stt_final","output":"voice_processing=off","input":"What's my battery","durationMs":903.033375,"route":"offline"}
+{"requestId":"D73BF8A2-A109-40DE-BF0E-3B521F4EBA39","model":"deepseek-chat","stage":"llm","input":"What's my battery","output":"Checking your battery now.","durationMs":1094.15625,"route":"online"}
+{"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online","requestId":"D73BF8A2-A109-40DE-BF0E-3B521F4EBA39","durationMs":834.410209}
+{"stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online","requestId":"D73BF8A2-A109-40DE-BF0E-3B521F4EBA39","durationMs":2271.204584}
+{"output":"voice_processing=off","durationMs":999.687417,"input":"List the running apps","stage":"stt_final","model":"apple-ondevice","route":"offline","requestId":"B9739204-54CB-4228-B03F-C1BB050684D1"}
+{"output":"Here's what's running.","durationMs":812.363042,"input":"List the running apps","stage":"llm","model":"deepseek-chat","route":"online","requestId":"EDB27BA1-496E-4218-847D-815C88085C02"}
+{"output":"voice_processing=off","durationMs":1094.678417,"input":"Open the calculator","stage":"stt_final","model":"apple-ondevice","route":"offline","requestId":"02C3901E-94E3-4787-BA47-DCFC2346B922"}
+{"output":"Calculator's up.","durationMs":948.124916,"input":"Open the calculator","stage":"llm","model":"deepseek-chat","route":"online","requestId":"E1E623D7-2466-4A74-9024-5226FFFCDCE6"}
+{"requestId":"E1E623D7-2466-4A74-9024-5226FFFCDCE6","route":"online","stage":"tts_first_chunk","model":"deepgram-aura-2-stream","durationMs":1207.228125}
+{"requestId":"E1E623D7-2466-4A74-9024-5226FFFCDCE6","route":"online","stage":"tts_stream_total","model":"deepgram-aura-2-stream","durationMs":2698.198709}
+{"output":"voice_processing=off","durationMs":953.937917,"requestId":"D658EFB1-108F-4E4C-8E77-8325A507C0F7","route":"offline","input":"This application","stage":"stt_final","model":"apple-ondevice"}
+{"output":"Which app, Nik? Name it and I'll open it.","durationMs":711.131375,"requestId":"388677A6-A422-417D-A9BE-4B9C82E317D0","route":"online","input":"This application","stage":"llm","model":"deepseek-chat"}
+{"stage":"tts_first_chunk","requestId":"388677A6-A422-417D-A9BE-4B9C82E317D0","route":"online","model":"deepgram-aura-2-stream","durationMs":1157.423916}
+{"stage":"tts_stream_total","requestId":"388677A6-A422-417D-A9BE-4B9C82E317D0","route":"online","model":"deepgram-aura-2-stream","durationMs":5514.740125}
+{"stage":"stt_final","model":"apple-ondevice","route":"offline","durationMs":908.302458,"requestId":"80C86B1B-3FFD-4AE3-8ABD-C20B69CF9726","input":"Exit this application","output":"voice_processing=off"}
+{"requestId":"FE564D26-BB7F-47E1-8FD4-BBDD2B219D91","stage":"stt_final","durationMs":1002.193041,"route":"offline","output":"voice_processing=off","model":"apple-ondevice","input":"Open Spotify"}
+{"route":"online","output":"Spotify's up.","durationMs":1005.459,"requestId":"15B3B68C-5B20-410F-881B-07A8AA135DE0","model":"deepseek-chat","stage":"llm","input":"Open Spotify"}
+{"requestId":"15B3B68C-5B20-410F-881B-07A8AA135DE0","durationMs":1236.196959,"stage":"tts_first_chunk","route":"online","model":"deepgram-aura-2-stream"}
+{"requestId":"15B3B68C-5B20-410F-881B-07A8AA135DE0","durationMs":2646.582334,"stage":"tts_stream_total","route":"online","model":"deepgram-aura-2-stream"}
+{"model":"apple-ondevice","requestId":"03B48283-5199-4C87-A1E1-3D4E252A1773","route":"offline","input":"Close Spotify","output":"voice_processing=off","stage":"stt_final","durationMs":1002.229917}
+{"model":"deepseek-chat","requestId":"8ABFFA16-FE19-49CC-AE1F-68C9BC5175A5","route":"online","input":"Close Spotify","output":"Spotify closed.","stage":"llm","durationMs":542.038917}
+{"requestId":"8ABFFA16-FE19-49CC-AE1F-68C9BC5175A5","stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online","durationMs":796.802708}
+{"requestId":"8ABFFA16-FE19-49CC-AE1F-68C9BC5175A5","stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online","durationMs":2229.074792}
+{"input":"What's my battery","durationMs":1001.421666,"output":"voice_processing=off","model":"apple-ondevice","route":"offline","stage":"stt_final","requestId":"43883E64-A3C6-4A94-9C8F-8FF219AE9667"}
+{"input":"What's my battery","durationMs":1144.90925,"output":"Checking your battery.","model":"deepseek-chat","route":"online","stage":"llm","requestId":"C9D08F3A-72FC-47D0-941E-CFD2F80821F5"}
+{"route":"online","model":"deepgram-aura-2-stream","durationMs":815.422791,"requestId":"C9D08F3A-72FC-47D0-941E-CFD2F80821F5","stage":"tts_first_chunk"}
+{"route":"online","model":"deepgram-aura-2-stream","durationMs":2088.006083,"requestId":"C9D08F3A-72FC-47D0-941E-CFD2F80821F5","stage":"tts_stream_total"}
+{"model":"apple-ondevice","requestId":"B36381B3-ACE3-44CE-BB7B-EC3D4777A4C5","route":"offline","input":"Open the calculator","output":"voice_processing=off","stage":"stt_final","durationMs":1001.359291}
+{"model":"deepseek-chat","requestId":"3D331E91-E5E3-4B8A-85D8-AF39F3080898","route":"online","input":"Open the calculator","output":"Calculator's up.","stage":"llm","durationMs":785.791541}
+{"stage":"tts_first_chunk","route":"online","model":"deepgram-aura-2-stream","durationMs":821.460792,"requestId":"3D331E91-E5E3-4B8A-85D8-AF39F3080898"}
+{"stage":"tts_stream_total","route":"online","model":"deepgram-aura-2-stream","durationMs":2092.035417,"requestId":"3D331E91-E5E3-4B8A-85D8-AF39F3080898"}
+{"input":"Close the calculator","durationMs":902.213792,"output":"voice_processing=off","model":"apple-ondevice","route":"offline","stage":"stt_final","requestId":"94157391-84FD-45AE-B23F-044E4C7986F9"}
+{"input":"Close the calculator","durationMs":883.152625,"output":"Calculator closed.","model":"deepseek-chat","route":"online","stage":"llm","requestId":"7A5927C8-2D22-433A-B495-B2128F2D8B4F"}
+{"stage":"tts_first_chunk","route":"online","model":"deepgram-aura-2-stream","durationMs":858.362458,"requestId":"7A5927C8-2D22-433A-B495-B2128F2D8B4F"}
+{"stage":"tts_stream_total","route":"online","model":"deepgram-aura-2-stream","durationMs":2452.982583,"requestId":"7A5927C8-2D22-433A-B495-B2128F2D8B4F"}
+{"model":"apple-ondevice","requestId":"47695FD3-7159-4E47-951D-5CACA3A0F3CC","route":"offline","input":"Exit this application","output":"voice_processing=off","stage":"stt_final","durationMs":1002.173208}
+{"route":"online","model":"deepgram-nova-2","durationMs":-1,"output":"voice_processing=off","requestId":"32988986-55AF-4502-9327-57B13852D7B1","stage":"stt_final","input":"what's my battery"}
+{"requestId":"80AF1D2C-893B-4DEC-A99B-A05579242AD1","durationMs":722.500125,"model":"deepseek-chat","stage":"llm","input":"what's my battery","route":"online","output":"Checking your battery now."}
+{"stage":"tts_first_chunk","route":"online","model":"deepgram-aura-2-stream","durationMs":828.868042,"requestId":"80AF1D2C-893B-4DEC-A99B-A05579242AD1"}
+{"stage":"tts_stream_total","route":"online","model":"deepgram-aura-2-stream","durationMs":2773.227209,"requestId":"80AF1D2C-893B-4DEC-A99B-A05579242AD1"}
+{"stage":"stt_final","durationMs":-1,"requestId":"095BE5A2-4120-4C10-AE8C-A7F3DC1C4C9A","output":"voice_processing=off","input":"list the running apps","route":"online","model":"deepgram-nova-2"}
+{"stage":"llm","durationMs":838.675958,"requestId":"CB8537A1-F17E-4EE9-B405-4EB71CADBB0C","output":"Here's what's running.","input":"list the running apps","route":"online","model":"deepseek-chat"}
+{"stage":"stt_final","requestId":"8C733982-9449-4775-B871-17BAF63DC6EA","durationMs":-1,"output":"voice_processing=off","input":"open the calculator","route":"online","model":"deepgram-nova-2"}
+{"stage":"llm","requestId":"D9542FC9-9917-446F-8683-4276B8B697B7","durationMs":997.37275,"output":"Calculator's up.","input":"open the calculator","route":"online","model":"deepseek-chat"}
+{"model":"deepgram-aura-2-stream","route":"online","durationMs":884.059708,"requestId":"D9542FC9-9917-446F-8683-4276B8B697B7","stage":"tts_first_chunk"}
+{"model":"deepgram-aura-2-stream","route":"online","durationMs":2158.392125,"requestId":"D9542FC9-9917-446F-8683-4276B8B697B7","stage":"tts_stream_total"}
+{"model":"deepgram-nova-2","output":"voice_processing=off","durationMs":-1,"requestId":"74517D21-5F87-49F5-A091-D43BD309C3E1","stage":"stt_final","input":"exit this application","route":"online"}
+{"model":"deepgram-nova-2","durationMs":-1,"output":"voice_processing=off","route":"online","input":"what's my battery","stage":"stt_final","tsMs":1794968738107.3342,"requestId":"C0C9179F-5A89-4DAB-944B-AEF2136F47F3"}
+{"input":"what's my battery","durationMs":883.54175,"stage":"llm","route":"online","requestId":"7B7BD1A6-F3B5-4E12-A992-36A1A3A0B1A7","tsMs":1794968738990.998,"model":"deepseek-chat","output":"Checking your battery now."}
+{"model":"deepgram-aura-2-stream","durationMs":1015.403209,"route":"online","stage":"tts_first_chunk","requestId":"7B7BD1A6-F3B5-4E12-A992-36A1A3A0B1A7","tsMs":1794968742010.455}
+{"model":"deepgram-aura-2-stream","durationMs":2965.685459,"route":"online","stage":"tts_stream_total","requestId":"7B7BD1A6-F3B5-4E12-A992-36A1A3A0B1A7","tsMs":1794968742010.463}
+{"tsMs":1794968750906.7979,"durationMs":-1,"stage":"stt_final","requestId":"6EF4D924-4B40-42AB-86D6-E75341437BB8","input":"list the running apps","route":"online","model":"deepgram-nova-2","output":"voice_processing=off"}
+{"model":"deepseek-chat","requestId":"DCF936A3-87A0-49F7-86AC-2C5BA114E461","output":"Here's what's running.","durationMs":1010.183667,"stage":"llm","input":"list the running apps","route":"online","tsMs":1794968751917.0452}
+{"tsMs":1794968761904.258,"durationMs":-1,"stage":"stt_final","requestId":"58B3F4EF-8972-480F-A1F3-BD99ACE9050D","input":"open the calculator","route":"online","model":"deepgram-nova-2","output":"voice_processing=off"}
+{"model":"deepseek-chat","requestId":"84730DAF-6A5D-4C0C-A18D-BCA8BBD18990","output":"Calculator's up.","durationMs":1042.746875,"stage":"llm","input":"open the calculator","route":"online","tsMs":1794968762947.0571}
+{"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","tsMs":1794968765626.891,"route":"online","durationMs":1114.121,"requestId":"84730DAF-6A5D-4C0C-A18D-BCA8BBD18990"}
+{"stage":"tts_stream_total","model":"deepgram-aura-2-stream","tsMs":1794968765626.899,"route":"online","durationMs":2581.185625,"requestId":"84730DAF-6A5D-4C0C-A18D-BCA8BBD18990"}
+{"tsMs":1794968774305.386,"durationMs":-1,"stage":"stt_final","requestId":"95EB4F2D-7484-4435-98B0-4C1C7FD5927A","input":"exit this application","model":"deepgram-nova-2","route":"online","output":"voice_processing=off"}
+{"output":"voice_processing=off","input":"What's my battery","requestId":"9B857685-1651-4004-B2BC-2EEF5BF1CC6D","durationMs":1015.988167,"route":"offline","tsMs":1794968798064.954,"model":"apple-ondevice","stage":"stt_final"}
+{"input":"What's my battery","route":"online","output":"Checking your battery now.","model":"deepseek-chat","requestId":"5521CB20-AA78-46D4-9EBF-C7840D747439","stage":"llm","durationMs":1204.684041,"tsMs":1794968799269.763}
+{"durationMs":1070.170959,"requestId":"5521CB20-AA78-46D4-9EBF-C7840D747439","model":"deepgram-aura-2-stream","stage":"tts_first_chunk","tsMs":1794968802223.6172,"route":"online"}
+{"durationMs":2901.264584,"requestId":"5521CB20-AA78-46D4-9EBF-C7840D747439","model":"deepgram-aura-2-stream","stage":"tts_stream_total","tsMs":1794968802223.628,"route":"online"}
+{"stage":"stt_final","durationMs":914.50525,"output":"voice_processing=off","tsMs":1794968810263.531,"input":"List the running apps","model":"apple-ondevice","requestId":"196F05B6-3781-4646-AC02-C79FB2FE25A8","route":"offline"}
+{"tsMs":1794968811087.773,"input":"List the running apps","model":"deepseek-chat","route":"online","durationMs":824.197584,"requestId":"FC12C3B4-A8B2-4D99-9B47-5400E595A441","stage":"llm","output":"Here's what's running."}
+{"tsMs":1794968822062.2393,"input":"Open the calculator","model":"apple-ondevice","route":"offline","stage":"stt_final","requestId":"F2DAC233-883F-447D-97F9-0AF1E3368A7A","durationMs":1015.509833,"output":"voice_processing=off"}
+{"tsMs":1794968823067.681,"input":"Open the calculator","model":"deepseek-chat","route":"online","stage":"llm","requestId":"D4245BD7-1268-48DD-9774-5CAFF2564DC9","durationMs":1005.305291,"output":"Calculator's up."}
+{"route":"online","requestId":"D4245BD7-1268-48DD-9774-5CAFF2564DC9","stage":"tts_first_chunk","durationMs":1184.902834,"tsMs":1794968825818.611,"model":"deepgram-aura-2-stream"}
+{"route":"online","requestId":"D4245BD7-1268-48DD-9774-5CAFF2564DC9","stage":"tts_stream_total","durationMs":2653.574667,"tsMs":1794968825818.617,"model":"deepgram-aura-2-stream"}
+{"tsMs":1794968833662.5828,"input":"Exit this application","model":"apple-ondevice","route":"offline","requestId":"20A0B23D-A1B7-454F-83AB-B3DBAF64A4F3","stage":"stt_final","durationMs":910.6855,"output":"voice_processing=off"}

@@ -8,6 +8,8 @@ struct TraceRecord: Codable {
       let durationMs: Double  // measured by the caller
       let input: String?      // user text
       let output: String?     // raw model content, before JSON parsing
+      // Wall-clock time the record was created, in ms since 1970. Has a default, so existing calls don't change.
+      var tsMs: Double = Date().timeIntervalSince1970 * 1000
 }
 
 let traceQueue: DispatchQueue = DispatchQueue(label: "com.apexagent.trace")
