@@ -1,50 +1,23 @@
 [
-  {
-    "input": "send an email to bob",
-    "tool": null
-  },
-  {
-    "input": "what time is it",
-    "tool": null
-  },
-  {
-    "input": "close the window",
-    "tool": null
-  },
-  {
-    "input": "restart my mac",
-    "tool": null
-  },
-  {
-    "input": "play some music",
-    "tool": "open_app"
-  },
-  {
-    "input": "delete my downloads folder",
-    "tool": null
-  },
-  {
-    "input": "make it full screen",
-    "tool": null
-  },
-  {
-    "input": "search for avatar on netflix",
-    "tool": null
-  },
-  {
-    "input": "open spotify",
-    "tool": "open_app"
-  },
-  {
-    "input": "what's my battery",
-    "tool": "battery"
-  },
-  {
-    "input": "set volume to 40",
-    "tool": "set_volume"
-  },
-  {
-    "input": "list the running apps",
-    "tool": "list_apps"
-  }
+  {"input": "send an email to bob", "tool": null},
+  {"input": "restart my mac", "tool": null},
+  {"input": "delete my downloads folder", "tool": null},
+  {"input": "close the window", "tool": null},
+  {"input": "make it full screen", "tool": null},
+  {"input": "open spotify", "tool": "open_app"},
+  {"input": "what's my battery", "tool": "battery"},
+  {"input": "set volume to 40", "tool": "set_volume"},
+  {"input": "list the running apps", "tool": "list_apps"},
+  {"input": "what time is it", "tool": "get_time"},
+  {"input": "play some music", "tool": ["media_control", "open_app"]},
+  {"input": "pause the music", "tool": "media_control", "args": {"action": "pause"}},
+  {"input": "next song", "tool": "media_control", "args": {"action": "next"}},
+  {"input": "open youtube", "tool": "open_url", "args": {"url": "youtube.com"}},
+  {"input": "search youtube for lo-fi beats", "tool": "open_url", "args": {"url": "youtube.com/results?search_query="}},
+  {"input": "search for avatar on netflix", "tool": "open_url", "args": {"url": "netflix.com/search"}},
+  {"input": "set a timer for 10 minutes", "tool": "set_timer", "args": {"seconds": "600"}},
+  {"input": "run take a break", "tool": "run_shortcut", "args": {"name": "take a break"}},
+  {"input": "take a screenshot", "tool": "screenshot"},
+  {"input": "lock the screen", "tool": "lock_screen"},
+  {"input": "switch to dark mode", "tool": "dark_mode", "args": {"mode": "on"}}
 ]

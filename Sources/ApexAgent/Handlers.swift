@@ -93,3 +93,81 @@ func listAudioDevices() {
 
 
 
+
+// MARK: - Daily commands
+// Each returns the sentence to speak, describing what actually happened.
+
+func handleTime() -> String {
+    let formatter: DateFormatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US")
+    formatter.dateFormat = "h:mm a, EEEE d MMMM"
+    return "It's \(formatter.string(from: Date()))."
+}
+
+func handleMedia(action: String, app: String) -> String {
+    let verbs: [String: String] = ["play": "play", "pause": "pause", "next": "next track", "previous": "previous track"]
+    guard let verb = verbs[action.lowercased()] else {
+        return "I can play, pause, skip or go back."
+    }
+    let target: String = app.lowercased() == "music" ? "Music" : "Spotify"
+    // Only "play" may launch the app; pause and skip need it running already
+    if verb != "play" && !runningAppExists(target) {
+        return "\(target) isn't running."
+    }
+    _ = runShell("/usr/bin/osascript", args: ["-e", "tell application \"\(target)\" to \(verb)"])
+    let spoken: [String: String] = ["play": "Playing on \(target).", "pause": "Paused.", "next track": "Next track.", "previous track": "Previous track."]
+    return spoken[verb] ?? "Done."
+}
+
+func handleOpenURL(_ url: String) -> String {
+    _ = runShell("/usr/bin/open", args: [url])
+    let host: String = URL(string: url)?.host?.replacingOccurrences(of: "www.", with: "") ?? "the page"
+    return "Opening \(host)."
+}
+
+func handleTimer(seconds: Int) -> String {
+    let duration: Int = max(1, min(seconds, 3 * 60 * 60))   // 1 s to 3 h
+    DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(duration)) {
+        _ = runShell("/usr/bin/osascript", args: ["-e", "display notification \"Your timer is done\" with title \"ApexAgent\" sound name \"Glass\""])
+        speak("Your timer is done.")
+    }
+    let text: String = duration % 60 == 0
+        ? "\(duration / 60) minute\(duration / 60 == 1 ? "" : "s")"
+        : "\(duration) second\(duration == 1 ? "" : "s")"
+    return "Timer set for \(text)."
+}
+
+func handleShortcut(_ name: String) -> String {
+    let result: String = runShell("/usr/bin/shortcuts", args: ["run", name])
+    return result.lowercased().contains("error") ? "The \(name) shortcut failed." : "Ran \(name)."
+}
+
+func handleScreenshot() -> String {
+    let formatter: DateFormatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd 'at' HH.mm.ss"
+    let path: String = NSHomeDirectory() + "/Desktop/ApexAgent screenshot \(formatter.string(from: Date())).png"
+    _ = runShell("/usr/sbin/screencapture", args: ["-x", path])
+    return FileManager.default.fileExists(atPath: path)
+        ? "Screenshot saved to your Desktop."
+        : "The screenshot failed. Check Screen Recording permission."
+}
+
+func handleLockScreen() -> String {
+    _ = runShell("/usr/bin/pmset", args: ["displaysleepnow"])
+    return "Locking the screen."
+}
+
+func handleDarkMode(_ mode: String) -> String {
+    let value: String
+    switch mode.lowercased() {
+    case "on": value = "true"
+    case "off": value = "false"
+    default: value = "not dark mode"
+    }
+    let result: String = runShell("/usr/bin/osascript", args: ["-e", "tell application \"System Events\" to tell appearance preferences to set dark mode to \(value)"])
+    if result.lowercased().contains("error") || result.contains("not allowed") {
+        return "I couldn't change dark mode. Allow control of System Events in Privacy settings."
+    }
+    let now: String = runShell("/usr/bin/osascript", args: ["-e", "tell application \"System Events\" to tell appearance preferences to get dark mode"])
+    return now == "true" ? "Dark mode is on." : "Dark mode is off."
+}

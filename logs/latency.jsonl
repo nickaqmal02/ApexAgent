@@ -321,3 +321,83 @@
 {"route":"online","requestId":"D4245BD7-1268-48DD-9774-5CAFF2564DC9","stage":"tts_first_chunk","durationMs":1184.902834,"tsMs":1794968825818.611,"model":"deepgram-aura-2-stream"}
 {"route":"online","requestId":"D4245BD7-1268-48DD-9774-5CAFF2564DC9","stage":"tts_stream_total","durationMs":2653.574667,"tsMs":1794968825818.617,"model":"deepgram-aura-2-stream"}
 {"tsMs":1794968833662.5828,"input":"Exit this application","model":"apple-ondevice","route":"offline","requestId":"20A0B23D-A1B7-454F-83AB-B3DBAF64A4F3","stage":"stt_final","durationMs":910.6855,"output":"voice_processing=off"}
+{"stage":"stt_final","output":"voice_processing=off","requestId":"57E82633-547D-4AD9-88FC-64BB660FF457","route":"online","model":"deepgram-nova-2","durationMs":-1,"tsMs":1794969419047.659,"input":"open spotify"}
+{"durationMs":1215.70225,"model":"deepseek-chat","output":"Spotify's up.","tsMs":1794969420263.886,"requestId":"3B00868D-9807-48FD-9289-CE76CBEDEFEE","input":"open spotify","route":"online","stage":"llm"}
+{"requestId":"3B00868D-9807-48FD-9289-CE76CBEDEFEE","stage":"tts_first_chunk","model":"deepgram-aura-2-stream","durationMs":1011.297542,"tsMs":1794969423236.073,"route":"online"}
+{"requestId":"3B00868D-9807-48FD-9289-CE76CBEDEFEE","stage":"tts_stream_total","model":"deepgram-aura-2-stream","durationMs":2847.398292,"tsMs":1794969423236.082,"route":"online"}
+{"route":"online","stage":"stt_final","model":"deepgram-nova-2","input":"close spotify","durationMs":-1,"tsMs":1794969427226.8228,"requestId":"8D11E1BB-5568-4945-B3CA-E45935C75379","output":"voice_processing=off"}
+{"route":"online","stage":"llm","model":"deepseek-chat","durationMs":953.040042,"input":"close spotify","tsMs":1794969428179.9788,"requestId":"1B5AEB52-9EE8-467E-8200-915C02EF06A2","output":"Spotify closed."}
+{"requestId":"1B5AEB52-9EE8-467E-8200-915C02EF06A2","stage":"tts_first_chunk","model":"deepgram-aura-2-stream","durationMs":1031.167541,"tsMs":1794969431066.603,"route":"online"}
+{"requestId":"1B5AEB52-9EE8-467E-8200-915C02EF06A2","stage":"tts_stream_total","model":"deepgram-aura-2-stream","durationMs":2702.088291,"tsMs":1794969431066.612,"route":"online"}
+{"input":"what's my battery","requestId":"144894AC-E63C-4F88-9E8E-4FE26310A6D2","stage":"stt_final","route":"online","output":"voice_processing=off","tsMs":1794969433641.327,"model":"deepgram-nova-2","durationMs":-1}
+{"input":"what's my battery","requestId":"7A9DD2B4-DD97-4B17-B447-6E49358EEE89","stage":"llm","route":"online","output":"Checking your battery.","tsMs":1794969434342.131,"model":"deepseek-chat","durationMs":700.728459}
+{"requestId":"7A9DD2B4-DD97-4B17-B447-6E49358EEE89","stage":"tts_first_chunk","model":"deepgram-aura-2-stream","durationMs":1078.418917,"tsMs":1794969436761.833,"route":"online"}
+{"requestId":"7A9DD2B4-DD97-4B17-B447-6E49358EEE89","stage":"tts_stream_total","model":"deepgram-aura-2-stream","durationMs":2388.583125,"tsMs":1794969436761.8398,"route":"online"}
+{"route":"online","stage":"stt_final","input":"exit this application","output":"voice_processing=off","durationMs":-1,"model":"deepgram-nova-2","tsMs":1794969439879.802,"requestId":"F242E3CF-EFDB-4190-8AAE-5EDC513BFDAA"}
+{"tsMs":1794969717437.8892,"input":"what time is it","route":"online","stage":"llm","requestId":"B2F2F8B6-FB68-4190-989B-887E44E7275C","output":"Checking the clock.","model":"deepseek-chat","durationMs":1045.315834}
+{"requestId":"F2BFDBF7-1AD1-4ABB-AC10-C1E25E416BAC","tsMs":1794969723750.823,"route":"online","input":"open youtube","model":"deepseek-chat","stage":"llm","output":"YouTube's up.","durationMs":816.137125}
+{"route":"online","tsMs":1794969725249.675,"requestId":"F2BFDBF7-1AD1-4ABB-AC10-C1E25E416BAC","durationMs":1086.28825,"model":"deepgram-aura-2-stream","stage":"tts_first_chunk"}
+{"route":"online","tsMs":1794969725249.6829,"requestId":"F2BFDBF7-1AD1-4ABB-AC10-C1E25E416BAC","durationMs":7561.547042,"model":"deepgram-aura-2-stream","stage":"tts_stream_total"}
+{"requestId":"F2BFDBF7-1AD1-4ABB-AC10-C1E25E416BAC","stage":"tts_first_chunk","route":"online","durationMs":841.834042,"tsMs":1794969728526.086,"model":"deepgram-aura-2-stream"}
+{"requestId":"F2BFDBF7-1AD1-4ABB-AC10-C1E25E416BAC","stage":"tts_stream_total","route":"online","durationMs":2954.008708,"tsMs":1794969728526.095,"model":"deepgram-aura-2-stream"}
+{"requestId":"527B7404-A07B-4FA2-8215-478AAA0A9194","tsMs":1794969730842.01,"route":"online","stage":"llm","input":"set a timer for 5 seconds","model":"deepseek-chat","output":"5-second timer going.","durationMs":899.240041}
+{"requestId":"527B7404-A07B-4FA2-8215-478AAA0A9194","durationMs":1365.681208,"tsMs":1794969734883.848,"stage":"tts_first_chunk","route":"online","model":"deepgram-aura-2-stream"}
+{"requestId":"527B7404-A07B-4FA2-8215-478AAA0A9194","durationMs":4022.788,"tsMs":1794969734883.857,"stage":"tts_stream_total","route":"online","model":"deepgram-aura-2-stream"}
+{"durationMs":1153.471542,"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online","tsMs":1794969739150.277,"requestId":"527B7404-A07B-4FA2-8215-478AAA0A9194"}
+{"durationMs":2804.634417,"stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online","tsMs":1794969739150.311,"requestId":"527B7404-A07B-4FA2-8215-478AAA0A9194"}
+{"requestId":"C2501A41-DD01-4719-A124-A847B153FB26","tsMs":1794969742959.825,"route":"online","input":"pause the music","stage":"llm","model":"deepseek-chat","output":"Paused.","durationMs":1008.568375}
+{"stage":"tts_first_chunk","durationMs":976.140625,"route":"online","requestId":"C2501A41-DD01-4719-A124-A847B153FB26","model":"deepgram-aura-2-stream","tsMs":1794969745997.7432}
+{"stage":"tts_stream_total","durationMs":3007.797667,"route":"online","requestId":"C2501A41-DD01-4719-A124-A847B153FB26","model":"deepgram-aura-2-stream","tsMs":1794969745997.7542}
+{"requestId":"90350234-BA9A-4883-9980-5B38C3079E11","tsMs":1794969749973.4812,"route":"online","input":"run my focus shortcut","stage":"llm","model":"deepseek-chat","output":"Running focus shortcut.","durationMs":1016.824}
+{"model":"deepgram-aura-2-stream","durationMs":813.623166,"route":"online","requestId":"90350234-BA9A-4883-9980-5B38C3079E11","stage":"tts_first_chunk","tsMs":1794969755373.79}
+{"model":"deepgram-aura-2-stream","durationMs":5360.243541,"route":"online","requestId":"90350234-BA9A-4883-9980-5B38C3079E11","stage":"tts_stream_total","tsMs":1794969755373.7988}
+{"requestId":"781CA5FE-9926-4DE2-88DE-ED6BFDDF3A01","tsMs":1794969756555.401,"route":"online","input":"switch to dark mode","stage":"llm","model":"deepseek-chat","output":"Dark mode on.","durationMs":591.2835}
+{"model":"deepgram-aura-2-stream","requestId":"781CA5FE-9926-4DE2-88DE-ED6BFDDF3A01","route":"online","durationMs":1190.453792,"stage":"tts_first_chunk","tsMs":1794969759971.474}
+{"model":"deepgram-aura-2-stream","requestId":"781CA5FE-9926-4DE2-88DE-ED6BFDDF3A01","route":"online","durationMs":2887.390917,"stage":"tts_stream_total","tsMs":1794969759971.482}
+{"requestId":"D6908E69-A2B0-46C2-A3DA-853F6D167C22","tsMs":1794969763914.242,"route":"online","input":"take a screenshot","stage":"llm","model":"deepseek-chat","output":"Snapped, saved to Desktop.","durationMs":942.271625}
+{"stage":"tts_first_chunk","tsMs":1794969769491.9749,"model":"deepgram-aura-2-stream","requestId":"D6908E69-A2B0-46C2-A3DA-853F6D167C22","route":"online","durationMs":1133.04925}
+{"stage":"tts_stream_total","tsMs":1794969769491.997,"model":"deepgram-aura-2-stream","requestId":"D6908E69-A2B0-46C2-A3DA-853F6D167C22","route":"online","durationMs":5458.887833}
+{"route":"online","durationMs":909.249375,"output":"Snapped, saved to Desktop.","tsMs":1794969801411.8772,"input":"take a screenshot","stage":"llm","model":"deepseek-chat","requestId":"F7BD5F37-B9BA-4737-A860-EA4347D10816"}
+{"stage":"tts_first_chunk","requestId":"F7BD5F37-B9BA-4737-A860-EA4347D10816","model":"deepgram-aura-2-stream","durationMs":1272.731833,"route":"online","tsMs":1794969805881.2651}
+{"stage":"tts_stream_total","requestId":"F7BD5F37-B9BA-4737-A860-EA4347D10816","model":"deepgram-aura-2-stream","durationMs":3883.061583,"route":"online","tsMs":1794969805881.273}
+{"input":"look at the screen","output":"voice_processing=off","model":"deepgram-nova-2","stage":"stt_final","durationMs":-1,"tsMs":1794969859510.931,"requestId":"755C5009-CFD9-431A-9976-A39DD0030073","route":"online"}
+{"output":"Snapped it, saved to Desktop.","stage":"llm","model":"deepseek-chat","input":"look at the screen","requestId":"C9896C63-687B-407F-A357-EC581DD3EF66","tsMs":1794969860491.154,"durationMs":980.060125,"route":"online"}
+{"durationMs":1021.607958,"tsMs":1794969865394.074,"model":"deepgram-aura-2-stream","requestId":"C9896C63-687B-407F-A357-EC581DD3EF66","stage":"tts_first_chunk","route":"online"}
+{"durationMs":4458.956542,"tsMs":1794969865394.084,"model":"deepgram-aura-2-stream","requestId":"C9896C63-687B-407F-A357-EC581DD3EF66","stage":"tts_stream_total","route":"online"}
+{"route":"online","requestId":"5E53FA2E-DF94-4CF3-91D8-5531AAE1E10C","input":"lock the screen","tsMs":1794969870177.674,"output":"voice_processing=off","model":"deepgram-nova-2","durationMs":-1,"stage":"stt_final"}
+{"route":"online","requestId":"A616356B-C75A-41C7-965A-64CFCBB89D40","input":"lock the screen","tsMs":1794969870790.576,"output":"Locked. Go touch grass, Nik.","model":"deepseek-chat","durationMs":612.85175,"stage":"llm"}
+{"route":"online","tsMs":1794969873575.5051,"model":"deepgram-aura-2-stream","requestId":"A616356B-C75A-41C7-965A-64CFCBB89D40","stage":"tts_first_chunk","durationMs":1205.723958}
+{"route":"online","tsMs":1794969873575.514,"model":"deepgram-aura-2-stream","requestId":"A616356B-C75A-41C7-965A-64CFCBB89D40","stage":"tts_stream_total","durationMs":2711.907417}
+{"route":"online","requestId":"C52924FE-E4C8-453A-9025-EDFAEEA6BB72","input":"switch to duttmore","tsMs":1794969885972.605,"output":"voice_processing=off","model":"deepgram-nova-2","durationMs":-1,"stage":"stt_final"}
+{"route":"online","requestId":"7E139298-45A6-4D5A-B1B0-08115878294A","input":"switch to duttmore","tsMs":1794969886645.3882,"output":"Lemme check what devices you got.","model":"deepseek-chat","durationMs":672.721416,"stage":"llm"}
+{"durationMs":1081.325292,"requestId":"7E139298-45A6-4D5A-B1B0-08115878294A","model":"deepgram-aura-2-stream","route":"online","tsMs":1794969890290.972,"stage":"tts_first_chunk"}
+{"durationMs":3444.751625,"requestId":"7E139298-45A6-4D5A-B1B0-08115878294A","model":"deepgram-aura-2-stream","route":"online","tsMs":1794969890290.982,"stage":"tts_stream_total"}
+{"route":"online","requestId":"6A516AE5-D5D3-464B-A9ED-0D5E5CBEBE22","input":"switch to that mode","tsMs":1794969894193.549,"output":"voice_processing=off","model":"deepgram-nova-2","durationMs":-1,"stage":"stt_final"}
+{"route":"online","requestId":"7B498569-FFEA-47B1-B8FB-33A14C138E65","input":"switch to that mode","tsMs":1794969895412.445,"output":"Toggled the theme.","model":"deepseek-chat","durationMs":1218.837291,"stage":"llm"}
+{"tsMs":1794969898695.837,"requestId":"7B498569-FFEA-47B1-B8FB-33A14C138E65","durationMs":801.758625,"route":"online","stage":"tts_first_chunk","model":"deepgram-aura-2-stream"}
+{"tsMs":1794969898695.8462,"requestId":"7B498569-FFEA-47B1-B8FB-33A14C138E65","durationMs":2267.247917,"route":"online","stage":"tts_stream_total","model":"deepgram-aura-2-stream"}
+{"input":"switch to dark mode","requestId":"061DFB44-5AC1-44B7-856D-F38EE94DFBCE","route":"online","tsMs":1794969904173.9712,"output":"voice_processing=off","model":"deepgram-nova-2","durationMs":-1,"stage":"stt_final"}
+{"input":"switch to dark mode","requestId":"CAEBDCCE-E1CB-498E-A334-F6A9E4EB73AD","route":"online","tsMs":1794969905208.0479,"output":"Dark mode on.","model":"deepseek-chat","durationMs":1034.018917,"stage":"llm"}
+{"requestId":"CAEBDCCE-E1CB-498E-A334-F6A9E4EB73AD","stage":"tts_first_chunk","route":"online","model":"deepgram-aura-2-stream","tsMs":1794969908285.456,"durationMs":840.744166}
+{"requestId":"CAEBDCCE-E1CB-498E-A334-F6A9E4EB73AD","stage":"tts_stream_total","route":"online","model":"deepgram-aura-2-stream","tsMs":1794969908285.463,"durationMs":2352.852291}
+{"route":"online","requestId":"A68391FB-9C50-463C-B8A0-65035F6C58B1","input":"as in this application","tsMs":1794969915775.507,"output":"voice_processing=off","model":"deepgram-nova-2","durationMs":-1,"stage":"stt_final"}
+{"route":"online","requestId":"C36BB2FE-CAA6-4026-83BE-F70DA878E50D","input":"as in this application","tsMs":1794969916878.36,"output":"Ah, I can't change my own app's theme — only the system appearance.","model":"deepseek-chat","durationMs":1102.800084,"stage":"llm"}
+{"route":"online","model":"deepgram-aura-2-stream","durationMs":788.211958,"tsMs":1794969922515.3752,"stage":"tts_first_chunk","requestId":"C36BB2FE-CAA6-4026-83BE-F70DA878E50D"}
+{"route":"online","model":"deepgram-aura-2-stream","durationMs":5618.112833,"tsMs":1794969922515.383,"stage":"tts_stream_total","requestId":"C36BB2FE-CAA6-4026-83BE-F70DA878E50D"}
+{"route":"online","input":"add zip this application","requestId":"1B48BE25-E1E3-4880-B2E5-031B1A1F6FF8","tsMs":1794969926775.5461,"output":"voice_processing=off","model":"deepgram-nova-2","durationMs":-1,"stage":"stt_final"}
+{"route":"online","input":"add zip this application","requestId":"41C1FFBD-3F77-4B91-B876-4D2C4DE84662","tsMs":1794969927817.721,"output":"Can't zip apps — no tool for that. Do it in terminal.","model":"deepseek-chat","durationMs":1042.121625,"stage":"llm"}
+{"requestId":"41C1FFBD-3F77-4B91-B876-4D2C4DE84662","model":"deepgram-aura-2-stream","durationMs":1062.022041,"tsMs":1794969933448.694,"stage":"tts_first_chunk","route":"online"}
+{"requestId":"41C1FFBD-3F77-4B91-B876-4D2C4DE84662","model":"deepgram-aura-2-stream","durationMs":5611.86775,"tsMs":1794969933448.705,"stage":"tts_stream_total","route":"online"}
+{"input":"close this application","requestId":"01553B45-1F30-4441-A08A-40D028278F8F","route":"online","tsMs":1794969937578.496,"output":"voice_processing=off","model":"deepgram-nova-2","durationMs":-1,"stage":"stt_final"}
+{"input":"close this application","requestId":"CE4ED67D-3F06-4536-B991-D92CD096D7F4","route":"online","tsMs":1794969938335.598,"output":"Closing ApexAgent.","model":"deepseek-chat","durationMs":757.044917,"stage":"llm"}
+{"route":"online","stage":"tts_first_chunk","model":"deepgram-aura-2-stream","durationMs":829.707875,"requestId":"CE4ED67D-3F06-4536-B991-D92CD096D7F4","tsMs":1794969944413.386}
+{"route":"online","stage":"tts_stream_total","model":"deepgram-aura-2-stream","durationMs":6058.945,"requestId":"CE4ED67D-3F06-4536-B991-D92CD096D7F4","tsMs":1794969944413.395}
+{"route":"online","requestId":"4972B537-878E-4411-9B9E-99ECA42981F9","input":"great","tsMs":1794969949672.3042,"output":"voice_processing=off","model":"deepgram-nova-2","durationMs":-1,"stage":"stt_final"}
+{"input":"great","requestId":"4E4DE37C-2731-4B60-978A-A287D1222FEC","route":"online","tsMs":1794969950451.802,"output":"Anytime, Nik. Go get that sweetness.","model":"deepseek-chat","durationMs":779.447416,"stage":"llm"}
+{"route":"online","stage":"tts_first_chunk","model":"deepgram-aura-2-stream","durationMs":1065.818583,"requestId":"4E4DE37C-2731-4B60-978A-A287D1222FEC","tsMs":1794969954962.7432}
+{"route":"online","stage":"tts_stream_total","model":"deepgram-aura-2-stream","durationMs":4493.164083,"requestId":"4E4DE37C-2731-4B60-978A-A287D1222FEC","tsMs":1794969954962.75}
+{"input":"close this application","route":"online","requestId":"1C3038B8-61EC-408B-8887-83A774AD337A","tsMs":1794970009873.7979,"output":"voice_processing=off","model":"deepgram-nova-2","durationMs":-1,"stage":"stt_final"}
+{"input":"close this application","requestId":"A23D063B-504D-4132-8942-4ED652C0ED8D","route":"online","tsMs":1794970010815.04,"output":"Closing ApexAgent.","model":"deepseek-chat","durationMs":941.178625,"stage":"llm"}
+{"model":"deepgram-aura-2-stream","requestId":"A23D063B-504D-4132-8942-4ED652C0ED8D","stage":"tts_first_chunk","durationMs":844.163584,"route":"online","tsMs":1794970016552.6729}
+{"model":"deepgram-aura-2-stream","requestId":"A23D063B-504D-4132-8942-4ED652C0ED8D","stage":"tts_stream_total","durationMs":5716.749834,"route":"online","tsMs":1794970016552.686}
+{"stage":"stt_final","input":"quit this application","durationMs":-1,"tsMs":1794970214601.7407,"requestId":"024A860C-C550-46DA-B83D-988B8DCAE544","model":"deepgram-nova-2","route":"online","output":"voice_processing=off"}

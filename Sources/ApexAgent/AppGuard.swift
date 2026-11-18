@@ -32,3 +32,23 @@ func nameAppearsInInput(_ name: String) -> Bool {
     let wanted: String = name.lowercased()
     return !wanted.isEmpty && currentUserInput.lowercased().contains(wanted)
 }
+
+// open_url only accepts web addresses, never files, apps or other URL schemes.
+func isWebURL(_ text: String) -> Bool {
+    guard let url = URL(string: text), let scheme = url.scheme?.lowercased(), let host = url.host else { return false }
+    return (scheme == "https" || scheme == "http") && !host.isEmpty
+}
+
+// Returns the real Shortcut name if one matches (ignoring case), so the model can't invent one.
+func matchingShortcut(_ name: String) -> String? {
+    let all: [String] = runShell("/usr/bin/shortcuts", args: ["list"]).components(separatedBy: "\n")
+    return all.first { $0.lowercased() == name.lowercased() }
+}
+
+// Every main word (3+ letters) of the Shortcut's name must be in what the user said.
+// Some Shortcuts send messages, so a vague request must never trigger one.
+func shortcutNamedInInput(_ name: String) -> Bool {
+    let said: String = currentUserInput.lowercased()
+    let words: [String] = name.lowercased().split(separator: " ").map(String.init).filter { $0.count >= 3 }
+    return !words.isEmpty && words.allSatisfy { said.contains($0) }
+}

@@ -423,6 +423,8 @@ func executeDecision(_ decision: LLMResponse) {
 
     // set when the guard rejects the tool, so the refusal is spoken instead of the LLM's claim
     var refusal: String? = nil
+    // set by tools that know the real result (the time, what played), so that is spoken instead of the LLM's guess
+    var toolReply: String? = nil
 
     // route to handler
     switch tool {
@@ -461,6 +463,39 @@ func executeDecision(_ decision: LLMResponse) {
             handleListApps()
         case "open_kitty":
             handleKittyWindow()
+        case "get_time":
+            toolReply = handleTime()
+        case "media_control":
+            let action: String = decision.args?["action"]?.stringValue ?? "play"
+            let app: String = decision.args?["app"]?.stringValue ?? "Spotify"
+            toolReply = handleMedia(action: action, app: app)
+        case "open_url":
+            if let url = decision.args?["url"]?.stringValue, isWebURL(url) {
+                toolReply = handleOpenURL(url)
+            } else {
+                refusal = "I can only open web addresses."
+                print("🛡️ guard: not a web URL (\(decision.args?["url"]?.stringValue ?? "none")); nothing opened")
+            }
+        case "set_timer":
+            if let raw = decision.args?["seconds"]?.stringValue, let seconds = Double(raw), seconds >= 1 {
+                toolReply = handleTimer(seconds: Int(seconds))
+            } else {
+                refusal = "How long should the timer be?"
+            }
+        case "run_shortcut":
+            if let name = decision.args?["name"]?.stringValue,
+               let actual = matchingShortcut(name), shortcutNamedInInput(actual) {
+                toolReply = handleShortcut(actual)
+            } else {
+                refusal = "I couldn't find that shortcut. Say its exact name."
+                print("🛡️ guard: no shortcut matching \(decision.args?["name"]?.stringValue ?? "none") in your request; nothing run")
+            }
+        case "screenshot":
+            toolReply = handleScreenshot()
+        case "lock_screen":
+            toolReply = handleLockScreen()
+        case "dark_mode":
+            toolReply = handleDarkMode(decision.args?["mode"]?.stringValue ?? "toggle")
         default:
             // LLM hallucinated a tool — treat as conversation, print reply
             if let reply = decision.reply {
@@ -470,7 +505,7 @@ func executeDecision(_ decision: LLMResponse) {
             }
         }
     // Print and SPEAK the reply: the refusal if the guard rejected the tool, otherwise the LLM's reply
-    if let reply = refusal ?? decision.reply {
+    if let reply = refusal ?? toolReply ?? decision.reply {
         print("🤖 \(reply)")
         if #available(macOS 10.14, *) {
             speak(reply)

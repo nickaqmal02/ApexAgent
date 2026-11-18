@@ -68,7 +68,7 @@ struct ApexAgent {
                 printHelp()
                 continue
             }
-            if lower == "exit" || lower == "quit" {
+            if lower == "exit" || lower == "quit" || isExitPhrase(input) {
                 print("😊 Goodbye Dude")
                 return
             }

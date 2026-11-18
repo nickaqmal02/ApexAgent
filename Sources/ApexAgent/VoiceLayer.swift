@@ -283,15 +283,36 @@ func handleFinalTranscript(_ transcript: String, engine: String, sinceLastPartia
 
     logTrace(TraceRecord(requestId: UUID().uuidString, stage: "stt_final", model: engine, route: engine == "apple-ondevice" ? "offline" : "online", durationMs: sinceLastPartialMs, input: transcript, output: "voice_processing=\(voiceProcessingOn ? "on" : "off")"))
 
-    // Voice exit: short phrases containing "exit" or "quit", handled before the LLM
-    let spoken: String = transcript.lowercased().trimmingCharacters(in: CharacterSet.punctuationCharacters.union(.whitespaces))
-    let words: [Substring] = spoken.split(separator: " ")
-    let isExitCommand: Bool = (words.contains("exit") || words.contains("quit")) && words.count <= 4
-    if isExitCommand {
+    // Voice exit, handled before the LLM
+    if isExitPhrase(transcript) {
         stopVoiceRecognition()
         print("😊 Goodbye Dude")
         exit(0)
     }
 
     askLLM(transcript) { _ in }
+}
+
+// True for short requests to close ApexAgent itself, spoken or typed:
+// "exit", "quit apex agent", "close this application", "stop listening".
+// Every word besides the verb must refer to ApexAgent or be filler, so requests that name
+// another app ("quit chrome", "close spotify application") go to the LLM instead of closing us.
+func isExitPhrase(_ text: String) -> Bool {
+    let cleaned: String = String(text.lowercased().unicodeScalars.filter { CharacterSet.letters.contains($0) || $0 == " " })
+    let words: [String] = cleaned.split(separator: " ").map(String.init)
+    guard !words.isEmpty, words.count <= 5 else { return false }
+
+    let verbs: Set<String> = ["exit", "quit", "close", "stop", "shut"]
+    let pointsAtUs: Set<String> = ["application", "app", "apex", "agent", "apexagent", "listening", "yourself", "program"]
+    let filler: Set<String> = ["this", "the", "please", "now", "down"]
+
+    guard words.contains(where: { verbs.contains($0) }) else { return false }
+    let others: [String] = words.filter { !verbs.contains($0) }
+    guard others.allSatisfy({ pointsAtUs.contains($0) || filler.contains($0) }) else { return false }
+
+    // "exit" and "quit" alone mean us; "close", "stop" and "shut" alone are too vague (stop the music?)
+    if words.contains("exit") || words.contains("quit") {
+        return true
+    }
+    return others.contains(where: { pointsAtUs.contains($0) })
 }
