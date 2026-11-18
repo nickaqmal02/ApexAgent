@@ -1,5 +1,6 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
+import AppKit
 import Foundation
 // TODO:
 // FIXME:
@@ -46,6 +47,26 @@ struct ApexAgent {
         glmAPIKey = ProcessInfo.processInfo.environment["DEEPSEEK_API_KEY"] ?? ""
         printBanner()
 
+        // The typed input loop runs on its own thread, so the main thread is free to draw the notch.
+        let inputThread: Thread = Thread { runREPL() }
+        inputThread.start()
+
+        if ProcessInfo.processInfo.environment["APEX_NOTCH"] == "0" {
+            // No notch: keep the process alive for the input thread
+            while true { sleep(3600) }
+        }
+
+        MainActor.assumeIsolated {
+            NotchController.shared.start()
+        }
+        let app: NSApplication = NSApplication.shared
+        app.setActivationPolicy(.accessory)   // no Dock icon, no menu bar takeover
+        app.run()
+    }
+
+    // REPL: read a typed line, handle built-in commands, send the rest to the LLM
+    static func runREPL() {
+
         // REPL = READ EVALUATE PRINT LOOP
         //
         while true {
@@ -54,7 +75,8 @@ struct ApexAgent {
 
             //2. Read Input ()
             guard let input = readLine()?.trimmingCharacters(in: .whitespacesAndNewlines) else {
-                continue
+                // End of input (the terminal closed or the pipe ended): stop instead of spinning forever
+                exit(0)
             }
 
             // 3. We shall handle empty input
@@ -70,7 +92,7 @@ struct ApexAgent {
             }
             if lower == "exit" || lower == "quit" || isExitPhrase(input) {
                 print("😊 Goodbye Dude")
-                return
+                exit(0)   // the main thread is running the notch, so returning from this thread is not enough
             }
             if lower == "clear" {
                 conversationHistory.removeAll()

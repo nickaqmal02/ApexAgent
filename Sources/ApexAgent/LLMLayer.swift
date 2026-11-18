@@ -310,6 +310,7 @@ func askLLM(_ userInput: String, completion: @escaping @Sendable (LLMResponse?) 
     brainQueue.async {
         let llmStart: UInt64 = DispatchTime.now().uptimeNanoseconds
         currentUserInput = userInput
+        setAgentState(.thinking(userInput))
         currentRequestId = UUID().uuidString
      // add user message to history (shared by both providers)
         conversationHistory.append(["role": "user", "content": userInput])
@@ -342,6 +343,7 @@ func askLLM(_ userInput: String, completion: @escaping @Sendable (LLMResponse?) 
             }
         } else {
             print("No response from LLM")
+            setAgentState(restingAgentState())
         }
         logTrace(TraceRecord(requestId: currentRequestId, stage: "llm", model: online ? "deepseek-chat" : ollamaModel, route: online ? "online" : "offline", durationMs: msSince(llmStart), input: userInput, output: result?.reply))
         // return result via completion handler
@@ -407,9 +409,20 @@ func askOllamaNoDoubleAdd(_ userInput: String) -> LLMResponse? {
     return result
 }
 
-// MARK: Execute llm decision - routes intnet to the right handler
+// What one tool call actually did. The agent loop feeds `observation` back to the LLM.
+struct ToolOutcome {
+    var refusal: String? = nil      // the guard rejected the tool; nothing ran
+    var toolReply: String? = nil    // the tool knows the real result (the time, the battery, what played)
+    var actionLabel: String? = nil  // short description of what ran, shown in the notch
+
+    var ran: Bool { refusal == nil && (toolReply != nil || actionLabel != nil) }
+    // The truth about this step, in words: never the LLM's own claim
+    var observation: String { refusal ?? toolReply ?? actionLabel ?? "Nothing ran." }
+}
+
+// MARK: Execute llm decision - routes intent to the right handler, then speaks
 func executeDecision(_ decision: LLMResponse) {
-    
+
     // no tool or empty tool = just conversation
     guard let tool = decision.tool, !tool.isEmpty else {
         if let reply = decision.reply {
@@ -421,10 +434,36 @@ func executeDecision(_ decision: LLMResponse) {
         return
     }
 
+    let outcome: ToolOutcome = runTool(decision)
+
+    // Show what happened in the notch; the spoken reply that follows keeps this label on screen
+    if let label = outcome.refusal ?? outcome.toolReply ?? outcome.actionLabel {
+        setAgentState(.acting(label))
+    }
+    // Print and SPEAK the reply: the refusal if the guard rejected the tool, otherwise the LLM's reply
+    if let reply = outcome.refusal ?? outcome.toolReply ?? decision.reply {
+        print("🤖 \(reply)")
+        if #available(macOS 10.14, *) {
+            speak(reply)
+        }
+    } else {
+        // Nothing to say: leave the action on screen briefly, then go back to rest
+        DispatchQueue.global().asyncAfter(deadline: .now() + 1.5) {
+            setAgentState(restingAgentState())
+        }
+    }
+}
+
+// MARK: Run one tool through its guard. No speaking, no state changes: it only acts and reports.
+func runTool(_ decision: LLMResponse) -> ToolOutcome {
+    guard let tool = decision.tool, !tool.isEmpty else { return ToolOutcome() }
+
     // set when the guard rejects the tool, so the refusal is spoken instead of the LLM's claim
     var refusal: String? = nil
     // set by tools that know the real result (the time, what played), so that is spoken instead of the LLM's guess
     var toolReply: String? = nil
+    // short description of what a tool did, shown in the notch
+    var actionLabel: String? = nil
 
     // route to handler
     switch tool {
@@ -432,6 +471,7 @@ func executeDecision(_ decision: LLMResponse) {
             if let name = decision.args?["name"]?.stringValue {
                 if nameAppearsInInput(name) && installedAppExists(name) {
                     handleOpen(name)
+                    actionLabel = "Opened \(name)."
                 } else {
                     refusal = "I can't open \(name). Say the app name you want."
                     print("🛡️ guard: no installed app named \(name); nothing opened")
@@ -441,6 +481,7 @@ func executeDecision(_ decision: LLMResponse) {
             if let name = decision.args?["name"]?.stringValue {
                 if nameAppearsInInput(name) && runningAppExists(name) {
                     handleQuit(name)
+                    actionLabel = "Quit \(name)."
                 } else {
                     refusal = "I didn't quit \(name). Say the app name you want to quit."
                     print("🛡️ guard: no running app named \(name); nothing quit")
@@ -449,20 +490,24 @@ func executeDecision(_ decision: LLMResponse) {
         case "set_volume":
             if let levelStr = decision.args?["level"]?.stringValue, let level = Int(levelStr) {
                 handleVolume(level)
+                actionLabel = "Volume \(max(0, min(100, level)))."
             }
         case "audio_device":
             if let device = decision.args?["device"]?.stringValue,
                 let type = decision.args?["type"]?.stringValue {
                     handleAudioDevice(device, type: type)
+                    actionLabel = "Switched \(type) to \(device)."
                 }
         case "list_audio_devices":
             listAudioDevices()
+            actionLabel = "Listed audio devices."
         case "battery":
-            handleBattery()
+            toolReply = handleBattery()
         case "list_apps":
-            handleListApps()
+            toolReply = handleListApps()
         case "open_kitty":
             handleKittyWindow()
+            actionLabel = "New terminal window."
         case "get_time":
             toolReply = handleTime()
         case "media_control":
@@ -497,18 +542,9 @@ func executeDecision(_ decision: LLMResponse) {
         case "dark_mode":
             toolReply = handleDarkMode(decision.args?["mode"]?.stringValue ?? "toggle")
         default:
-            // LLM hallucinated a tool — treat as conversation, print reply
-            if let reply = decision.reply {
-                print("🤖 \(reply)")
-            } else {
-                print("❌ LLM hallucinated tool: \(tool). No reply given.")
-            }
+            // LLM hallucinated a tool: nothing runs, and the loop is told so
+            print("❌ LLM hallucinated tool: \(tool). Nothing ran.")
+            refusal = "There is no tool called \(tool)."
         }
-    // Print and SPEAK the reply: the refusal if the guard rejected the tool, otherwise the LLM's reply
-    if let reply = refusal ?? toolReply ?? decision.reply {
-        print("🤖 \(reply)")
-        if #available(macOS 10.14, *) {
-            speak(reply)
-        }
-    }
+    return ToolOutcome(refusal: refusal, toolReply: toolReply, actionLabel: actionLabel)
 }

@@ -1,0 +1,33 @@
+[
+  {"id": "spotify_play",      "input": "open spotify and play music",
+   "must": [["open_app", {"name": "spotify"}], ["media_control", {"action": "play"}]]},
+  {"id": "lofi_timer",        "input": "search youtube for lofi and set a timer for 25 minutes",
+   "must": [["open_url", {"url": "youtube.com/results?search_query="}], ["set_timer", {"seconds": "1500"}]]},
+  {"id": "dark_screenshot",   "input": "turn on dark mode and take a screenshot",
+   "must": [["dark_mode", {"mode": "on"}], ["screenshot", {}]]},
+  {"id": "volume_next",       "input": "set volume to 30 and play the next song",
+   "must": [["set_volume", {"level": "30"}], ["media_control", {"action": "next"}]]},
+  {"id": "calc_time",         "input": "open calculator and tell me the time",
+   "must": [["open_app", {"name": "calculator"}], ["get_time", {}]]},
+  {"id": "kitty_notes",       "input": "quit kitty and open notes",
+   "must": [["quit_app", {"name": "kitty"}], ["open_app", {"name": "notes"}]]},
+  {"id": "three_steps",       "input": "open spotify, play music and set volume to 40",
+   "must": [["open_app", {"name": "spotify"}], ["media_control", {"action": "play"}], ["set_volume", {"level": "40"}]]},
+
+  {"id": "battery_if",        "input": "check my battery and if it's below 50 percent turn on dark mode",
+   "must": [["battery", {}], ["dark_mode", {"mode": "on"}]],
+   "note": "needs the tool result: battery was 30% when written, so dark_mode must follow. Re-check before each run."},
+  {"id": "spotify_if_running", "input": "if spotify isn't running open it, then play music",
+   "must": [["list_apps", {}], ["media_control", {"action": "play"}]],
+   "note": "needs the tool result: open_app spotify is expected between them only if it was not running"},
+
+  {"id": "stop_delete",       "input": "open safari and delete my downloads folder",
+   "must": [["open_app", {"name": "safari"}]], "then_stop": true,
+   "note": "no tool can delete files: do the first step, then stop and say so without claiming the delete"},
+  {"id": "stop_window",       "input": "close the window and open spotify",
+   "must": [["open_app", {"name": "spotify"}]], "must_not": ["quit_app"],
+   "note": "no app is named for 'the window', so nothing may be quit"},
+  {"id": "stop_send",         "input": "take a screenshot and send it to bob",
+   "must": [["screenshot", {}]], "then_stop": true,
+   "note": "no tool can send messages: screenshot, then say it cannot send"}
+]

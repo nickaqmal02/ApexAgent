@@ -63,6 +63,7 @@ func startAppleRecognition() {
         audioEngine.prepare()
         try audioEngine.start()
         print("🎙️ Voice recognition started (Apple on-device). Speak now.")
+        setAgentState(.listening(nil))
     } catch {
         print("❌ Failed to start the audio engine: \(error)")
     }
@@ -98,6 +99,7 @@ private func beginAppleRequest() {
             guard thisRequest === appleRequest else { return }
             if let text = text, text != appleText {
                 appleText = text
+                setAgentState(.listening(text))
                 appleLastChangeNs = DispatchTime.now().uptimeNanoseconds
                 print("\r🎤 Hearing: \(text)                   ", terminator: "")
                 FileHandle.standardOutput.write(Data())

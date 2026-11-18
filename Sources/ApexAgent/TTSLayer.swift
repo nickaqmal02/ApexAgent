@@ -20,7 +20,9 @@ func speak(_ text: String) {
     speechQueue.sync {
         let startedAt: Double = Date().timeIntervalSince1970
         print(String(format: "▶ speak start %.2f: %@", startedAt.truncatingRemainder(dividingBy: 1000), String(text.prefix(40))))
+        setAgentState(.speaking(text, acted: false))
         speakNow(text)
+        setAgentState(restingAgentState())
         print(String(format: "■ speak end   %.2f", Date().timeIntervalSince1970.truncatingRemainder(dividingBy: 1000)))
     }
 }

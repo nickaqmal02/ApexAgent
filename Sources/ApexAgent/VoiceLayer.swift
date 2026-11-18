@@ -26,7 +26,7 @@ func setMicMuted(_ muted: Bool) {
 // Opens the Deepgram listening socket and waits up to 3 s for it to answer a ping.
 @available(macOS 10.15, *)
 func connectDeepgramSocket() -> Bool {
-    let urlString = "wss://api.deepgram.com/v1/listen?model=nova-2&language=en&encoding=linear16&sample_rate=16000&keywords=ApexAgent:2,Spotify:2,jev:2,exit:3,quit:3"
+    let urlString = "wss://api.deepgram.com/v1/listen?model=nova-2&language=en&encoding=linear16&sample_rate=16000&interim_results=true&keywords=ApexAgent:2,Spotify:2,jev:2,exit:3,quit:3"
 
     guard let url = URL(string: urlString) else {
         print("❌ Invalid URL")
@@ -132,6 +132,7 @@ func startVoiceRecognition() {
         audioEngine.prepare()
         try audioEngine.start()
         print("🎙️ Voice recognition started. Speak now.")
+        setAgentState(.listening(nil))
     } catch {
         print("❌ Failed to start the audio engine: \(error)")
     }
@@ -178,6 +179,7 @@ func stopVoiceRecognition() {
         webSocketTask = nil
     }
     print("🛑 Voice recognition stopped.")
+    setAgentState(.idle)
 }
 
 // Retries the connection after 1, 2, 4, 8 and 8 seconds, then gives up.
@@ -255,6 +257,7 @@ func processDeepgramJSON(_ data: Data) {
         handleFinalTranscript(transcript, engine: "deepgram-nova-2", sinceLastPartialMs: sinceLastPartial)
     } else {
         lastPartialNs = DispatchTime.now().uptimeNanoseconds
+        setAgentState(.listening(transcript))
         // PARTIAL transcript — print it inline so you see it live
         // \r returns to the start of the line, overwriting the previous partial
         print("\r🎤 Hearing: \(transcript)                   ", terminator: "")

@@ -401,3 +401,80 @@
 {"model":"deepgram-aura-2-stream","requestId":"A23D063B-504D-4132-8942-4ED652C0ED8D","stage":"tts_first_chunk","durationMs":844.163584,"route":"online","tsMs":1794970016552.6729}
 {"model":"deepgram-aura-2-stream","requestId":"A23D063B-504D-4132-8942-4ED652C0ED8D","stage":"tts_stream_total","durationMs":5716.749834,"route":"online","tsMs":1794970016552.686}
 {"stage":"stt_final","input":"quit this application","durationMs":-1,"tsMs":1794970214601.7407,"requestId":"024A860C-C550-46DA-B83D-988B8DCAE544","model":"deepgram-nova-2","route":"online","output":"voice_processing=off"}
+{"stage":"stt_final","tsMs":1794971820403.6912,"durationMs":-1,"output":"voice_processing=off","route":"online","model":"deepgram-nova-2","requestId":"B2F91A8C-FF92-4DAA-8251-8854ED107C7A","input":"take a screenshot"}
+{"durationMs":1177.204875,"model":"deepseek-chat","requestId":"015759A6-FA41-4211-A74A-B283445345D2","input":"take a screenshot","stage":"llm","route":"online","tsMs":1794971821581.1272,"output":"Snapped, saved to Desktop."}
+{"requestId":"015759A6-FA41-4211-A74A-B283445345D2","durationMs":803.465084,"model":"deepgram-aura-2-stream","route":"online","tsMs":1794971825576.394,"stage":"tts_first_chunk"}
+{"requestId":"015759A6-FA41-4211-A74A-B283445345D2","durationMs":3551.901375,"model":"deepgram-aura-2-stream","route":"online","tsMs":1794971825576.4019,"stage":"tts_stream_total"}
+{"tsMs":1794971832220.5159,"requestId":"F4378596-29F9-4674-9D39-08CA5DA89D94","model":"deepgram-nova-2","stage":"stt_final","route":"online","output":"voice_processing=off","input":"thank you","durationMs":-1}
+{"tsMs":1794971833044.769,"requestId":"A21B4A19-CF4C-48D2-9D36-98757C2D2D58","model":"deepseek-chat","route":"online","stage":"llm","output":"Anytime, Nik.","input":"thank you","durationMs":824.197167}
+{"durationMs":856.923916,"stage":"tts_first_chunk","route":"online","model":"deepgram-aura-2-stream","tsMs":1794971835592.814,"requestId":"A21B4A19-CF4C-48D2-9D36-98757C2D2D58"}
+{"durationMs":2529.713458,"stage":"tts_stream_total","route":"online","model":"deepgram-aura-2-stream","tsMs":1794971835592.824,"requestId":"A21B4A19-CF4C-48D2-9D36-98757C2D2D58"}
+{"requestId":"EB836DEC-E3B7-4799-8FF3-9DF2ABF27E48","output":"voice_processing=off","tsMs":1794971838414.0872,"input":"close this application","durationMs":-1,"route":"online","stage":"stt_final","model":"deepgram-nova-2"}
+{"model":"deepseek-chat","output":"Checking the clock.","durationMs":868.832583,"tsMs":1794972488643.77,"requestId":"4A9809D5-7F73-417E-BF9F-DCCECC6D2FB1","stage":"llm","route":"online","input":"what time is it"}
+{"durationMs":852.717334,"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online","tsMs":1794972495317.7021,"requestId":"0FDB2AAB-8612-4A2F-B30E-CC12D692CF1C"}
+{"durationMs":6439.947209,"stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online","tsMs":1794972495317.707,"requestId":"0FDB2AAB-8612-4A2F-B30E-CC12D692CF1C"}
+{"durationMs":672.463042,"input":"hello","stage":"llm","route":"online","output":"Yo Nik, what's up?","model":"deepseek-chat","tsMs":1794972495989.818,"requestId":"0FDB2AAB-8612-4A2F-B30E-CC12D692CF1C"}
+{"durationMs":791.448875,"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online","tsMs":1794972498584.3281,"requestId":"0FDB2AAB-8612-4A2F-B30E-CC12D692CF1C"}
+{"durationMs":2576.44575,"stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online","tsMs":1794972498584.337,"requestId":"0FDB2AAB-8612-4A2F-B30E-CC12D692CF1C"}
+{"tsMs":1794972595011.911,"model":"deepseek-chat","route":"online","output":"Checking the clock.","input":"what time is it","durationMs":1246.175042,"stage":"llm","requestId":"4EAB7486-BB3D-4DDB-95CB-9E050A0EF78E"}
+{"tsMs":1794972602327.2559,"requestId":"4EAB7486-BB3D-4DDB-95CB-9E050A0EF78E","stage":"tts_first_chunk","model":"deepgram-aura-2-stream","route":"online","durationMs":849.402334}
+{"tsMs":1794972602327.269,"requestId":"4EAB7486-BB3D-4DDB-95CB-9E050A0EF78E","stage":"tts_stream_total","model":"deepgram-aura-2-stream","route":"online","durationMs":7083.53575}
+{"route":"online","output":"Yo Nik, what's up?","model":"deepseek-chat","durationMs":761.071583,"input":"hello","requestId":"D0EF53E1-2B8A-450F-8F73-0AD8A6D8CFFF","tsMs":1794972604534.4749,"stage":"llm"}
+{"requestId":"D0EF53E1-2B8A-450F-8F73-0AD8A6D8CFFF","route":"online","durationMs":866.177416,"model":"deepgram-aura-2-stream","tsMs":1794972607650.094,"stage":"tts_first_chunk"}
+{"requestId":"D0EF53E1-2B8A-450F-8F73-0AD8A6D8CFFF","route":"online","durationMs":3097.171708,"model":"deepgram-aura-2-stream","tsMs":1794972607650.103,"stage":"tts_stream_total"}
+{"model":"deepgram-nova-2","tsMs":1794972688916.2732,"input":"hey mate what's up","requestId":"72F52180-892A-4DB5-88B6-828150A8B6E0","stage":"stt_final","route":"online","durationMs":-1,"output":"voice_processing=off"}
+{"durationMs":868.123833,"model":"deepseek-chat","route":"online","stage":"llm","output":"Not much, just chilling. What's the move, Nik?","requestId":"15714FFF-B0F5-4D73-AF1E-8CAF654928DA","input":"hey mate what's up","tsMs":1794972689784.4692}
+{"route":"online","requestId":"15714FFF-B0F5-4D73-AF1E-8CAF654928DA","stage":"tts_first_chunk","model":"deepgram-aura-2-stream","tsMs":1794972694377.1938,"durationMs":1036.136875}
+{"route":"online","requestId":"15714FFF-B0F5-4D73-AF1E-8CAF654928DA","stage":"tts_stream_total","model":"deepgram-aura-2-stream","tsMs":1794972694377.2122,"durationMs":4544.129167}
+{"model":"deepgram-nova-2","requestId":"C4C5636C-D79A-499A-B92A-91B5D689B748","output":"voice_processing=off","stage":"stt_final","input":"hey do you hear me","durationMs":-1,"tsMs":1794972717711.752,"route":"online"}
+{"model":"deepseek-chat","requestId":"BDCD14BF-D25B-4171-B2E8-A7006BFBBDFE","output":"Loud and clear, Nik. What's up?","stage":"llm","input":"hey do you hear me","durationMs":828.663833,"tsMs":1794972718540.477,"route":"online"}
+{"stage":"tts_first_chunk","model":"deepgram-aura-2-stream","requestId":"BDCD14BF-D25B-4171-B2E8-A7006BFBBDFE","route":"online","durationMs":1009.448375,"tsMs":1794972722544.217}
+{"stage":"tts_stream_total","model":"deepgram-aura-2-stream","requestId":"BDCD14BF-D25B-4171-B2E8-A7006BFBBDFE","route":"online","durationMs":3957.457209,"tsMs":1794972722544.227}
+{"requestId":"EBCC8A28-D984-49E0-B4BC-F84D7FABA0EC","route":"online","output":"voice_processing=off","stage":"stt_final","input":"how are you doing","durationMs":-1,"tsMs":1794972726799.34,"model":"deepgram-nova-2"}
+{"requestId":"9F0C7DED-9EBD-4DC4-AEFB-AD9BAF1D6A65","route":"online","output":"Running smooth. Ready when you are.","stage":"llm","input":"how are you doing","durationMs":865.603959,"tsMs":1794972727665.012,"model":"deepseek-chat"}
+{"model":"deepgram-aura-2-stream","stage":"tts_first_chunk","route":"online","durationMs":1028.538584,"tsMs":1794972732176.88,"requestId":"9F0C7DED-9EBD-4DC4-AEFB-AD9BAF1D6A65"}
+{"model":"deepgram-aura-2-stream","stage":"tts_stream_total","route":"online","durationMs":4494.068334,"tsMs":1794972732176.896,"requestId":"9F0C7DED-9EBD-4DC4-AEFB-AD9BAF1D6A65"}
+{"route":"online","requestId":"87453514-C1F5-4F88-8FD9-3D38A4BB9614","output":"voice_processing=off","stage":"stt_final","input":"quit this application","durationMs":-1,"tsMs":1794972736117.6018,"model":"deepgram-nova-2"}
+{"tsMs":1794972863269.248,"durationMs":864.37675,"stage":"llm","model":"deepseek-chat","input":"what time is it","output":"Checking the clock.","route":"online","requestId":"7720EFB0-5931-4E49-A132-F280A00EE5CA"}
+{"requestId":"7720EFB0-5931-4E49-A132-F280A00EE5CA","model":"deepgram-aura-2-stream","durationMs":1094.351917,"route":"online","stage":"tts_first_chunk","tsMs":1794972869751.1658}
+{"requestId":"7720EFB0-5931-4E49-A132-F280A00EE5CA","model":"deepgram-aura-2-stream","durationMs":6251.172,"route":"online","stage":"tts_stream_total","tsMs":1794972869751.179}
+{"tsMs":1794972872107.2559,"model":"deepseek-chat","stage":"llm","input":"hello","route":"online","requestId":"22639E30-57A9-4CA0-819D-C15038BFBB37","output":"Yo Nik, what's up?","durationMs":668.849125}
+{"tsMs":1794972875479.275,"durationMs":836.698292,"requestId":"22639E30-57A9-4CA0-819D-C15038BFBB37","model":"deepgram-aura-2-stream","route":"online","stage":"tts_first_chunk"}
+{"tsMs":1794972875479.288,"durationMs":3348.103792,"requestId":"22639E30-57A9-4CA0-819D-C15038BFBB37","model":"deepgram-aura-2-stream","route":"online","stage":"tts_stream_total"}
+{"output":"voice_processing=off","requestId":"8637FAEF-386F-4444-B772-0ABBDABC9B47","tsMs":1794972885259.8828,"input":"what's my battery","model":"deepgram-nova-2","durationMs":100.113667,"stage":"stt_final","route":"online"}
+{"output":"Checking your battery.","requestId":"3616E10E-0B72-4880-8841-AE69B67BB4E2","tsMs":1794972886167.711,"model":"deepseek-chat","input":"what's my battery","durationMs":907.767417,"stage":"llm","route":"online"}
+{"model":"deepgram-aura-2-stream","route":"online","requestId":"3616E10E-0B72-4880-8841-AE69B67BB4E2","stage":"tts_first_chunk","durationMs":799.275042,"tsMs":1794972888472.498}
+{"model":"deepgram-aura-2-stream","route":"online","requestId":"3616E10E-0B72-4880-8841-AE69B67BB4E2","stage":"tts_stream_total","durationMs":2269.302333,"tsMs":1794972888472.5051}
+{"output":"voice_processing=off","model":"deepgram-nova-2","stage":"stt_final","tsMs":1794973010471.7432,"durationMs":1003.539208,"route":"online","requestId":"2BBDDD32-7C06-4630-9521-E803F4F621F9","input":"how are you doing"}
+{"model":"deepseek-chat","output":"Running smooth, Nik. Ready when you are.","durationMs":764.078458,"requestId":"94837FB2-7E8F-426D-82B5-6067BFD3CD9B","tsMs":1794973011235.898,"input":"how are you doing","stage":"llm","route":"online"}
+{"route":"online","stage":"tts_first_chunk","durationMs":855.24675,"tsMs":1794973015687.2449,"model":"deepgram-aura-2-stream","requestId":"94837FB2-7E8F-426D-82B5-6067BFD3CD9B"}
+{"route":"online","stage":"tts_stream_total","durationMs":4405.821875,"tsMs":1794973015687.253,"model":"deepgram-aura-2-stream","requestId":"94837FB2-7E8F-426D-82B5-6067BFD3CD9B"}
+{"output":"voice_processing=off","route":"online","durationMs":1005.756167,"tsMs":1794973019070.7258,"input":"opens per eye","requestId":"F00DC6AE-1AB6-4AFF-98E3-127D6D5F813D","stage":"stt_final","model":"deepgram-nova-2"}
+{"output":"Not sure what you mean, Nik. Rephrase?","route":"online","durationMs":814.740917,"tsMs":1794973019885.509,"input":"opens per eye","requestId":"491140C5-4002-4716-8384-CA1C511E0D38","stage":"llm","model":"deepseek-chat"}
+{"route":"online","stage":"tts_first_chunk","durationMs":790.279583,"tsMs":1794973023804.841,"model":"deepgram-aura-2-stream","requestId":"491140C5-4002-4716-8384-CA1C511E0D38"}
+{"route":"online","stage":"tts_stream_total","durationMs":3899.1145,"tsMs":1794973023804.888,"model":"deepgram-aura-2-stream","requestId":"491140C5-4002-4716-8384-CA1C511E0D38"}
+{"output":"voice_processing=off","route":"online","tsMs":1794973028263.5,"model":"deepgram-nova-2","input":"open spotify","durationMs":991.612208,"stage":"stt_final","requestId":"02A3175D-52C4-4C16-A6E6-D936D75727AF"}
+{"output":"Spotify's up.","route":"online","tsMs":1794973028690.213,"input":"open spotify","model":"deepseek-chat","durationMs":426.657458,"stage":"llm","requestId":"9BF271A8-003B-4BCC-9102-4B0D5B6A6584"}
+{"tsMs":1794973031060.4182,"requestId":"9BF271A8-003B-4BCC-9102-4B0D5B6A6584","stage":"tts_first_chunk","route":"online","durationMs":834.928208,"model":"deepgram-aura-2-stream"}
+{"tsMs":1794973031060.4292,"requestId":"9BF271A8-003B-4BCC-9102-4B0D5B6A6584","stage":"tts_stream_total","route":"online","durationMs":2268.047333,"model":"deepgram-aura-2-stream"}
+{"durationMs":803.462459,"tsMs":1794973033973.644,"model":"deepgram-nova-2","route":"online","output":"voice_processing=off","requestId":"692DC41F-F4E0-4864-B1E8-8A9512679BE6","stage":"stt_final","input":"close spotify"}
+{"durationMs":778.826666,"tsMs":1794973034752.5261,"route":"online","model":"deepseek-chat","output":"Spotify closed.","requestId":"611B0C29-08CA-4403-ADB8-7865E9311085","stage":"llm","input":"close spotify"}
+{"route":"online","tsMs":1794973037573.745,"durationMs":775.925083,"stage":"tts_first_chunk","requestId":"611B0C29-08CA-4403-ADB8-7865E9311085","model":"deepgram-aura-2-stream"}
+{"route":"online","tsMs":1794973037573.758,"durationMs":2560.9925,"stage":"tts_stream_total","requestId":"611B0C29-08CA-4403-ADB8-7865E9311085","model":"deepgram-aura-2-stream"}
+{"output":"voice_processing=off","durationMs":95.410459,"input":"where's my battery","stage":"stt_final","model":"deepgram-nova-2","tsMs":1794973042363.814,"requestId":"849B3673-3268-4860-A00D-674A71EDBDFE","route":"online"}
+{"output":"Checking your battery.","input":"where's my battery","durationMs":755.276375,"stage":"llm","model":"deepseek-chat","tsMs":1794973043119.1401,"requestId":"E1188443-28EE-4FBB-B3B8-BBB320131C47","route":"online"}
+{"model":"deepgram-aura-2-stream","requestId":"E1188443-28EE-4FBB-B3B8-BBB320131C47","durationMs":799.817042,"route":"online","tsMs":1794973045255.769,"stage":"tts_first_chunk"}
+{"model":"deepgram-aura-2-stream","requestId":"E1188443-28EE-4FBB-B3B8-BBB320131C47","durationMs":2104.281875,"route":"online","tsMs":1794973045255.7812,"stage":"tts_stream_total"}
+{"requestId":"3EDC18CA-9CDD-4437-8400-18BD35C718BC","output":"voice_processing=off","tsMs":1794973051365.8928,"model":"deepgram-nova-2","durationMs":1000.068625,"route":"online","stage":"stt_final","input":"what's the time"}
+{"requestId":"81923F68-8682-41C7-AF1E-F28C1357CCA0","output":"Checking the clock.","tsMs":1794973052038.439,"model":"deepseek-chat","durationMs":672.49,"route":"online","stage":"llm","input":"what's the time"}
+{"model":"deepgram-aura-2-stream","requestId":"81923F68-8682-41C7-AF1E-F28C1357CCA0","durationMs":790.1585,"route":"online","tsMs":1794973057126.97,"stage":"tts_first_chunk"}
+{"model":"deepgram-aura-2-stream","requestId":"81923F68-8682-41C7-AF1E-F28C1357CCA0","durationMs":5067.276417,"route":"online","tsMs":1794973057126.9797,"stage":"tts_stream_total"}
+{"route":"online","input":"alright quit this application","model":"deepgram-nova-2","tsMs":1794973066867.932,"output":"voice_processing=off","requestId":"4A8B13FC-6CC4-4076-8DA1-60F451C6811A","stage":"stt_final","durationMs":1005.919334}
+{"route":"online","model":"deepseek-chat","input":"alright quit this application","tsMs":1794973067635.906,"output":"Say \"exit\" to close me.","requestId":"C399BE69-D0B3-4A7F-94C6-93CAF7C197B5","stage":"llm","durationMs":767.921917}
+{"route":"online","stage":"tts_first_chunk","durationMs":840.9005,"tsMs":1794973070322.0469,"model":"deepgram-aura-2-stream","requestId":"C399BE69-D0B3-4A7F-94C6-93CAF7C197B5"}
+{"route":"online","stage":"tts_stream_total","durationMs":2666.255291,"tsMs":1794973070322.0579,"model":"deepgram-aura-2-stream","requestId":"C399BE69-D0B3-4A7F-94C6-93CAF7C197B5"}
+{"durationMs":500.007125,"output":"voice_processing=off","tsMs":1794973076674.571,"stage":"stt_final","input":"is it this application","route":"online","requestId":"4522646C-CAB0-4859-A993-C8B9D5C10CC0","model":"deepgram-nova-2"}
+{"durationMs":663.374583,"output":"Yep, that's me. Say \"exit\" to close.","tsMs":1794973077338.006,"stage":"llm","input":"is it this application","route":"online","requestId":"5885EC9D-8E3A-49BC-801A-0D287940176C","model":"deepseek-chat"}
+{"tsMs":1794973081778.378,"requestId":"5885EC9D-8E3A-49BC-801A-0D287940176C","stage":"tts_first_chunk","durationMs":1028.344625,"model":"deepgram-aura-2-stream","route":"online"}
+{"tsMs":1794973081778.3853,"requestId":"5885EC9D-8E3A-49BC-801A-0D287940176C","stage":"tts_stream_total","durationMs":4419.116792,"model":"deepgram-aura-2-stream","route":"online"}
+{"durationMs":1109.209958,"model":"deepgram-nova-2","input":"close this application","route":"online","requestId":"2349E9DA-B0B2-44A0-83F3-FBF623154924","tsMs":1794973085674.546,"output":"voice_processing=off","stage":"stt_final"}
