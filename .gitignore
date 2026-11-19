@@ -10,3 +10,6 @@ DerivedData/
 PersonalLessonApexAgent.md
 logs/*.jsonl
 
+
+# personal study data from the study notch
+data/
