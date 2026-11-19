@@ -202,11 +202,28 @@ final class StudyModel: ObservableObject {
         }
     }
 
+    // Publish the study report online after a session (opt-in: APEX_STUDY_UPLOAD=1).
+    // Runs scripts/study_report.py --upload, which needs STUDY_BUCKET / STUDY_DIST_ID / STUDY_URL
+    // in the environment, so start ApexAgent from a terminal that loaded ~/.zshrc.
+    // Serial background queue: the notch never waits, and two quick stops upload one after another.
+    // Offline is fine: the upload fails, gets logged, and the next one sends the whole report again.
+    private let uploadQueue = DispatchQueue(label: "study.upload")
+
+    private func uploadReport() {
+        guard ProcessInfo.processInfo.environment["APEX_STUDY_UPLOAD"] == "1" else { return }
+        uploadQueue.async {
+            let out = runShell("/usr/bin/env", args: ["python3", "scripts/study_report.py", "--upload", "--no-open"])
+            let last = out.split(separator: "\n").last.map(String.init) ?? "(no output)"
+            print(last.hasPrefix("Live at") ? "☁️ report: \(last)" : "☁️ report upload failed: \(last)")
+        }
+    }
+
     func stop(completed: Bool) {
         guard let name = subject, let began = startedAt else { return }
         tick?.invalidate()
         let studiedMin: Double = completed ? plannedMinutes : (plannedMinutes * 60 - remaining) / 60
         store.appendSession(subject: name, plannedMin: plannedMinutes, actualMin: studiedMin, startedAt: began, endedAt: Date(), completed: completed)
+        if studiedMin >= 1 { uploadReport() }   // quick taps don't change the report enough to upload
         todayMinutes = store.todayMinutes()
         print("📚 study \(completed ? "finished" : "stopped"): \(name), \(String(format: "%.1f", studiedMin)) min saved")
         subject = nil
