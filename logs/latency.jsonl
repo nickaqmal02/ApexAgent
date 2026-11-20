@@ -710,3 +710,20 @@
 {"requestId":"7FB6D14E-CA59-4F5E-8C4E-5892C8C778B8","stage":"tts_first_chunk","durationMs":802.095458,"tsMs":1795021597325.698,"route":"online","model":"deepgram-aura-2-stream"}
 {"model":"deepgram-aura-2-stream","tsMs":1795021597325.707,"stage":"tts_stream_total","requestId":"7FB6D14E-CA59-4F5E-8C4E-5892C8C778B8","route":"online","durationMs":3722.628917}
 {"route":"online","durationMs":798.945459,"output":"voice_processing=off","stage":"stt_final","tsMs":1795021600944.547,"requestId":"ADFA3ABC-F83A-4267-87B7-0B0C22469488","input":"close this application","model":"deepgram-nova-2"}
+{"tsMs":1795096476116.352,"input":"no no two is two","requestId":"27EF668C-0B0F-4055-8F96-C72EC318EE25","stage":"stt_final","route":"online","output":"voice_processing=off","durationMs":1601.477584,"model":"deepgram-nova-2"}
+{"stage":"llm","output":"Got it, two is two. What's up?","model":"deepseek-chat","durationMs":1067.39325,"tsMs":1795096477184.962,"route":"online","requestId":"F2E0151C-56E2-4E76-A0AD-6803D0BC70F8","input":"no no two is two"}
+{"stage":"agent_loop","output":"Got it, two is two. What's up?","model":"answer","durationMs":1067.405333,"tsMs":1795096477184.9722,"route":"steps=0","requestId":"F2E0151C-56E2-4E76-A0AD-6803D0BC70F8","input":"no no two is two"}
+{"durationMs":1136.887958,"tsMs":1795096481218.588,"requestId":"F2E0151C-56E2-4E76-A0AD-6803D0BC70F8","model":"deepgram-aura-2-stream","stage":"tts_first_chunk","route":"online"}
+{"durationMs":3979.637417,"tsMs":1795096481218.6,"requestId":"F2E0151C-56E2-4E76-A0AD-6803D0BC70F8","model":"deepgram-aura-2-stream","stage":"tts_stream_total","route":"online"}
+{"stage":"stt_final","output":"voice_processing=off","model":"deepgram-nova-2","durationMs":904.987584,"tsMs":1795096485622.347,"route":"online","input":"office spotify","requestId":"FFFD1329-1CA9-44F3-9FAD-69792123494A"}
+{"stage":"llm","output":"Spotify opening.","model":"deepseek-chat","durationMs":593.432,"tsMs":1795096486215.8232,"route":"online","input":"office spotify","requestId":"4B8C966E-EC94-4972-B5BC-4B08CBDD2533"}
+{"stage":"agent_step","output":"Opened Spotify.","model":"open_app","durationMs":137.562167,"tsMs":1795096486353.466,"route":"online","input":"open_app(name=Spotify)","requestId":"4B8C966E-EC94-4972-B5BC-4B08CBDD2533"}
+{"stage":"agent_loop","output":"Spotify opening.","model":"done","durationMs":731.092709,"tsMs":1795096486353.483,"route":"steps=1","input":"office spotify","requestId":"4B8C966E-EC94-4972-B5BC-4B08CBDD2533"}
+{"tsMs":1795096489636.509,"requestId":"4B8C966E-EC94-4972-B5BC-4B08CBDD2533","stage":"tts_first_chunk","route":"online","durationMs":1215.417042,"model":"deepgram-aura-2-stream"}
+{"tsMs":1795096489636.5261,"requestId":"4B8C966E-EC94-4972-B5BC-4B08CBDD2533","stage":"tts_stream_total","route":"online","durationMs":3252.243958,"model":"deepgram-aura-2-stream"}
+{"stage":"stt_final","output":"voice_processing=off","model":"deepgram-nova-2","durationMs":423.826417,"tsMs":1795096493339.274,"route":"online","input":"chloe spotify","requestId":"D1F04885-83AC-4ABB-B8D1-DF6ADCD80469"}
+{"stage":"llm","output":"Playing Spotify.","model":"deepseek-chat","durationMs":644.686833,"tsMs":1795096493984.098,"route":"online","input":"chloe spotify","requestId":"3536D7C6-CB79-45A6-90DC-A9B69E4B167C"}
+{"stage":"agent_step","output":"Playing on Spotify.","model":"media_control","durationMs":341.738,"tsMs":1795096494325.87,"route":"online","input":"media_control(action=play,app=Spotify)","requestId":"3536D7C6-CB79-45A6-90DC-A9B69E4B167C"}
+{"stage":"agent_loop","output":"Playing on Spotify.","model":"done","durationMs":986.463458,"tsMs":1795096494325.875,"route":"steps=1","input":"chloe spotify","requestId":"3536D7C6-CB79-45A6-90DC-A9B69E4B167C"}
+{"model":"deepgram-aura-2-stream","tsMs":1795096496812.6821,"durationMs":875.200959,"route":"online","requestId":"3536D7C6-CB79-45A6-90DC-A9B69E4B167C","stage":"tts_first_chunk"}
+{"model":"deepgram-aura-2-stream","tsMs":1795096496812.6921,"durationMs":2467.050042,"route":"online","requestId":"3536D7C6-CB79-45A6-90DC-A9B69E4B167C","stage":"tts_stream_total"}

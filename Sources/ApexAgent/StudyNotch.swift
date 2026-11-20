@@ -159,6 +159,16 @@ final class StudyModel: ObservableObject {
         return String(format: "%02d:%02d", s / 60, s % 60)
     }
 
+    // How close the running pomodoro is to its end: drives the clock pill's colour.
+    // soon = last 20%, final = last minute (or last 10% of a short test session). Breaks stay calm.
+    var urgency: TimerUrgency {
+        guard running, !paused else { return .calm }
+        let total = plannedMinutes * 60
+        if remaining <= min(60, total * 0.1) { return .final }
+        if remaining <= total * 0.2 { return .soon }
+        return .calm
+    }
+
     func timeLabel(_ subject: String) -> String {
         let m = todayMinutes[subject] ?? 0
         return m < 60 ? "\(Int(m.rounded()))m" : String(format: "%.1fh", m / 60)
@@ -349,6 +359,65 @@ let maxSubjectNameLength: Int = 24
 let studyGreen = Color(red: 0.25, green: 0.73, blue: 0.31)
 let studyOrange = Color(red: 0.94, green: 0.53, blue: 0.24)
 let studyBlue = Color(red: 0.35, green: 0.65, blue: 1.0)   // breaks
+let studyRed = Color(red: 1.0, green: 0.33, blue: 0.30)    // the last minute of a pomodoro
+
+enum TimerUrgency { case calm, soon, final }
+
+// Soft capsule behind the subject name and the clock: tinted glass, never loud.
+// strength > 1 brightens it (the final minute breathes with this).
+struct SoftPill: ViewModifier {
+    let tint: Color
+    var strength: Double = 1
+
+    func body(content: Content) -> some View {
+        content
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(Capsule().fill(tint.opacity(0.15 * strength)))
+            .overlay(Capsule().strokeBorder(tint.opacity(0.28 * strength), lineWidth: 0.75))
+    }
+}
+
+// The countdown: calm white, orange in the last 20%, red and breathing in the last minute
+// (a faster heartbeat in the last 10 seconds). Paused = orange, break = blue.
+struct TimerPill: View {
+    @ObservedObject var study: StudyModel
+
+    var body: some View {
+        let urgency = study.urgency
+        TimelineView(.animation(minimumInterval: 1.0 / 30, paused: urgency != .final)) { ctx in
+            let speed: Double = study.remaining <= 10 ? 9 : 4.5
+            let beat: Double = urgency == .final ? 0.5 + 0.5 * sin(ctx.date.timeIntervalSinceReferenceDate * speed) : 0
+            Text(study.clock)
+                .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                .foregroundColor(textColor(urgency))
+                .modifier(SoftPill(tint: tint(urgency), strength: 1 + beat * 1.3))
+                .shadow(color: studyRed.opacity(urgency == .final ? 0.55 * beat : 0), radius: 6)
+                .scaleEffect(1 + 0.04 * beat)
+        }
+        .animation(.easeInOut(duration: 0.6), value: urgency)
+    }
+
+    private func tint(_ u: TimerUrgency) -> Color {
+        if study.paused { return studyOrange }
+        if study.resting { return studyBlue }
+        switch u {
+        case .calm: return .white
+        case .soon: return studyOrange
+        case .final: return studyRed
+        }
+    }
+
+    private func textColor(_ u: TimerUrgency) -> Color {
+        if study.paused { return studyOrange }
+        if study.resting { return studyBlue }
+        switch u {
+        case .calm: return .white
+        case .soon: return Color(red: 1.0, green: 0.72, blue: 0.45)
+        case .final: return Color(red: 1.0, green: 0.55, blue: 0.52)
+        }
+    }
+}
 
 // Each subject gets its own colour, stable across launches (String.hashValue is random per run)
 func subjectAccent(_ name: String) -> Color {
@@ -464,7 +533,7 @@ struct SubjectTile: View {
 // The row beside the camera while a session runs: "● Swift ........ 24:58"
 struct StudyStatusRow: View {
     @ObservedObject var study: StudyModel
-    let width: CGFloat
+    let sides: (left: CGFloat, right: CGFloat)   // the left grows with the subject name
     let notchWidth: CGFloat
     let notchHeight: CGFloat
 
@@ -476,39 +545,44 @@ struct StudyStatusRow: View {
                         Circle().fill(study.paused ? studyOrange : studyGreen).frame(width: 7, height: 7)
                         Text(name).font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundColor(.white).lineLimit(1)
                     }
+                    .modifier(SoftPill(tint: study.paused ? studyOrange : subjectAccent(name)))   // the subject's own tile colour
                 } else if study.resting {
                     HStack(spacing: 5) {
                         Image(systemName: "cup.and.saucer.fill").foregroundColor(study.paused ? studyOrange : studyBlue).font(.system(size: 11))
                         Text("Break").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundColor(.white).lineLimit(1)
                     }
+                    .modifier(SoftPill(tint: study.paused ? studyOrange : studyBlue))
                 } else if study.breakOver {
                     HStack(spacing: 5) {
                         Image(systemName: "bell.fill").foregroundColor(studyBlue).font(.system(size: 11))
                         Text("Break over").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundColor(.white).lineLimit(1)
                     }
+                    .modifier(SoftPill(tint: studyBlue))
                 } else if let done = study.justFinished {
                     HStack(spacing: 5) {
                         Image(systemName: "checkmark.circle.fill").foregroundColor(studyGreen).font(.system(size: 12))
                         Text(done).font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundColor(.white).lineLimit(1)
                     }
+                    .modifier(SoftPill(tint: studyGreen))
                 }
             }
-            .frame(width: 90, alignment: .leading)
-            Spacer(minLength: notchWidth)
+            .frame(width: sides.left - 12, alignment: .leading)
+            Color.clear.frame(width: notchWidth)   // the camera
             Group {
                 if study.running || study.resting {
-                    Text(study.clock).font(.system(size: 13, weight: .semibold, design: .monospaced))
-                        .foregroundColor(study.paused ? studyOrange : (study.resting ? studyBlue : .white))
+                    TimerPill(study: study)
                 } else if study.breakOver {
                     Text("Pick one").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundColor(studyBlue)
+                        .modifier(SoftPill(tint: studyBlue))
                 } else if study.justFinished != nil {
                     Text("Done").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundColor(studyGreen)
+                        .modifier(SoftPill(tint: studyGreen))
                 }
             }
-            .frame(width: 60, alignment: .trailing)
+            .frame(width: sides.right - 12, alignment: .trailing)
         }
         .padding(.horizontal, 12)
-        .frame(width: width, height: notchHeight)
+        .frame(width: sides.left + notchWidth + sides.right, height: notchHeight)
     }
 }
 

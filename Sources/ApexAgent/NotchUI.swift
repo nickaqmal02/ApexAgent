@@ -71,12 +71,42 @@ final class NotchModel: ObservableObject {
     // Idle hugs the notch. Active: a little wider for the icons, plus one or two rows for the words.
     // Priority: hover (study picker) > agent activity > running study session > plain notch
     var size: CGSize {
-        if hovering { return CGSize(width: max(notchWidth + 240, 440), height: notchHeight + 104) }
+        if hovering || (!expanded && study.showsStatus) {
+            let s = statusSides
+            return CGSize(width: s.left + notchWidth + s.right, height: notchHeight + (hovering ? 104 : 0))
+        }
         if expanded { return CGSize(width: notchWidth + 96, height: notchHeight + (labelLines == 2 ? 46 : 28)) }
-        if study.showsStatus { return CGSize(width: notchWidth + 176, height: notchHeight) }   // room for "☕ Break" and the clock
         return CGSize(width: notchWidth, height: notchHeight)
     }
+
+    // The study row's two sides of the camera. The right (clock) keeps a fixed width; the left grows
+    // to fit the subject name, so "RAG LANGCHAIN KN" shows in full instead of "RAG LANG…".
+    var statusSides: (left: CGFloat, right: CGFloat) {
+        let base: CGFloat = hovering ? max(120, (440 - notchWidth) / 2) : 88
+        return (max(base, statusLeftNeeded), base)
+    }
+
+    // The notch is wider on the left only, so shift it left by half the extra:
+    // that keeps the empty middle exactly over the camera.
+    var xOffset: CGFloat {
+        guard hovering || (!expanded && study.showsStatus) else { return 0 }
+        let s = statusSides
+        return (s.right - s.left) / 2
+    }
+
+    // Left side = padding 12 + pill padding 16 + icon 12 + gap 5 + text + 8 breathing room before the camera
+    private var statusLeftNeeded: CGFloat {
+        let text: String? = study.subject ?? (study.resting ? "Break" : (study.breakOver ? "Break over" : study.justFinished))
+        guard let text else { return 0 }
+        return 12 + 16 + 12 + 5 + ceil((text as NSString).size(withAttributes: [.font: statusFont]).width) + 8
+    }
 }
+
+// Same face as the row's Text (12 pt semibold rounded), used to measure the subject name
+@MainActor private let statusFont: NSFont = {
+    let base = NSFont.systemFont(ofSize: 12, weight: .semibold)
+    return base.fontDescriptor.withDesign(.rounded).flatMap { NSFont(descriptor: $0, size: 12) } ?? base
+}()
 
 // Flat top that meets the screen edge, rounded bottom corners like the notch
 struct NotchShape: Shape {
@@ -312,7 +342,7 @@ struct NotchView: View {
 
             if model.hovering {
                 VStack(spacing: 0) {
-                    StudyStatusRow(study: study, width: size.width, notchWidth: model.notchWidth, notchHeight: model.notchHeight)
+                    StudyStatusRow(study: study, sides: model.statusSides, notchWidth: model.notchWidth, notchHeight: model.notchHeight)
                     StudyPicker(study: study).frame(width: size.width, height: 104)
                 }
                 .transition(.opacity)
@@ -339,15 +369,17 @@ struct NotchView: View {
                 }
                 .transition(.opacity)
             } else if study.showsStatus {
-                StudyStatusRow(study: study, width: size.width, notchWidth: model.notchWidth, notchHeight: model.notchHeight)
+                StudyStatusRow(study: study, sides: model.statusSides, notchWidth: model.notchWidth, notchHeight: model.notchHeight)
                     .transition(.opacity)
             }
         }
+        .offset(x: model.xOffset)   // wider on the left only: keep the gap over the camera
         .frame(width: notchPanelWidth, height: model.notchHeight + notchPanelExtraHeight, alignment: .top)
         .animation(.spring(response: 0.38, dampingFraction: 0.8), value: model.state.kind)
         .animation(.spring(response: 0.38, dampingFraction: 0.8), value: model.labelLines)
         .animation(.spring(response: 0.35, dampingFraction: 0.82), value: model.hovering)
         .animation(.spring(response: 0.35, dampingFraction: 0.82), value: study.showsStatus)
+        .animation(.spring(response: 0.35, dampingFraction: 0.82), value: model.xOffset)
         .animation(.easeInOut(duration: 0.4), value: glowTint)
         .onChange(of: model.state.kind) { _ in
             // Overshoot then settle: the pill "jumps" a little when something new happens
@@ -376,7 +408,14 @@ struct NotchView: View {
         if model.hovering { return Color.white.opacity(0.8) }
         if model.expanded { return model.state.tint }
         if study.resting { return study.paused ? studyOrange : studyBlue }
-        if study.running { return study.paused ? studyOrange : studyGreen }
+        if study.running {
+            if study.paused { return studyOrange }
+            switch study.urgency {   // the rim warms up with the clock as the pomodoro ends
+            case .calm: return studyGreen
+            case .soon: return studyOrange
+            case .final: return studyRed
+            }
+        }
         if study.showsStatus { return studyGreen }
         return .clear
     }
@@ -405,7 +444,7 @@ struct NotchView: View {
 }
 
 // The window is a fixed transparent box big enough for the largest look (the study picker)
-let notchPanelWidth: CGFloat = 520
+let notchPanelWidth: CGFloat = 720   // room for a 24-letter subject on the left
 let notchPanelExtraHeight: CGFloat = 110
 
 // A panel that can take typing (the + box) without activating the app
@@ -471,8 +510,8 @@ final class NotchController {
     // The black shape's area on screen (AppKit y grows upward, so the top is screen maxY)
     // Clipped to this screen: a monitor placed above the MacBook starts right at its top edge,
     // and moving the mouse across that edge must not open the notch.
-    private func shapeRect(_ size: CGSize, margin: CGFloat) -> NSRect {
-        NSRect(x: screenFrame.midX - size.width / 2 - margin, y: screenFrame.maxY - size.height - margin,
+    private func shapeRect(_ size: CGSize, margin: CGFloat, offset: CGFloat) -> NSRect {
+        NSRect(x: screenFrame.midX + offset - size.width / 2 - margin, y: screenFrame.maxY - size.height - margin,
                width: size.width + margin * 2, height: size.height + margin * 2).intersection(screenFrame)
     }
 
@@ -481,12 +520,12 @@ final class NotchController {
         let mouse: NSPoint = NSEvent.mouseLocation
         if model.hovering {
             // Stay open while the mouse is near, or while typing a new subject
-            if !model.study.typing && !shapeRect(model.size, margin: 14).contains(mouse) {
+            if !model.study.typing && !shapeRect(model.size, margin: 14, offset: model.xOffset).contains(mouse) {
                 model.hovering = false
                 panel.ignoresMouseEvents = true
                 panel.resignKey()
             }
-        } else if shapeRect(model.size, margin: 2).contains(mouse) {
+        } else if shapeRect(model.size, margin: 2, offset: model.xOffset).contains(mouse) {
             model.hovering = true
             panel.ignoresMouseEvents = false   // open: the panel takes clicks
         }
