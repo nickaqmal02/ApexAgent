@@ -131,6 +131,21 @@ struct NotchShape: Shape {
     }
 }
 
+// Frosted glass from AppKit: blurs the menu bar, wallpaper and windows behind the notch.
+// Dark HUD material so white text reads on any wallpaper.
+struct GlassBackground: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+        view.material = .hudWindow
+        view.blendingMode = .behindWindow
+        view.state = .active                       // keep blurring even though the app is never focused
+        view.appearance = NSAppearance(named: .darkAqua)
+        return view
+    }
+
+    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
+}
+
 // The glossy look: a faint top-to-bottom sheen (like light on glass) and, while the agent
 // works or you hover, a slow diagonal band of light sweeping across.
 // No band during a study session: a 25-minute shimmer would be distracting.
@@ -163,16 +178,6 @@ struct GlossOverlay: View {
 enum GlowEnergy: Equatable {
     case off, calm, hover, listening, thinking, acting, speaking
 
-    var speed: Double {       // comet laps per second around the rim
-        switch self {
-        case .off, .calm: return 0
-        case .hover: return 0.18
-        case .listening: return 0.3
-        case .thinking: return 0.75
-        case .acting: return 0.5
-        case .speaking: return 0.4
-        }
-    }
     var breathPeriod: Double { // seconds per glow in-and-out
         switch self {
         case .thinking: return 0.9
@@ -193,8 +198,7 @@ enum GlowEnergy: Equatable {
     }
 }
 
-// The living layer: a comet of light running around the rim, aurora blobs drifting inside,
-// and a glow that breathes. Driven by a TimelineView that is paused when idle, so an idle
+// The living layer: a rim and outer glow that breathe in the state colour. Driven by a TimelineView that is paused when idle, so an idle
 // notch costs no frames at all.
 struct LivingGlow: View {
     let tint: Color
@@ -209,43 +213,8 @@ struct LivingGlow: View {
             GeometryReader { geo in
                 let w = geo.size.width, h = geo.size.height
                 ZStack {
-                    // Aurora: two soft blobs of the state colour drifting past each other
-                    if s > 0.4 {
-                        ZStack {
-                            Ellipse()
-                                .fill(tint.opacity(0.45 * s))
-                                .frame(width: w * 0.45, height: h * 0.9)
-                                .blur(radius: 18)
-                                .offset(x: CGFloat(sin(t * 0.9)) * w * 0.3, y: h * 0.45)
-                            Ellipse()
-                                .fill(Color.white.opacity(0.18 * s))
-                                .frame(width: w * 0.3, height: h * 0.7)
-                                .blur(radius: 16)
-                                .offset(x: CGFloat(cos(t * 0.7 + 1.3)) * w * 0.32, y: h * 0.5)
-                        }
-                        .frame(width: w, height: h)
-                        .clipShape(NotchShape(bottomRadius: radius))
-                    }
-                    // Comet: a bright arc travelling around the rim
-                    if energy.speed > 0 {
-                        NotchShape(bottomRadius: radius)
-                            .stroke(
-                                AngularGradient(
-                                    gradient: Gradient(stops: [
-                                        .init(color: .clear, location: 0.0),
-                                        .init(color: .clear, location: 0.55),
-                                        .init(color: tint.opacity(0.9), location: 0.85),
-                                        .init(color: .white, location: 0.93),
-                                        .init(color: .clear, location: 1.0),
-                                    ]),
-                                    center: .center,
-                                    angle: .degrees((t * energy.speed * 360).truncatingRemainder(dividingBy: 360))
-                                ),
-                                lineWidth: 2
-                            )
-                            .blur(radius: 0.6)
-                    }
-                    // Breathing rim, always on while there is any energy
+                    // Breathing rim in the state colour. (The travelling comet and drifting aurora
+                    // were removed: the only motion now is the shine sweep in GlossOverlay.)
                     NotchShape(bottomRadius: radius)
                         .stroke(tint.opacity((0.25 + 0.45 * breath) * s), lineWidth: 1.2)
                 }
@@ -327,8 +296,16 @@ struct NotchView: View {
         let size = model.size
         let radius: CGFloat = (model.expanded || model.hovering) ? 16 : 8
         ZStack(alignment: .top) {
-            NotchShape(bottomRadius: radius)
-                .fill(Color.black)
+            // Transparent glass: blur what's behind, a light smoky tint so white text stays readable,
+            // and a thin bright edge. (The real camera notch stays black: it has no pixels.)
+            GlassBackground()
+                .overlay(NotchShape(bottomRadius: radius).fill(Color.black.opacity(0.28)))
+                .clipShape(NotchShape(bottomRadius: radius))
+                .overlay(
+                    NotchShape(bottomRadius: radius)
+                        .stroke(LinearGradient(colors: [Color.white.opacity(0.05), Color.white.opacity(0.35)],
+                                               startPoint: .top, endPoint: .bottom), lineWidth: 0.8)
+                )
                 .frame(width: size.width, height: size.height)
                 // Glass: a soft sheen and a moving light band, clipped to the notch
                 .overlay(
