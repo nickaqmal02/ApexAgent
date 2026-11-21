@@ -11,24 +11,102 @@ import SwiftUI
 
 // MARK: - Storage
 
-// One subject, its pomodoro length and its break length. Editable from the notch (the pencil on each tile).
+// The four parts of the day the notch tracks. Each activity (a "subject") belongs to one.
+// Saved by its raw value in subjects.json, so the order and labels can change freely.
+enum StudyCategory: String, Codable, CaseIterable, Identifiable {
+    case academic, health, soul, personal
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .academic: return "Academic"
+        case .health: return "Health"
+        case .soul: return "Soul"
+        case .personal: return "Personal"
+        }
+    }
+
+    var icon: String {   // SF Symbols
+        switch self {
+        case .academic: return "book.fill"
+        case .health: return "figure.walk"
+        case .soul: return "moon.stars.fill"
+        case .personal: return "drop.fill"
+        }
+    }
+
+    // Same four colours as the web report's dark mode (checked for colour-blind separation there):
+    // blue #3987e5, teal #199e70, gold #c98500, pink #d55181
+    var color: Color {
+        switch self {
+        case .academic: return Color(red: 0x39 / 255, green: 0x87 / 255, blue: 0xe5 / 255)
+        case .health: return Color(red: 0x19 / 255, green: 0x9e / 255, blue: 0x70 / 255)
+        case .soul: return Color(red: 0xc9 / 255, green: 0x85 / 255, blue: 0x00 / 255)
+        case .personal: return Color(red: 0xd5 / 255, green: 0x51 / 255, blue: 0x81 / 255)
+        }
+    }
+
+    var next: StudyCategory {
+        let all = Self.allCases
+        return all[(all.firstIndex(of: self)! + 1) % all.count]
+    }
+}
+
+// One activity: its pomodoro length, break length and category. Editable from the notch (the pencil on each tile).
 struct Subject: Codable, Hashable {
     var name: String
     var minutes: Double
     var breakMinutes: Double = 5
+    var category: StudyCategory = .academic
+    // Optional choices asked when you tap the tile, e.g. Pray → Subuh / Zohor / Asar / Maghrib / Isyak.
+    // The choice is saved in the CSV's detail column. Empty = start straight away.
+    var options: [String] = []
+    // true: the day counts only when every option is done (the five fard prayers).
+    // false: any one option done counts the day (sunnah prayers: Dhuha, Tahajjud, ...).
+    var needsAll: Bool = true
+    // A habit gets a card on the report's Habits page and counts toward a perfect day.
+    // Off = time only (toilet, coffee): the time is still counted everywhere else.
+    // Academic subjects are never habits on their own (they share the one Study card).
+    var isHabit: Bool = true
 
-    init(name: String, minutes: Double, breakMinutes: Double = 5) {
+    init(name: String, minutes: Double, breakMinutes: Double = 5, category: StudyCategory = .academic,
+         options: [String] = [], needsAll: Bool = true, isHabit: Bool? = nil) {
         self.name = name
         self.minutes = minutes
         self.breakMinutes = breakMinutes
+        self.category = category
+        self.options = options
+        self.needsAll = needsAll
+        self.isHabit = isHabit ?? (category != .academic)
     }
 
-    // Files saved before breaks existed have no breakMinutes: use 5
+    // Ready-made choices for a new activity, by name:
+    //   Pray / Solat      → the five daily prayers, all needed for the day
+    //   Sunnah / Nawafil  → common sunnah prayers, any one counts the day
+    // Any activity's choices can be changed later in its edit view (the Choices line).
+    static func defaultOptions(for name: String) -> [String] {
+        switch name.lowercased() {
+        case "pray", "solat", "prayer": return ["Subuh", "Zohor", "Asar", "Maghrib", "Isyak"]
+        case "sunnah", "sunat", "solat sunat", "sunnah prayer", "nawafil": return ["Dhuha", "Rawatib", "Tahajjud", "Witir", "Hajat"]
+        default: return []
+        }
+    }
+
+    static func defaultNeedsAll(for name: String) -> Bool {
+        !["sunnah", "sunat", "solat sunat", "sunnah prayer", "nawafil"].contains(name.lowercased())
+    }
+
+    // Older files: no breakMinutes means 5, no category means Academic (everything so far was study)
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         name = try c.decode(String.self, forKey: .name)
         minutes = try c.decode(Double.self, forKey: .minutes)
         breakMinutes = try c.decodeIfPresent(Double.self, forKey: .breakMinutes) ?? 5
+        category = (try? c.decodeIfPresent(StudyCategory.self, forKey: .category)) ?? .academic
+        options = (try? c.decodeIfPresent([String].self, forKey: .options)) ?? Subject.defaultOptions(for: name)
+        needsAll = (try? c.decodeIfPresent(Bool.self, forKey: .needsAll)) ?? Subject.defaultNeedsAll(for: name)
+        isHabit = (try? c.decodeIfPresent(Bool.self, forKey: .isHabit)) ?? (category != .academic)
     }
 }
 
@@ -36,7 +114,9 @@ struct StudyStore {
     let folder: URL
     var subjectsURL: URL { folder.appendingPathComponent("subjects.json") }
     var sessionsURL: URL { folder.appendingPathComponent("study_sessions.csv") }
-    static let header: String = "id,subject,planned_min,actual_min,started_at,ended_at,completed\n"
+    static let header: String = "id,subject,planned_min,actual_min,started_at,ended_at,completed,category,detail\n"
+    static let headerBeforeCategories: String = "id,subject,planned_min,actual_min,started_at,ended_at,completed"
+    static let headerBeforeDetail: String = "id,subject,planned_min,actual_min,started_at,ended_at,completed,category"
 
     init() {
         folder = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("data")
@@ -60,12 +140,17 @@ struct StudyStore {
     }
 
     // Quotes around the subject so a comma in a name cannot break the columns
-    func appendSession(subject: String, plannedMin: Double, actualMin: Double, startedAt: Date, endedAt: Date, completed: Bool) {
+    // The category is stored on the row, so moving an activity to another tab later does not rewrite its history
+    // detail = the option chosen for this session (which prayer), empty when the activity has none
+    func appendSession(subject: String, category: StudyCategory, detail: String?, plannedMin: Double, actualMin: Double,
+                       startedAt: Date, endedAt: Date, completed: Bool) {
         let iso = ISO8601DateFormatter()
         iso.timeZone = .current
-        let safeSubject: String = "\"" + subject.replacingOccurrences(of: "\"", with: "\"\"") + "\""
-        let row: String = [UUID().uuidString, safeSubject, String(format: "%.1f", plannedMin), String(format: "%.1f", actualMin),
-                           iso.string(from: startedAt), iso.string(from: endedAt), completed ? "1" : "0"].joined(separator: ",") + "\n"
+        let quote = { (s: String) in "\"" + s.replacingOccurrences(of: "\"", with: "\"\"") + "\"" }
+        let row: String = [UUID().uuidString, quote(subject), String(format: "%.1f", plannedMin), String(format: "%.1f", actualMin),
+                           iso.string(from: startedAt), iso.string(from: endedAt), completed ? "1" : "0", category.rawValue,
+                           detail.map(quote) ?? ""]
+            .joined(separator: ",") + "\n"
         if !FileManager.default.fileExists(atPath: sessionsURL.path) {
             try? Self.header.data(using: .utf8)?.write(to: sessionsURL)
         }
@@ -82,10 +167,63 @@ struct StudyStore {
         var totals: [String: Double] = [:]
         for line in text.split(separator: "\n").dropFirst() {
             let cols = Self.parseCSVLine(String(line))
-            guard cols.count == 7, let minutes = Double(cols[3]), let started = iso.date(from: cols[4]) else { continue }
+            guard cols.count >= 7, let minutes = Double(cols[3]), let started = iso.date(from: cols[4]) else { continue }
             if Calendar.current.isDateInToday(started) { totals[cols[1], default: 0] += minutes }
         }
         return totals
+    }
+
+    // One-time upgrade of a CSV written before categories existed: copy it to a backup, then add a
+    // category column to every row, taken from the activity list as it is now (names no longer in
+    // the list, e.g. renamed ones, become academic: everything before categories was study).
+    // Does nothing once the header has the column, so it is safe to run on every start.
+    func upgradeSessionsIfNeeded(categoryOf: (String) -> StudyCategory) {
+        guard let text = try? String(contentsOf: sessionsURL, encoding: .utf8) else { return }
+        let lines = text.split(separator: "\n").map(String.init)
+        guard let first = lines.first?.trimmingCharacters(in: .whitespaces) else { return }
+        // Already has categories, only the detail column is new: rewrite the header line. Old rows simply
+        // have no detail (readers treat a missing last column as empty), so they stay as they are.
+        if first == Self.headerBeforeDetail {
+            let rest = text.drop(while: { $0 != "\n" })
+            do {
+                try (Self.header.dropLast() + rest).write(to: sessionsURL, atomically: true, encoding: .utf8)
+                print("📚 study CSV upgraded: added a detail column")
+            } catch {
+                print("📚 study CSV upgrade failed: \(error.localizedDescription)")
+            }
+            return
+        }
+        guard first == Self.headerBeforeCategories else { return }
+        let backup = folder.appendingPathComponent("study_sessions.before-categories.csv")
+        if !FileManager.default.fileExists(atPath: backup.path) {
+            do { try FileManager.default.copyItem(at: sessionsURL, to: backup) }
+            catch { print("📚 study CSV upgrade skipped: could not make a backup (\(error.localizedDescription))"); return }
+        }
+        var out: String = Self.header
+        for line in lines.dropFirst() where !line.isEmpty {
+            let cols = Self.parseCSVLine(line)
+            out += line + "," + (cols.count >= 2 ? categoryOf(cols[1]) : .academic).rawValue + "\n"
+        }
+        do {
+            try out.write(to: sessionsURL, atomically: true, encoding: .utf8)
+            print("📚 study CSV upgraded: added a category column to \(lines.count - 1) rows (backup: \(backup.lastPathComponent))")
+        } catch {
+            print("📚 study CSV upgrade failed: \(error.localizedDescription)")
+        }
+    }
+
+    // "name|detail" for every option finished today (Pray|Subuh ...), to tick them in the picker
+    func todayDoneDetails() -> Set<String> {
+        guard let text = try? String(contentsOf: sessionsURL, encoding: .utf8) else { return [] }
+        let iso = ISO8601DateFormatter()
+        var done: Set<String> = []
+        for line in text.split(separator: "\n").dropFirst() {
+            let cols = Self.parseCSVLine(String(line))
+            guard cols.count >= 9, !cols[8].isEmpty, cols[6] == "1", let started = iso.date(from: cols[4]),
+                  Calendar.current.isDateInToday(started) else { continue }
+            done.insert(cols[1] + "|" + cols[8])
+        }
+        return done
     }
 
     static func parseCSVLine(_ line: String) -> [String] {
@@ -123,11 +261,20 @@ final class StudyModel: ObservableObject {
     @Published var editName: String = ""
     @Published var editMinutes: String = ""
     @Published var editBreak: String = ""
+    @Published var editCategory: StudyCategory = .academic
+    @Published var editOptions: String = ""        // "Dhuha, Tahajjud, Witir": the choices, comma separated
+    @Published var editIsHabit: Bool = true         // off = time only (toilet, coffee)
+    // The category tab open in the picker; new activities go into it
+    @Published var category: StudyCategory = .academic
     // The break after a finished pomodoro: whose break it is, and a short "break over" notice
     @Published var breakFor: String? = nil
     @Published var breakOver: Bool = false
     // The running session
     @Published var subject: String? = nil
+    @Published var detail: String? = nil          // the option picked for the running session (which prayer)
+    @Published var choosing: Subject? = nil       // tapped an activity with options: the picker asks which one
+    @Published var todayDone: Set<String> = []    // "Pray|Subuh" etc. finished today
+    @Published var choosingTick: Bool = false      // the choice came from ✓ (log it) rather than a tap (start the timer)
     @Published var remaining: TimeInterval = 0
     @Published var paused: Bool = false
     @Published var justFinished: String? = nil
@@ -143,8 +290,11 @@ final class StudyModel: ObservableObject {
     private var tick: Timer? = nil
 
     init() {
-        subjects = store.loadSubjects()
+        let loaded = store.loadSubjects()
+        subjects = loaded
+        store.upgradeSessionsIfNeeded { name in loaded.first { $0.name == name }?.category ?? .academic }
         todayMinutes = store.todayMinutes()
+        todayDone = store.todayDoneDetails()
         store.saveSubjects(subjects)
     }
 
@@ -153,6 +303,14 @@ final class StudyModel: ObservableObject {
     var showsStatus: Bool { running || resting || justFinished != nil || breakOver }
     // Typing in the + or edit box: keep the notch open even if the mouse wanders off
     var typing: Bool { adding || editing != nil }
+
+    // Tiles shown under the open category tab
+    var visibleSubjects: [Subject] { subjects.filter { $0.category == category } }
+
+    // Category of the running (or just-finished / resting) activity, for the status row icon
+    func categoryOf(_ name: String) -> StudyCategory {
+        subjects.first { $0.name == name }?.category ?? .academic
+    }
 
     var clock: String {
         let s = Int(remaining.rounded(.up))
@@ -169,18 +327,62 @@ final class StudyModel: ObservableObject {
         return .calm
     }
 
+    func doneToday(_ name: String, _ option: String) -> Bool { todayDone.contains(name + "|" + option) }
+
     func timeLabel(_ subject: String) -> String {
         let m = todayMinutes[subject] ?? 0
         return m < 60 ? "\(Int(m.rounded()))m" : String(format: "%.1fh", m / 60)
     }
 
-    func start(_ item: Subject) {
+    // "Pray · Asar" while a session with a chosen option runs, otherwise just the name
+    var subjectLabel: String? {
+        guard let name = subject else { return nil }
+        return detail.map { "\(name) · \($0)" } ?? name
+    }
+
+    // The ✓ on a habit tile: "I already did it" without running the timer (a walk done away from the Mac).
+    // Activities with choices ask which one first (Pray → Asar), then log it the same way.
+    func tick(_ item: Subject) {
+        if item.options.isEmpty { checkIn(item) } else { choosing = item; choosingTick = true }
+    }
+
+    // Logs a finished session of the activity's full length, ending now, as if the timer ran.
+    // No break, no sound loop: just saved, a short "✓" in the notch, and the report rebuilt.
+    func checkIn(_ item: Subject, detail chosen: String? = nil) {
+        choosing = nil
+        choosingTick = false
+        let end = Date()
+        store.appendSession(subject: item.name, category: item.category, detail: chosen, plannedMin: item.minutes,
+                            actualMin: item.minutes, startedAt: end.addingTimeInterval(-item.minutes * 60), endedAt: end, completed: true)
+        todayMinutes = store.todayMinutes()
+        todayDone = store.todayDoneDetails()
+        let label: String = chosen.map { "\(item.name) · \($0)" } ?? item.name
+        print("📚 checked in: \(label), \(Int(item.minutes)) min")
+        NSSound(named: "Glass")?.play()
+        if !running && !resting {
+            justFinished = label
+            DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+                MainActor.assumeIsolated { if self.justFinished == label { self.justFinished = nil } }
+            }
+        }
+        reportSoon()
+    }
+
+    // Tapping a tile: activities with options ask first (Pray → which prayer), the rest start now
+    func tap(_ item: Subject) {
+        choosingTick = false
+        if item.options.isEmpty { start(item) } else { choosing = item }
+    }
+
+    func start(_ item: Subject, detail chosen: String? = nil) {
+        choosing = nil
         if running { stop(completed: false) }
         if resting { endBreak(finished: false) }   // starting a subject ends the break early
         breakOver = false
         plannedMinutes = testMinutes ?? item.minutes
         let name: String = item.name
         subject = name
+        detail = chosen
         startedAt = Date()
         remaining = plannedMinutes * 60
         endDate = Date().addingTimeInterval(remaining)
@@ -190,7 +392,7 @@ final class StudyModel: ObservableObject {
         tick = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { _ in
             MainActor.assumeIsolated { self.update() }
         }
-        print("📚 study started: \(name), \(plannedMinutes) min")
+        print("📚 study started: \(subjectLabel ?? name), \(plannedMinutes) min")
     }
 
     // Uses the end time, not a counter, so the clock stays right even if the Mac is busy
@@ -219,24 +421,43 @@ final class StudyModel: ObservableObject {
     // Offline is fine: the upload fails, gets logged, and the next one sends the whole report again.
     private let uploadQueue = DispatchQueue(label: "study.upload")
 
+    // Rebuilds data/study_report.html, and uploads it too when APEX_STUDY_UPLOAD=1.
+    // Without the upload setting it still rebuilds the local file, so the page on disk is never stale.
     private func uploadReport() {
-        guard ProcessInfo.processInfo.environment["APEX_STUDY_UPLOAD"] == "1" else { return }
+        let upload: Bool = ProcessInfo.processInfo.environment["APEX_STUDY_UPLOAD"] == "1"
         uploadQueue.async {
-            let out = runShell("/usr/bin/env", args: ["python3", "scripts/study_report.py", "--upload", "--no-open"])
+            let args = ["python3", "scripts/study_report.py", "--no-open"] + (upload ? ["--upload"] : [])
+            let out = runShell("/usr/bin/env", args: args)
             let last = out.split(separator: "\n").last.map(String.init) ?? "(no output)"
-            print(last.hasPrefix("Live at") ? "☁️ report: \(last)" : "☁️ report upload failed: \(last)")
+            if !upload { print("📄 report rebuilt locally: \(last)") }
+            else { print(last.hasPrefix("Live at") ? "☁️ report: \(last)" : "☁️ report upload failed: \(last)") }
         }
+    }
+
+    // After adding, editing or removing an activity: rebuild the report so new names, categories,
+    // lengths and prayer choices show up. Waits 3 s so a burst of edits makes one upload, not five.
+    private var pendingReport: DispatchWorkItem?
+
+    private func reportSoon() {
+        pendingReport?.cancel()
+        let work = DispatchWorkItem { [weak self] in MainActor.assumeIsolated { self?.uploadReport() } }
+        pendingReport = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: work)
     }
 
     func stop(completed: Bool) {
         guard let name = subject, let began = startedAt else { return }
         tick?.invalidate()
         let studiedMin: Double = completed ? plannedMinutes : (plannedMinutes * 60 - remaining) / 60
-        store.appendSession(subject: name, plannedMin: plannedMinutes, actualMin: studiedMin, startedAt: began, endedAt: Date(), completed: completed)
+        store.appendSession(subject: name, category: categoryOf(name), detail: detail, plannedMin: plannedMinutes, actualMin: studiedMin,
+                            startedAt: began, endedAt: Date(), completed: completed)
         if studiedMin >= 1 { uploadReport() }   // quick taps don't change the report enough to upload
         todayMinutes = store.todayMinutes()
-        print("📚 study \(completed ? "finished" : "stopped"): \(name), \(String(format: "%.1f", studiedMin)) min saved")
+        todayDone = store.todayDoneDetails()
+        let label: String = subjectLabel ?? name
+        print("📚 study \(completed ? "finished" : "stopped"): \(label), \(String(format: "%.1f", studiedMin)) min saved")
         subject = nil
+        detail = nil
         startedAt = nil
         endDate = nil
         paused = false
@@ -246,9 +467,9 @@ final class StudyModel: ObservableObject {
             if breakLength > 0 {
                 startBreak(for: name, minutes: breakLength)
             } else {
-                justFinished = name
+                justFinished = label   // "Pray · Asar ✓"
                 DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
-                    MainActor.assumeIsolated { if self.justFinished == name { self.justFinished = nil } }
+                    MainActor.assumeIsolated { if self.justFinished == label { self.justFinished = nil } }
                 }
             }
         }
@@ -293,8 +514,11 @@ final class StudyModel: ObservableObject {
     func addSubject() {
         let name = newName.trimmingCharacters(in: .whitespacesAndNewlines)
         if !name.isEmpty && !subjects.contains(where: { $0.name.lowercased() == name.lowercased() }) {
-            subjects.append(Subject(name: String(name.prefix(maxSubjectNameLength)), minutes: 25))
+            let clean = String(name.prefix(maxSubjectNameLength))
+            subjects.append(Subject(name: clean, minutes: 25, category: category, options: Subject.defaultOptions(for: clean),
+                                    needsAll: Subject.defaultNeedsAll(for: clean)))
             store.saveSubjects(subjects)
+            reportSoon()   // the web report shows the change too
         }
         newName = ""
         adding = false
@@ -306,6 +530,9 @@ final class StudyModel: ObservableObject {
         editName = item.name
         editMinutes = String(Int(item.minutes))
         editBreak = String(Int(item.breakMinutes))
+        editCategory = item.category
+        editOptions = item.options.joined(separator: ", ")
+        editIsHabit = item.isHabit
         onNeedKeyboard?()
     }
 
@@ -333,7 +560,17 @@ final class StudyModel: ObservableObject {
         if let rest = Int(editBreak.trimmingCharacters(in: .whitespaces)) {
             subjects[index].breakMinutes = Double(max(0, min(60, rest)))
         }
+        subjects[index].category = editCategory
+        subjects[index].isHabit = editCategory != .academic && editIsHabit
+        // Choices: comma separated, blanks and repeats dropped, at most 8 so they fit on one row
+        var seen: Set<String> = []
+        subjects[index].options = editOptions.split(separator: ",")
+            .map { String($0.trimmingCharacters(in: .whitespaces).prefix(14)) }
+            .filter { !$0.isEmpty && seen.insert($0.lowercased()).inserted }
+            .prefix(8).map { $0 }
+        category = editCategory   // follow the activity to its new tab
         store.saveSubjects(subjects)
+        reportSoon()   // the web report shows the change too
         cancelEdit()
     }
 
@@ -342,11 +579,13 @@ final class StudyModel: ObservableObject {
         editName = ""
         editMinutes = ""
         editBreak = ""
+        editOptions = ""
     }
 
     func remove(_ name: String) {
         subjects.removeAll { $0.name == name }
         store.saveSubjects(subjects)
+        reportSoon()   // the web report shows the change too
         cancelEdit()
     }
 }
@@ -454,6 +693,7 @@ struct SubjectTile: View {
     let index: Int
     let onTap: () -> Void
     let onEdit: () -> Void
+    var onTick: (() -> Void)? = nil   // the ✓ badge; habits only
     @State private var hover = false
     @State private var pressed = false
     @State private var shown = false
@@ -466,7 +706,14 @@ struct SubjectTile: View {
             Text(item.name).font(.system(size: 12, weight: .semibold, design: .rounded))
                 .lineLimit(1).minimumScaleFactor(0.55)
             Text(item.breakMinutes > 0 ? "\(Int(item.minutes)) + \(Int(item.breakMinutes)) min" : "\(Int(item.minutes)) min").font(.system(size: 10, weight: .medium, design: .rounded)).foregroundColor(.white.opacity(0.75))
-            Text("\(today) today").font(.system(size: 9, weight: .medium, design: .rounded)).foregroundColor(.white.opacity(0.45))
+            HStack(spacing: 2) {
+                // Time-only activities (toilet, coffee) get a small clock so they read as "not a habit"
+                if !item.isHabit && item.category != .academic {
+                    Image(systemName: "clock").font(.system(size: 7.5, weight: .semibold))
+                }
+                Text("\(today) today").font(.system(size: 9, weight: .medium, design: .rounded))
+            }
+            .foregroundColor(.white.opacity(0.45))
         }
         .foregroundColor(.white)
         .padding(.horizontal, 4)
@@ -500,6 +747,20 @@ struct SubjectTile: View {
                 }
                 .buttonStyle(LivelyButtonStyle(glow: accent))
                 .offset(x: 4, y: -4)
+                .transition(.scale(scale: 0.2).combined(with: .opacity))
+            }
+        }
+        // ✓ on habit tiles (not study): "already did it", logs it without running the timer
+        .overlay(alignment: .topLeading) {
+            if hover, let onTick, item.category != .academic {
+                Button(action: onTick) {
+                    Image(systemName: "checkmark").font(.system(size: 9, weight: .heavy)).foregroundColor(.white)
+                        .frame(width: 18, height: 18)
+                        .background(Circle().fill(item.category.color))
+                }
+                .buttonStyle(LivelyButtonStyle(glow: item.category.color))
+                .help("Done already: log it without the timer")
+                .offset(x: -4, y: -4)
                 .transition(.scale(scale: 0.2).combined(with: .opacity))
             }
         }
@@ -540,10 +801,14 @@ struct StudyStatusRow: View {
     var body: some View {
         HStack(spacing: 0) {
             Group {
-                if let name = study.subject {
+                if let name = study.subject, let label = study.subjectLabel {
                     HStack(spacing: 5) {
-                        Circle().fill(study.paused ? studyOrange : studyGreen).frame(width: 7, height: 7)
-                        Text(name).font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundColor(.white).lineLimit(1)
+                        // The activity's category icon (book, walker, moon, drop); orange while paused
+                        Image(systemName: study.categoryOf(name).icon)
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundColor(study.paused ? studyOrange : study.categoryOf(name).color)
+                            .frame(width: 12)
+                        Text(label).font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundColor(.white).lineLimit(1)
                     }
                     .modifier(SoftPill(tint: study.paused ? studyOrange : subjectAccent(name)))   // the subject's own tile colour
                 } else if study.resting {
@@ -602,10 +867,19 @@ struct StudyPicker: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 9).padding(.vertical, 6)
                         .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.12)))
-                        .frame(width: 170)
+                        .frame(width: 150)
                         .focused($nameFocused)
                         .onSubmit { study.saveEdit() }
                         .onAppear { nameFocused = true }
+                    // Tap to move the activity to the next category
+                    Button { study.editCategory = study.editCategory.next } label: {
+                        Label(study.editCategory.label, systemImage: study.editCategory.icon)
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .foregroundColor(study.editCategory.color)
+                            .modifier(SoftPill(tint: study.editCategory.color))
+                    }
+                    .buttonStyle(LivelyButtonStyle(glow: study.editCategory.color))
+                    .help("Change category")
                     pill("Save", studyGreen) { study.saveEdit() }
                     Button { if let name = study.editing { study.remove(name) } } label: {
                         Image(systemName: "trash").font(.system(size: 11, weight: .semibold)).foregroundColor(.white.opacity(0.7))
@@ -628,10 +902,66 @@ struct StudyPicker: View {
                     stepButton("plus") { study.nudgeBreak(1) }
                     Text("min").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundColor(.white.opacity(0.6))
                 }
+                // Line 3 (habits only): the choices asked when you tap the tile, comma separated.
+                // Empty = no question, the timer starts straight away.
+                if study.editCategory != .academic {
+                    HStack(spacing: 6) {
+                        // Habit on: a card on the Habits page, counts toward a perfect day.
+                        // Off: time only (toilet, coffee), still counted in every time total.
+                        Button { study.editIsHabit.toggle() } label: {
+                            Label(study.editIsHabit ? "Habit" : "Time only",
+                                  systemImage: study.editIsHabit ? "checkmark.circle.fill" : "clock")
+                                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                .foregroundColor(study.editIsHabit ? study.editCategory.color : .white.opacity(0.7))
+                                .modifier(SoftPill(tint: study.editIsHabit ? study.editCategory.color : .white.opacity(0.6)))
+                        }
+                        .buttonStyle(LivelyButtonStyle(glow: study.editCategory.color))
+                        .help("Habit: shown on the Habits page. Time only: just counts the time.")
+                        Text("Choices").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundColor(study.editCategory.color)
+                        TextField("e.g. Dhuha, Tahajjud, Witir", text: $study.editOptions)
+                            .textFieldStyle(.plain)
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 8).padding(.vertical, 5)
+                            .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.12)))
+                            .frame(width: 220)
+                            .onSubmit { study.saveEdit() }
+                    }
+                }
             }
+        } else if let item = study.choosing {
+            // Which one? e.g. Pray → Subuh · Zohor · Asar · Maghrib · Isyak. Ones already done today are ticked.
+            let tint = item.category.color
+            VStack(spacing: 10) {
+                HStack(spacing: 6) {
+                    Image(systemName: item.category.icon).foregroundColor(tint).font(.system(size: 11, weight: .semibold))
+                    // From ✓: "Which prayer did you do?" (logs it). From a tap: "Which prayer?" (starts the timer).
+                    Text("Which \(["pray", "solat", "sunnah", "sunat"].contains { item.name.lowercased().contains($0) } ? "prayer" : "one")\(study.choosingTick ? " did you do" : "")?")
+                        .font(.system(size: 12.5, weight: .semibold, design: .rounded)).foregroundColor(.white)
+                }
+                HStack(spacing: 6) {
+                    ForEach(item.options, id: \.self) { option in
+                        let done = study.doneToday(item.name, option)
+                        Button { study.choosingTick ? study.checkIn(item, detail: option) : study.start(item, detail: option) } label: {
+                            HStack(spacing: 4) {
+                                if done { Image(systemName: "checkmark").font(.system(size: 9, weight: .bold)) }
+                                Text(option).font(.system(size: 11.5, weight: .semibold, design: .rounded))
+                            }
+                            .foregroundColor(.white.opacity(done ? 0.7 : 1))
+                            .padding(.horizontal, 10).padding(.vertical, 6)
+                            .background(Capsule().fill(tint.opacity(done ? 0.18 : 0.42)))
+                            .overlay(Capsule().strokeBorder(tint.opacity(0.7), lineWidth: 0.8))
+                        }
+                        .buttonStyle(LivelyButtonStyle(glow: tint))
+                    }
+                }
+                pill("Cancel", .white.opacity(0.25)) { study.choosing = nil; study.choosingTick = false }
+            }
+            .padding(.top, 6)
         } else if study.adding {
             HStack(spacing: 8) {
-                TextField("Subject name", text: $study.newName)
+                Image(systemName: study.category.icon).foregroundColor(study.category.color).font(.system(size: 12))
+                TextField("New \(study.category.label.lowercased()) activity", text: $study.newName)
                     .textFieldStyle(.plain)
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundColor(.white)
@@ -645,12 +975,22 @@ struct StudyPicker: View {
                 pill("Cancel", .white.opacity(0.25)) { study.newName = ""; study.adding = false }
             }
         } else {
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
+                // Category tabs: Academic · Health · Soul · Personal
+                HStack(spacing: 6) {
+                    ForEach(StudyCategory.allCases) { cat in
+                        CategoryTab(category: cat, selected: study.category == cat,
+                                    count: study.subjects.filter { $0.category == cat }.count) {
+                            study.category = cat
+                        }
+                    }
+                }
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
-                        ForEach(Array(study.subjects.enumerated()), id: \.element) { index, item in
+                        ForEach(Array(study.visibleSubjects.enumerated()), id: \.element) { index, item in
                             SubjectTile(item: item, today: study.timeLabel(item.name), active: study.subject == item.name,
-                                        index: index, onTap: { study.start(item) }, onEdit: { study.beginEditing(item) })
+                                        index: index, onTap: { study.tap(item) }, onEdit: { study.beginEditing(item) },
+                                        onTick: { study.tick(item) })
                                 .contextMenu {
                                     Button("Edit \(item.name)") { study.beginEditing(item) }
                                     Button("Remove \(item.name)") { study.remove(item.name) }
@@ -662,6 +1002,7 @@ struct StudyPicker: View {
                     .padding(.top, 6)      // room for the pencil badge and the lift
                     .padding(.bottom, 4)   // room for the hover glow
                 }
+                .id(study.category)        // a fresh row per tab, so the tiles drop in again
                 if study.running {
                     HStack(spacing: 8) {
                         pill(study.paused ? "Resume" : "Pause", studyOrange) { study.togglePause() }
@@ -673,7 +1014,8 @@ struct StudyPicker: View {
                         pill("Skip break", studyBlue) { study.endBreak(finished: false) }
                     }
                 } else {
-                    Text("Click a subject to start  ·  hover a tile and tap ✎ to edit")
+                    Text(study.visibleSubjects.isEmpty ? "Tap + to add your first \(study.category.label.lowercased()) activity"
+                                                       : "Click to start  ·  hover a tile and tap ✎ to edit")
                         .font(.system(size: 10.5, weight: .medium, design: .rounded))
                         .foregroundColor(.white.opacity(0.5))
                 }
@@ -708,6 +1050,32 @@ struct StudyPicker: View {
                 .padding(.horizontal, 12).padding(.vertical, 5)
                 .background(Capsule().fill(tint))
         }.buttonStyle(LivelyButtonStyle(glow: tint))
+    }
+}
+
+// One category tab above the tiles: icon, name and how many activities it holds
+struct CategoryTab: View {
+    let category: StudyCategory
+    let selected: Bool
+    let count: Int
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Image(systemName: category.icon).font(.system(size: 10, weight: .semibold))
+                Text(category.label).font(.system(size: 11, weight: .semibold, design: .rounded))
+                if count > 0 {
+                    Text("\(count)").font(.system(size: 9.5, weight: .bold, design: .rounded)).opacity(0.6)
+                }
+            }
+            .foregroundColor(selected ? .white : category.color.opacity(0.85))
+            .padding(.horizontal, 9).padding(.vertical, 4)
+            .background(Capsule().fill(category.color.opacity(selected ? 0.38 : 0.10)))
+            .overlay(Capsule().strokeBorder(category.color.opacity(selected ? 0.7 : 0.22), lineWidth: 0.8))
+        }
+        .buttonStyle(LivelyButtonStyle(glow: category.color))
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selected)
     }
 }
 

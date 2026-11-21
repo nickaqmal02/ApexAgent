@@ -12,6 +12,8 @@
   --bg:#f2f2f7; --card:#ffffff; --ink:#000000; --ink2:#3c3c4399; --ink3:#3c3c434d; --sep:#3c3c4329; --fill:#7878801f;
   --green:#34c759; --orange:#ff9500; --red:#ff3b30; --blue:#007aff; --purple:#af52de; --teal:#30b0c7;
   --bar-bg:#f9f9f9cc;
+  /* categories: validated 4-slot palette (CVD ΔE ≥ 8.4); always shown with an icon and a label */
+  --academic:#2a78d6; --health:#1baf7a; --soul:#eda100; --personal:#e87ba4;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#6250d6; --s8:#e34948;
   --text:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;
   --round:ui-rounded,"SF Pro Rounded",-apple-system,system-ui,sans-serif;
@@ -21,6 +23,7 @@
   --bg:#000000; --card:#1c1c1e; --ink:#ffffff; --ink2:#ebebf599; --ink3:#ebebf54d; --sep:#54545899; --fill:#7878805c;
   --green:#30d158; --orange:#ff9f0a; --red:#ff453a; --blue:#0a84ff; --purple:#bf5af2; --teal:#40c8e0;
   --bar-bg:#1e1e1ecc;
+  --academic:#3987e5; --health:#199e70; --soul:#c98500; --personal:#d55181;
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#0ca30c; --s7:#9085e9; --s8:#e66767;
   color-scheme:dark}}
 *{box-sizing:border-box}
@@ -47,13 +50,80 @@ h2{font:700 22px/1.2 var(--text);margin:26px 0 10px;letter-spacing:.01em}
 .sub{font-size:15px;color:var(--ink2);margin-top:3px}
 .mini{width:92px;height:40px;flex:none}
 .full{grid-column:1/-1}
-/* ring */
-.ringcard{display:flex;align-items:center;gap:20px}
-.ring{width:118px;height:118px;flex:none}
-.ring circle{fill:none;stroke-width:15;stroke-linecap:round}
-.ringtxt .lab{font:600 17px var(--text)}
-.ringtxt .val{font:600 26px/1.15 var(--round);color:var(--green);font-variant-numeric:tabular-nums}
-.ringtxt .val small{font-size:17px;color:var(--green);opacity:.85}
+/* rings: one per category, outside in (Academic, Health, Soul, Personal) */
+.ringcard{display:flex;align-items:center;gap:22px}
+.ring{width:132px;height:132px;flex:none}
+.ring circle{fill:none;stroke-width:11;stroke-linecap:round}
+.ring .prog{transition:stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1)}
+.rlegend{display:grid;gap:7px;flex:1;min-width:0}
+.rl{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:8px;row-gap:0}
+.rl .lab{font:600 15px var(--text);color:var(--c);display:flex;align-items:center;gap:6px}
+.rl .lab svg{width:15px;height:15px;fill:var(--c)}
+.rl .val{font:600 17px var(--round);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rl .val small{font-size:13px;color:var(--ink2);margin-left:2px}
+.rl .ok{font-size:12px;color:var(--ink2);grid-column:1/-1;padding-left:21px}
+/* category icon badge, used in lists and headings */
+.cico{width:24px;height:24px;border-radius:6px;background:var(--c);display:grid;place-items:center;flex:none}
+.cico svg{width:15px;height:15px;fill:#fff}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:13px;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:9px;height:9px;border-radius:3px;background:var(--c)}
+/* habits: one card per activity, 4 weeks of day squares, today's progress and the streak */
+/* the big all-habits grid on top of Habits: one column per week, one cell per day.
+   Sequential: a single green, light to dark by the share of habits done; full green = every habit */
+.heatwrap{overflow-x:auto;scrollbar-width:none;margin-top:12px;--cs:14px}
+@media (min-width:700px){.heatwrap{--cs:21px}}
+.heat{display:grid;grid-template-columns:auto 1fr;gap:4px 6px;width:max-content;min-width:100%}
+.heat .mrow{grid-column:2;display:grid;grid-auto-flow:column;grid-auto-columns:var(--cs);gap:3px;font-size:11px;color:var(--ink2);height:14px}
+.heat .mrow span{white-space:nowrap;overflow:visible}
+.heat .dlab{display:grid;grid-template-rows:repeat(7,var(--cs));gap:3px;font-size:10px;color:var(--ink3);line-height:var(--cs)}
+.heat .cells{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,var(--cs));grid-auto-columns:var(--cs);gap:3px}
+.heat .c{border-radius:4px;background:var(--fill)}
+.heat .c.l1,.hkey .l1{background:color-mix(in srgb,var(--green) 28%,var(--fill))}
+.heat .c.l2,.hkey .l2{background:color-mix(in srgb,var(--green) 52%,var(--fill))}
+.heat .c.l3,.hkey .l3{background:color-mix(in srgb,var(--green) 76%,var(--fill))}
+.heat .c.l4,.hkey .l4{background:var(--green)}
+.heat .c.future{background:transparent;box-shadow:inset 0 0 0 1px var(--sep)}
+.heat .c.now{outline:2px solid var(--ink);outline-offset:1px}
+.hkey{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--ink2);margin-top:10px;justify-content:flex-end}
+.hkey i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.hstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;border-top:.5px solid var(--sep);padding-top:10px;font-size:12.5px;color:var(--ink2)}
+.hstats b{display:block;font:600 20px/1.15 var(--round);color:var(--ink);font-variant-numeric:tabular-nums}
+.today{display:grid;gap:10px}
+.today .hl{margin:0}
+.dots{display:flex;flex-wrap:wrap;gap:6px}
+.dots span{height:8px;flex:1 1 24px;max-width:64px;border-radius:99px;background:var(--fill)}
+.dots span.on{background:var(--c)}
+.dots span.half{background:linear-gradient(90deg,var(--c) var(--p),var(--fill) var(--p))}
+.habit{display:grid;gap:12px}
+.hhead{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px}
+.hhead .cico{width:34px;height:34px;border-radius:10px}.hhead .cico svg{width:19px;height:19px}
+.hname{font:600 17px/1.2 var(--text);overflow-wrap:anywhere}
+.hmeta{font-size:13px;color:var(--ink2)}
+.hstat{width:40px;height:40px;position:relative;display:grid;place-items:center}
+.hstat svg{position:absolute;inset:0;width:40px;height:40px}
+.hstat circle{fill:none;stroke-width:4;stroke-linecap:round}
+.hstat .tick{width:18px;height:18px;fill:#fff;position:relative}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
+.week .wd{font:600 11px var(--text);color:var(--ink3);text-transform:uppercase;letter-spacing:.02em}
+.week .wd.now{color:var(--c)}
+.week .dot{width:30px;height:30px;margin:5px auto 4px;border-radius:50%;background:var(--fill);display:grid;place-items:center}
+.week .dot.s1{background:color-mix(in srgb,var(--c) 40%,transparent)}
+.week .dot.s2{background:var(--c)}
+.week .dot.now{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--c)}
+.week .dot.future{background:transparent;border:1.5px dashed var(--sep)}
+.week .dot svg{width:13px;height:13px;fill:#fff}
+.week .amt{font:600 12px var(--round);font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+.week .amt.zero{color:var(--ink3);font-weight:500}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{display:inline-flex;align-items:center;gap:4px;font:600 12.5px var(--text);padding:5px 10px;border-radius:99px;
+  border:1px solid color-mix(in srgb,var(--c) 55%,transparent);color:var(--ink2)}
+.opt.on{background:var(--c);border-color:var(--c);color:#fff}
+.opt svg{width:10px;height:10px;fill:currentColor}
+.hfoot{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:.5px solid var(--sep);padding-top:10px;font-size:12.5px;color:var(--ink2)}
+.hfoot b{display:block;font:600 18px/1.15 var(--round);color:var(--ink);font-variant-numeric:tabular-nums}
+.gh{display:flex;align-items:center;gap:8px}
+.gh .n{font:500 15px var(--text);color:var(--ink2);margin-left:auto}
 /* highlight */
 .hl{font:600 19px/1.3 var(--text);margin:4px 0 14px}
 .cmp{display:grid;gap:10px}
@@ -101,7 +171,7 @@ svg.chart text{fill:var(--ink2);font:12px var(--text);font-variant-numeric:tabul
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--bar-bg);
   backdrop-filter:saturate(1.8) blur(20px);-webkit-backdrop-filter:saturate(1.8) blur(20px);border-top:.5px solid var(--sep);
   padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-.tabbar nav{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+.tabbar nav{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
 .tabbar a{display:grid;justify-items:center;gap:2px;font:500 10.5px var(--text);color:var(--ink2);text-decoration:none;padding:4px 0;border-radius:8px}
 .tabbar svg{width:26px;height:26px;fill:currentColor}
 .tabbar a[aria-current="page"]{color:var(--blue)}
@@ -112,7 +182,8 @@ svg.chart text{fill:var(--ink2);font:12px var(--text);font-variant-numeric:tabul
 .tip .sw{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
 section{animation:fade .25s ease-out}
 @keyframes fade{from{opacity:.5}to{opacity:1}}
-@media (max-width:640px){.grid{grid-template-columns:1fr}.ring{width:100px;height:100px}}
+@media (max-width:640px){.grid{grid-template-columns:1fr}.ring{width:112px;height:112px}.ringcard{gap:16px}}
+@media (max-width:360px){.ringcard{flex-direction:column;align-items:stretch}.ring{align-self:center}}
 @media (prefers-reduced-motion:reduce){section{animation:none}.ring .prog{transition:none!important}}
 </style></head>
 <body>
@@ -120,18 +191,28 @@ section{animation:fade .25s ease-out}
   <div class="date" id="today-date"></div>
   <h1 id="title">Summary</h1>
 
-  <section data-view="overview">
+  <section data-view="habits" hidden>
+    <div class="card" style="--t:var(--green);margin-bottom:12px">
+      <div class="chead"><span class="cat"><svg viewBox="0 0 20 20"><path d="M2 2h4v4H2zm6 0h4v4H8zm6 0h4v4h-4zM2 8h4v4H2zm6 0h4v4H8zm6 0h4v4h-4zM2 14h4v4H2zm6 0h4v4H8zm6 0h4v4h-4z"/></svg>All habits</span><span class="when" id="heat-range"></span></div>
+      <div class="hl" id="heat-text"></div>
+      <div class="heatwrap" id="heatwrap"><div class="heat" id="heat" role="img"></div></div>
+      <div class="hkey" aria-hidden="true">Fewer <i style="background:var(--fill)"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> All done</div>
+      <div class="hstats" id="heat-stats"></div>
+    </div>
+    <div class="card today" style="--t:var(--green)">
+      <div class="chead"><span class="cat"><svg viewBox="0 0 20 20"><path d="M10 1.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zm-1.2 12.3L4.9 9.9l1.4-1.4 2.5 2.5 5-5 1.4 1.4-6.4 6.4z"/></svg>Today</span><span class="when" id="h-count"></span></div>
+      <div class="hl" id="h-text"></div>
+      <div class="dots" id="h-dots"></div>
+    </div>
+    <div id="h-cards"></div>
+    <p class="foot">This week, Monday to Sunday. A filled dot is a day done (Study: any study that day; Pray: all five prayers); a faint one is a day started but not finished. The number under each dot is that day's time. Check in from the notch.</p>
+  </section>
+
+  <section data-view="overview" hidden>
     <div class="grid">
       <div class="card ringcard full">
-        <svg class="ring" viewBox="0 0 120 120" role="img" id="ring" aria-label="Today's focus against the daily goal">
-          <circle cx="60" cy="60" r="50" style="stroke:var(--green);opacity:.22"/>
-          <circle class="prog" cx="60" cy="60" r="50" transform="rotate(-90 60 60)" style="stroke:var(--green);transition:stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1)"/>
-        </svg>
-        <div class="ringtxt">
-          <div class="lab">Focus</div>
-          <div class="val" id="ring-val"></div>
-          <div class="sub" id="ring-sub"></div>
-        </div>
+        <svg class="ring" viewBox="0 0 132 132" role="img" id="ring" aria-label="Today against each category's daily goal"></svg>
+        <div class="rlegend" id="ring-legend"></div>
       </div>
     </div>
 
@@ -139,7 +220,7 @@ section{animation:fade .25s ease-out}
     <div class="grid">
       <div class="card" style="--t:var(--green)">
         <div class="chead"><span class="cat"><svg viewBox="0 0 20 20"><path d="M10 1.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zm.9 4.3v4.03l2.9 1.75-.93 1.53-3.77-2.27V5.8h1.8z"/></svg>Focus Time</span><span class="when">Today</span></div>
-        <div class="cbody"><div><div class="big" id="c-today"></div><div class="sub">studied today</div></div><svg class="mini" id="m-today" viewBox="0 0 92 40"></svg></div>
+        <div class="cbody"><div><div class="big" id="c-today"></div><div class="sub">logged today</div></div><svg class="mini" id="m-today" viewBox="0 0 92 40"></svg></div>
       </div>
       <div class="card" style="--t:var(--orange)">
         <div class="chead"><span class="cat"><svg viewBox="0 0 20 20"><path d="M10.3 1.2c.4 3-1.9 4.3-3.3 6.3-1 1.4-1.5 2.9-1.3 4.6.3 3 2.6 5.4 4.8 5.6-1.3-1-2-2.5-1.6-4.2.3-1.2 1.2-2.2 1.9-3.3.4 1.4 1.5 2.1 2.1 3.2.8 1.6.4 3.4-1 4.4 2.6-.6 4.6-3.1 4.6-6.2 0-4.7-3.6-7.5-6.2-10.4z"/></svg>Streak</span><span class="when" id="w-streak"></span></div>
@@ -151,12 +232,17 @@ section{animation:fade .25s ease-out}
       </div>
       <div class="card" style="--t:var(--blue)">
         <div class="chead"><span class="cat"><svg viewBox="0 0 20 20"><path d="M5 2h2v2h6V2h2v2h1.5A1.5 1.5 0 0 1 18 5.5v11a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 2 16.5v-11A1.5 1.5 0 0 1 3.5 4H5V2zM4 8v8h12V8H4z"/></svg>Last 7 Days</span><span class="when">Week</span></div>
-        <div class="cbody"><div><div class="big" id="c-week"></div><div class="sub">focus this week</div></div><svg class="mini" id="m-week" viewBox="0 0 92 40"></svg></div>
+        <div class="cbody"><div><div class="big" id="c-week"></div><div class="sub">logged this week</div></div><svg class="mini" id="m-week" viewBox="0 0 92 40"></svg></div>
       </div>
     </div>
 
     <h2>Highlights</h2>
     <div class="grid">
+      <div class="card full" style="--t:var(--blue)">
+        <div class="chead"><span class="cat"><svg viewBox="0 0 20 20"><path d="M2 4h9v3H2zm0 4.5h14v3H2zM2 13h6v3H2z"/></svg>Balance</span><span class="when">Last 7 days</span></div>
+        <div class="hl" id="bal-text"></div>
+        <div class="cmp" id="bal-cmp"></div>
+      </div>
       <div class="card full" style="--t:var(--green)">
         <div class="chead"><span class="cat"><svg viewBox="0 0 20 20"><path d="M3 15h2.5V9H3v6zm5.8 0h2.4V4H8.8v11zm5.7 0H17v-8h-2.5v8z"/></svg>Focus Time</span></div>
         <div class="hl" id="hl-text"></div>
@@ -165,7 +251,8 @@ section{animation:fade .25s ease-out}
       <div class="card full" style="--t:var(--green)">
         <div class="kicker">Daily average</div>
         <div class="big" id="avg"></div><div class="range" id="avg-range"></div>
-        <svg class="chart" id="daily" role="img" aria-label="Focus minutes per day, last 14 days"></svg>
+        <div class="legend" id="daily-legend"></div>
+        <svg class="chart" id="daily" role="img" aria-label="Minutes per day by category, last 14 days"></svg>
       </div>
       <div class="card full" style="--t:var(--purple)">
         <div class="chead"><span class="cat"><svg viewBox="0 0 20 20"><path d="M11.6 2.2A8 8 0 1 0 17.8 12 6.5 6.5 0 0 1 11.6 2.2z"/></svg>Study Hours</span><span class="when">All time</span></div>
@@ -174,23 +261,25 @@ section{animation:fade .25s ease-out}
         <svg class="chart" id="hours" role="img" aria-label="Focus minutes by the hour a session started"></svg>
       </div>
     </div>
-    <p class="foot">Sessions under 1 minute count as quick taps and are left out of the finish rate. The streak counts days in a row with real study. Updated <span id="gen"></span>.</p>
+    <p class="foot">Sessions under 1 minute count as quick taps and are left out of the finish rate. The streak counts days in a row with any real session. Updated <span id="gen"></span>.</p>
   </section>
 
   <section data-view="subjects" hidden>
-    <div class="grid" id="subj-cards"></div>
+    <div id="subj-cards"></div>
   </section>
 
   <section data-view="sessions" hidden>
     <div class="seg" id="seg" role="group" aria-label="Result"></div>
-    <div class="chips" id="chips" role="group" aria-label="Subject"></div>
+    <div class="chips" id="cchips" role="group" aria-label="Category"></div>
+    <div class="chips" id="chips" role="group" aria-label="Activity"></div>
     <div id="groups"></div>
   </section>
 </div>
 
 <div class="tabbar"><nav aria-label="Views">
+  <a href="#habits"><svg viewBox="0 0 28 28"><path d="M14 3.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21zm-1.6 14.9-4.6-4.6 1.8-1.8 2.8 2.8 6.1-6.1 1.8 1.8-7.9 7.9z"/></svg>Habits</a>
   <a href="#overview"><svg viewBox="0 0 28 28"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h5A2.5 2.5 0 0 1 14 6.5v5A2.5 2.5 0 0 1 11.5 14h-5A2.5 2.5 0 0 1 4 11.5v-5zm11.5 9.5H21.5A2.5 2.5 0 0 1 24 18.5v3a2.5 2.5 0 0 1-2.5 2.5h-6a2.5 2.5 0 0 1-2.5-2.5v-3a2.5 2.5 0 0 1 2.5-2.5zM16 4h5.5A2.5 2.5 0 0 1 24 6.5v5.5h-8V4zM4 16h8v8H6.5A2.5 2.5 0 0 1 4 21.5V16z"/></svg>Summary</a>
-  <a href="#subjects"><svg viewBox="0 0 28 28"><path d="M5 5h7v7H5zM16 5h7v7h-7zM5 16h7v7H5zM16 16h7v7h-7z" opacity=".95"/></svg>Subjects</a>
+  <a href="#subjects"><svg viewBox="0 0 28 28"><path d="M5 5h7v7H5zM16 5h7v7h-7zM5 16h7v7H5zM16 16h7v7h-7z" opacity=".95"/></svg>Activities</a>
   <a href="#sessions"><svg viewBox="0 0 28 28"><path d="M4 6.5a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0zM9.5 5.5h14.5v2H9.5zM4 14a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0zm5.5-1h14.5v2H9.5zM4 21.5a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0zm5.5-1h14.5v2H9.5z"/></svg>Sessions</a>
 </nav></div>
 <div class="tip" id="tip"></div>
@@ -199,7 +288,19 @@ section{animation:fade .25s ease-out}
 const D = __DATA__;
 const NS = "http://www.w3.org/2000/svg";
 const T = D.totals;
-const color = s => `var(--s${(D.subjects.indexOf(s) % 8) + 1})`;
+// Colour follows the category, never the subject's rank, so it means the same thing on every view
+const ICON = {
+  academic: "M3 3.5C3 2.7 3.7 2 4.5 2H9v15H4.5A1.5 1.5 0 0 1 3 15.5v-12zM11 2h4.5c.8 0 1.5.7 1.5 1.5v12c0 .8-.7 1.5-1.5 1.5H11V2z",
+  health: "M11 1.5a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6zM9.2 6.2l2.6.4 1.6 2.9 2.4.9-.6 1.6-3-1.1-.8-1.4-.7 3 2.2 2.3V19h-1.8v-3.4l-2.2-2.1-1 4.7-1.8-.4 2-9-1.4.8v2.6H5V9.6z",
+  soul: "M11.6 2.2A8 8 0 1 0 17.8 12 6.5 6.5 0 0 1 11.6 2.2z",
+  personal: "M10 1.5s-5.5 6.2-5.5 10a5.5 5.5 0 0 0 11 0c0-3.8-5.5-10-5.5-10z",
+};
+const CATS = D.categories;
+const CAT = Object.fromEntries(CATS.map(c => [c.key, c]));
+const catOf = s => (D.subjectCategory && D.subjectCategory[s]) || "academic";
+const ccol = k => `var(--${k})`;
+const color = s => ccol(catOf(s));
+const icon = k => `<svg viewBox="0 0 20 20" aria-hidden="true"><path d="${ICON[k]}"/></svg>`;
 const fmt = m => { m = Math.round(m); return m >= 60 ? `${Math.floor(m/60)}h` + (m % 60 ? ` ${m % 60}m` : "") : `${m}m`; };
 // Health-style value: big numbers, small units ("1 h 39 min")
 const big = m => { m = Math.round(m); const h = Math.floor(m / 60), r = m % 60;
@@ -218,9 +319,9 @@ const chartW = () => Math.max(300, Math.min(760, document.querySelector(".wrap")
 const dayTot = D.days.map(d => Object.values(d.values).reduce((a, b) => a + b, 0));
 
 // ---------- Views ----------
-const VIEWS = {overview: "Summary", subjects: "Subjects", sessions: "Sessions"};
+const VIEWS = {habits: "Habits", overview: "Summary", subjects: "Activities", sessions: "Sessions"};
 function show() {
-  const v = location.hash.slice(1) in VIEWS ? location.hash.slice(1) : "overview";
+  const v = location.hash.slice(1) in VIEWS ? location.hash.slice(1) : "habits";
   document.querySelectorAll("section[data-view]").forEach(s => s.hidden = s.dataset.view !== v);
   document.querySelectorAll(".tabbar a").forEach(a => {
     if (a.getAttribute("href") === "#" + v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
@@ -230,16 +331,104 @@ function show() {
 }
 addEventListener("hashchange", show);
 
+// ---------- Big all-habits grid (on top of Habits) ----------
+(() => {
+  const HT = D.heat; if (!HT) return;
+  const lvl = n => n == null ? "future" : !n ? "" : n >= HT.total ? "l4" : n / HT.total > 2 / 3 ? "l3" : n / HT.total > 1 / 3 ? "l2" : "l1";
+  const weeks = HT.days.length / 7;
+  // Month names over the first column of each month
+  const months = Array.from({length: weeks}, (_, w) => { const d = HT.days[w * 7];
+    // The first column gets a name too, unless a new month starts in the next two columns (no "MayJun")
+    const soon = [1, 2].some(k => HT.days[(w + k) * 7] && HT.days[(w + k) * 7].first);
+    return d.first || (w === 0 && !soon) ? `<span>${d.m}</span>` : "<span></span>"; }).join("");
+  const cells = HT.days.map(d => `<div class="c ${lvl(d.n)}${d.today ? " now" : ""}" data-t="${esc(d.d)}|${d.n == null ? "" : d.n}"></div>`).join("");
+  $("heat").innerHTML = `<div></div><div class="mrow">${months}</div>
+    <div class="dlab"><span>M</span><span></span><span>W</span><span></span><span>F</span><span></span><span></span></div><div class="cells">${cells}</div>`;
+  $("heat").setAttribute("aria-label", `Last ${weeks} weeks: ${HT.perfect} days with all ${HT.total} habits done`);
+  $("heat-range").textContent = `${weeks} weeks`;
+  $("heat-text").textContent = HT.streak > 1 ? `${HT.streak} perfect days in a row. Keep it going.`
+    : HT.perfect ? `${HT.perfect} perfect day${HT.perfect === 1 ? "" : "s"} so far: every habit done.` : `Full green means all ${HT.total} habits done that day.`;
+  $("heat-stats").innerHTML = `<span><b>${HT.perfect}</b>perfect days</span><span><b>${HT.streak}</b>current streak</span><span><b>${HT.best}</b>best streak</span>`;
+  $("heat").querySelectorAll(".c").forEach(c => { const [d, n] = c.dataset.t.split("|");
+    c.addEventListener("mousemove", ev => showTip(ev, `<b>${d}</b>${n === "" ? row("Coming up", "") : row("Habits done", `${n} of ${HT.total}`)}`));
+    c.addEventListener("mouseleave", hideTip); });
+  const w = $("heatwrap"); w.scrollLeft = w.scrollWidth;   // newest weeks in view on a narrow phone
+})();
+
+// ---------- Habits ----------
+(() => {
+  const H = D.habits || [];
+  const todayOf = h => h.days.find(x => x.today) || h.days[h.days.length - 1];
+  const doneToday = H.filter(h => todayOf(h).s === 2).length;
+  // Short amounts for under the dots: 45m, 1.5h
+  const short = m => m < 1 ? "–" : m < 60 ? `${Math.round(m)}m` : `${(m / 60).toFixed(1).replace(/\.0$/, "")}h`;
+  // Pray (all needed): prayers done / 5. Sunnah (any counts): full once one is done. Others: minutes / length.
+  const anyMode = h => h.options.length && h.needsAll === false;
+  const progress = h => anyMode(h) ? (h.todayOptions.length ? 1 : 0)
+    : h.options.length ? h.todayOptions.length / h.options.length : Math.min(1, h.today / (h.target || 1));
+  $("h-count").textContent = H.length ? `${doneToday} of ${H.length}` : "";
+  $("h-text").textContent = !H.length ? "No habits yet."
+    : doneToday === H.length ? "Every habit done today. Nice."
+    : doneToday ? `${doneToday} done, ${H.length - doneToday} to go today.` : "Nothing checked off yet today.";
+  // One bar per habit: full when done today, partly filled otherwise (Pray by prayers, the rest by minutes)
+  $("h-dots").innerHTML = H.map(h => { const s = todayOf(h).s, p = 100 * progress(h);
+    const tip = anyMode(h) ? `${h.todayOptions.length} done` : h.options.length ? `${h.todayOptions.length} of ${h.options.length}` : `${fmt(h.today)} of ${fmt(h.target)}`;
+    return `<span class="${s === 2 ? "on" : p ? "half" : ""}" style="--c:${ccol(h.category)};--p:${p}%" title="${esc(h.name)}: ${tip}"></span>`; }).join("");
+  const tickPath = "M7.8 15.2 3 10.4l1.8-1.8 3 3 7.4-7.4L17 6z";
+  const cardOf = h => {
+    const isStudy = h.name === "Study" && h.category === "academic";
+    // Study: the day's dot fills as soon as you study, but the circle only ticks at the daily goal
+    const done = isStudy ? h.today >= h.target : todayOf(h).s === 2;
+    const len = 2 * Math.PI * 17, p = progress(h), hasOpts = h.options.length > 0;
+    const todayTxt = anyMode(h) ? `${h.todayOptions.length}` : hasOpts ? `${h.todayOptions.length}/${h.options.length}` : fmt(h.today);
+    const opts = hasOpts ? `<div class="opts" aria-label="Today">${h.options.map(o => { const on = h.todayOptions.includes(o);
+      return `<span class="opt${on ? " on" : ""}">${on ? `<svg viewBox="0 0 20 20" aria-hidden="true"><path d="${tickPath}"/></svg>` : ""}${esc(o)}</span>`; }).join("")}</div>` : "";
+    const stat = `<div class="hstat" role="img" aria-label="${done ? "Done today" : `${todayTxt} of ${hasOpts ? h.options.length : fmt(h.target)} today`}">
+      <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" style="stroke:var(--fill)"/>
+      ${done ? `<circle cx="20" cy="20" r="17" style="fill:var(--c);stroke:var(--c)"/>`
+             : `<circle cx="20" cy="20" r="17" transform="rotate(-90 20 20)" style="stroke:var(--c);stroke-dasharray:${len};stroke-dashoffset:${len * (1 - p)}"/>`}
+      </svg>${done ? `<svg class="tick" viewBox="0 0 20 20" aria-hidden="true"><path d="${tickPath}"/></svg>` : ""}</div>`;
+    // The week: weekday, a dot per day, and that day's amount underneath (Pray: prayers, others: time)
+    const week = h.days.map(x => {
+      const amt = x.future ? "" : anyMode(h) ? (x.n ? `${x.n}` : "–") : hasOpts ? `${x.n}/${h.options.length}` : short(x.m);
+      const zero = !x.future && (hasOpts ? !x.n : x.m < 1);
+      return `<div><div class="wd${x.today ? " now" : ""}">${x.wd[0]}</div>
+        <div class="dot s${x.future ? 0 : x.s}${x.today ? " now" : ""}${x.future ? " future" : ""}" data-t="${esc(x.d)}|${x.m}|${hasOpts ? `${x.n}/${h.options.length}` : ""}|${x.future ? 1 : ""}">${x.s === 2 && !x.future ? `<svg viewBox="0 0 20 20" aria-hidden="true"><path d="${tickPath}"/></svg>` : ""}</div>
+        <div class="amt${zero ? " zero" : ""}">${amt}</div></div>`; }).join("");
+    const meta = anyMode(h) ? `any of ${h.options.length}` : hasOpts ? `${h.options.length} a day` : isStudy ? `goal ${fmt(h.target)} a day · all subjects` : `${fmt(h.target)} a day`;
+    return `<div class="card habit" style="--c:${ccol(h.category)}">
+      <div class="hhead"><span class="cico">${icon(h.category)}</span>
+        <div><div class="hname">${esc(h.name)}</div><div class="hmeta">${meta} · ${CAT[h.category].label}</div></div>${stat}</div>
+      ${opts}
+      <div class="week" role="img" aria-label="${esc(h.name)} this week: ${h.weekDone} of 7 days done, ${fmt(h.weekMin)}">${week}</div>
+      <div class="hfoot"><span><b>${h.streak}</b>day streak</span><span><b>${h.weekDone}<small style="font-size:13px;color:var(--ink2)">/7</small></b>days this week</span><span><b>${fmt(h.weekMin)}</b>this week</span></div>
+    </div>`;
+  };
+  $("h-cards").innerHTML = CATS.map(c => { const mine = H.filter(h => h.category === c.key); if (!mine.length) return "";
+    return `<h2 class="gh" style="--c:${ccol(c.key)}"><span class="cico">${icon(c.key)}</span>${c.label}<span class="n">${mine.length} habit${mine.length === 1 ? "" : "s"}</span></h2>
+      <div class="grid">${mine.map(cardOf).join("")}</div>`; }).join("");
+  $("h-cards").querySelectorAll(".dot").forEach(el => {
+    const [d, m, n, future] = el.dataset.t.split("|");
+    el.addEventListener("mousemove", ev => showTip(ev, `<b>${d}</b>${future ? row("Coming up", "") : (n ? row("Done", n) : "") + row("Logged", fmt(+m))}`));
+    el.addEventListener("mouseleave", hideTip); });
+})();
+
 // ---------- Summary ----------
 $("today-date").textContent = new Date().toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "long"});
 $("gen").textContent = D.generated;
 
-(() => { // ring: today against the daily goal (fills past 100% by wrapping is overkill; cap at full)
-  const c = document.querySelector("#ring .prog"), len = 2 * Math.PI * 50, p = Math.min(1, T.today / (T.goal || 1));
-  c.style.strokeDasharray = len; c.style.strokeDashoffset = len;
-  requestAnimationFrame(() => requestAnimationFrame(() => c.style.strokeDashoffset = len * (1 - p)));
-  $("ring-val").innerHTML = `${Math.round(T.today)}/${Math.round(T.goal)}<small>MIN</small>`;
-  $("ring-sub").textContent = T.today >= T.goal ? "Daily goal reached" : `${Math.round(100 * T.today / T.goal)}% of today's goal`;
+(() => { // rings: each category's today against its own daily goal, outside in; capped at a full ring
+  const svg = $("ring"), progs = [];
+  CATS.forEach((c, i) => { const r = 58 - i * 13.5, len = 2 * Math.PI * r, p = Math.min(1, c.today / (c.goal || 1));
+    el("circle", {cx: 66, cy: 66, r, style: `stroke:${ccol(c.key)};opacity:.2`}, svg);
+    const pr = el("circle", {class: "prog", cx: 66, cy: 66, r, transform: "rotate(-90 66 66)",
+      style: `stroke:${ccol(c.key)};stroke-dasharray:${len};stroke-dashoffset:${len}`}, svg);
+    progs.push([pr, len * (1 - p)]); });
+  requestAnimationFrame(() => requestAnimationFrame(() => progs.forEach(([pr, off]) => pr.style.strokeDashoffset = off)));
+  $("ring-legend").innerHTML = CATS.map(c => `<div class="rl" style="--c:${ccol(c.key)}">
+      <span class="lab">${icon(c.key)}${c.label}</span>
+      <span class="val">${Math.round(c.today)}/${Math.round(c.goal)}<small>min</small></span>
+      <span class="ok">${c.today >= c.goal ? "Goal reached" : `${Math.round(100 * c.today / (c.goal || 1))}% of goal`}</span></div>`).join("");
 })();
 
 function mini(id, values, tint, highlightLast = true) {
@@ -268,6 +457,15 @@ mini("m-week", dayTot.slice(-7), "var(--blue)", false);
     `<div class="row" style="--t:${t}"><div class="num">${big(v)}</div><div class="track"><div class="fillbar" style="width:${Math.max(1.5, 100 * v / mx)}%"></div></div><div class="cap">${lab}</div></div>`).join("");
 })();
 
+(() => { // balance: last 7 days per category, one bar each in its own colour
+  const mx = Math.max(1, ...CATS.map(c => c.week)), top = [...CATS].sort((a, b) => b.week - a.week)[0];
+  const quiet = CATS.filter(c => !c.week).map(c => c.label);
+  $("bal-text").textContent = !top.week ? "Nothing logged in the last 7 days yet."
+    : `Most of your week went to ${top.label}` + (quiet.length ? `; nothing yet for ${quiet.join(" and ")}.` : ".");
+  $("bal-cmp").innerHTML = CATS.map(c =>
+    `<div class="row" style="--t:${ccol(c.key)}"><div class="num">${big(c.week)}</div><div class="track"><div class="fillbar" style="width:${c.week ? Math.max(1.5, 100 * c.week / mx) : 0}%"></div></div><div class="cap">${c.label} · ${c.sessions} session${c.sessions === 1 ? "" : "s"} all time</div></div>`).join("");
+})();
+
 function niceStep(max, ticks) { const need = max / ticks; return [5,10,15,30,45,60,90,120,180,240,300].find(v => v >= need) || 360; }
 
 (() => { // daily bars, one tint, dashed average line
@@ -281,12 +479,19 @@ function niceStep(max, ticks) { const need = max / ticks; return [5,10,15,30,45,
     el("line", {x1: L, x2: W - R + 6, y1: yy, y2: yy, stroke: "var(--sep)", "stroke-dasharray": i ? "2 3" : ""}, svg);
     el("text", {x: W - R + 12, y: yy + 4}, svg).textContent = fmt(i * step); }
   const slot = (W - L - R) / D.days.length, bw = Math.min(26, slot * .55);
+  $("daily-legend").innerHTML = CATS.map(c => `<span style="--c:${ccol(c.key)}"><i></i>${c.label}</span>`).join("");
   D.days.forEach((d, i) => { const cx = L + slot * (i + .5), v = dayTot[i];
-    if (v) el("rect", {x: cx - bw / 2, y: y(v), width: bw, height: Math.max(2, y(0) - y(v)), rx: 4, style: "fill:var(--green)"}, svg);
+    // Stacked by category, bottom up in category order, a 2px gap between segments
+    let base = 0;
+    CATS.forEach(c => { const m = d.cats[c.key]; if (!m) return;
+      const y1 = y(base + m), y0 = y(base), h = Math.max(1.5, y0 - y1 - (base ? 2 : 0));
+      el("rect", {x: cx - bw / 2, y: y1, width: bw, height: h, rx: 3, style: `fill:${ccol(c.key)}`}, svg);
+      base += m; });
     if ((D.days.length - 1 - i) % (slot < 34 ? 3 : 2) === 0) el("text", {x: cx, y: H - 6, "text-anchor": "middle"}, svg).textContent = d.weekday[0] + " " + d.label.split(" ")[0];
     const hit = el("rect", {x: L + slot * i, y: Tp, width: slot, height: H - Tp - B, class: "hit"}, svg);
-    const rows = D.subjects.filter(s => d.values[s]).map(s => row(esc(s), fmt(d.values[s]), color(s))).join("");
-    hit.addEventListener("mousemove", ev => showTip(ev, `<b>${d.weekday} ${d.label} · ${fmt(v)}</b>${rows || row("No study", "")}`));
+    const rows = CATS.filter(c => d.cats[c.key]).map(c => row(`<b style="display:inline;color:var(--ink)">${c.label}</b>`, fmt(d.cats[c.key]), ccol(c.key)) +
+      D.subjects.filter(s => d.values[s] && catOf(s) === c.key).map(s => row("&nbsp;&nbsp;&nbsp;" + esc(s), fmt(d.values[s]))).join("")).join("");
+    hit.addEventListener("mousemove", ev => showTip(ev, `<b>${d.weekday} ${d.label} · ${fmt(v)}</b>${rows || row("Nothing logged", "")}`));
     hit.addEventListener("mouseleave", hideTip); });
   if (avg) { const ya = y(avg);
     el("line", {x1: L, x2: W - R + 6, y1: ya, y2: ya, style: "stroke:var(--green)", "stroke-width": 1.5, "stroke-dasharray": "5 4"}, svg);
@@ -313,14 +518,14 @@ function niceStep(max, ticks) { const need = max / ticks; return [5,10,15,30,45,
     hit.addEventListener("mouseleave", hideTip); });
 })();
 
-// ---------- Subjects ----------
-$("subj-cards").innerHTML = D.bySubject.map(r => {
+// ---------- Activities, grouped by category ----------
+const card = r => {
   const series = D.days.map(d => d.values[r.subject] || 0), mx = Math.max(1, ...series), w = 300 / series.length;
   const bars = series.map((v, i) => { const h = v ? Math.max(4, 54 * v / mx) : 2;
     return `<rect x="${i * w + 2}" y="${56 - h}" width="${w - 5}" height="${h}" rx="3" style="fill:${v ? color(r.subject) : "var(--fill)"}"/>`; }).join("");
   const attempts = r.done + r.stopped;
   return `<div class="card subj" style="--c:${color(r.subject)}">
-    <div class="chead"><span class="cat"><i>${esc(r.subject.trim()[0] || "?")}</i>${esc(r.subject)}</span><span class="when">${esc(r.last)}</span></div>
+    <div class="chead"><span class="cat"><span class="cico">${icon(r.category)}</span>${esc(r.subject)}</span><span class="when">${esc(r.last)}</span></div>
     <div class="big">${big(r.min)}</div><div class="sub">total focus</div>
     <svg class="chart" viewBox="0 0 300 56" preserveAspectRatio="none" style="height:56px" role="img" aria-label="${esc(r.subject)}: minutes per day, last 14 days">${bars}</svg>
     <div class="stats">
@@ -329,25 +534,36 @@ $("subj-cards").innerHTML = D.bySubject.map(r => {
       <div><b>${r.avg ? fmt(r.avg) : "–"}</b><span>avg session</span></div>
     </div>
   </div>`;
-}).join("") || `<p class="empty">No subjects yet. Hover the notch and add one.</p>`;
+};
+$("subj-cards").innerHTML = CATS.map(c => {
+  const mine = D.bySubject.filter(r => r.category === c.key);
+  if (!mine.length) return "";
+  return `<h2 class="gh" style="--c:${ccol(c.key)}"><span class="cico">${icon(c.key)}</span>${c.label}<span class="n">${fmt(c.total)} total</span></h2>
+    <div class="grid">${mine.map(card).join("")}</div>`;
+}).join("") || `<p class="empty">No activities yet. Hover the notch and add one.</p>`;
 
 // ---------- Sessions ----------
-let fSubj = "all", fRes = "all";
+let fSubj = "all", fRes = "all", fCat = "all";
 const result = s => s.done ? "done" : (s.actual < 1 ? "tap" : "stop");
 const RES = [["all", "All"], ["done", "Done"], ["stop", "Stopped"], ["tap", "Taps"]];
 const LABEL = {done: "Done", stop: "Stopped", tap: "Quick tap"};
 function renderSessions() {
   $("seg").innerHTML = RES.map(([k, t]) => `<button data-k="${k}" aria-pressed="${k === fRes}">${t}</button>`).join("");
   $("seg").querySelectorAll("button").forEach(b => b.onclick = () => { fRes = b.dataset.k; renderSessions(); });
-  $("chips").innerHTML = [["all", "All Subjects"], ...D.subjects.map(s => [s, s])].map(([k, t]) =>
+  // Row 1: categories. Row 2: the activities inside the chosen category.
+  $("cchips").innerHTML = [["all", "All"], ...CATS.map(c => [c.key, c.label])].map(([k, t]) =>
+    `<button class="chip" data-k="${k}" aria-pressed="${k === fCat}" ${k !== "all" ? `style="--c:${ccol(k)}"` : ""}>${k !== "all" ? "<i></i>" : ""}${t}</button>`).join("");
+  $("cchips").querySelectorAll("button").forEach(b => b.onclick = () => { fCat = b.dataset.k; fSubj = "all"; renderSessions(); });
+  const subs = D.subjects.filter(s => fCat === "all" || catOf(s) === fCat);
+  $("chips").innerHTML = [["all", "All activities"], ...subs.map(s => [s, s])].map(([k, t]) =>
     `<button class="chip" data-k="${esc(k)}" aria-pressed="${k === fSubj}" ${k !== "all" ? `style="--c:${color(k)}"` : ""}>${k !== "all" ? "<i></i>" : ""}${esc(t)}</button>`).join("");
   $("chips").querySelectorAll("button").forEach(b => b.onclick = () => { fSubj = b.dataset.k; renderSessions(); });
-  const list = D.sessions.filter(s => (fSubj === "all" || s.subject === fSubj) && (fRes === "all" || result(s) === fRes));
+  const list = D.sessions.filter(s => (fCat === "all" || s.category === fCat) && (fSubj === "all" || s.subject === fSubj) && (fRes === "all" || result(s) === fRes));
   const groups = [];
   list.forEach(s => { const g = groups[groups.length - 1]; if (g && g.name === s.group) g.items.push(s); else groups.push({name: s.group, items: [s]}); });
   $("groups").innerHTML = groups.map(g => `<div class="ghead">${esc(g.name)}</div><div class="list">` + g.items.map(s =>
-    `<div class="li" style="--c:${color(s.subject)}"><span class="ic">${esc(s.subject.trim()[0] || "?")}</span>
-      <div><div class="t">${esc(s.subject)}</div><div class="d">${s.start}–${s.end} · planned ${Math.round(s.planned)} min</div></div>
+    `<div class="li" style="--c:${ccol(s.category)}"><span class="cico">${icon(s.category)}</span>
+      <div><div class="t">${esc(s.subject)}${s.detail ? ` · ${esc(s.detail)}` : ""}</div><div class="d">${CAT[s.category].label} · ${s.start}–${s.end} · planned ${Math.round(s.planned)} min</div></div>
       <div class="r"><div class="v">${s.actual >= 10 ? Math.round(s.actual) : s.actual}<small>min</small></div><div class="res ${result(s)}">${LABEL[result(s)]}</div></div></div>`).join("") + `</div>`).join("")
     || `<p class="empty">No sessions match.</p>`;
 }

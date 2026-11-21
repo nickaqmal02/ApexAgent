@@ -727,3 +727,9 @@
 {"stage":"agent_loop","output":"Playing on Spotify.","model":"done","durationMs":986.463458,"tsMs":1795096494325.875,"route":"steps=1","input":"chloe spotify","requestId":"3536D7C6-CB79-45A6-90DC-A9B69E4B167C"}
 {"model":"deepgram-aura-2-stream","tsMs":1795096496812.6821,"durationMs":875.200959,"route":"online","requestId":"3536D7C6-CB79-45A6-90DC-A9B69E4B167C","stage":"tts_first_chunk"}
 {"model":"deepgram-aura-2-stream","tsMs":1795096496812.6921,"durationMs":2467.050042,"route":"online","requestId":"3536D7C6-CB79-45A6-90DC-A9B69E4B167C","stage":"tts_stream_total"}
+{"input":"q","route":"online","model":"deepseek-chat","requestId":"FCCE3896-737C-4703-83AC-4C886AC9192F","tsMs":1795245256007.903,"output":"What's up, Nik?","stage":"llm","durationMs":1583.619667}
+{"durationMs":1583.644458,"route":"steps=0","model":"answer","requestId":"FCCE3896-737C-4703-83AC-4C886AC9192F","tsMs":1795245256007.926,"output":"What's up, Nik?","stage":"agent_loop","input":"q"}
+{"requestId":"FCCE3896-737C-4703-83AC-4C886AC9192F","durationMs":1290.920709,"tsMs":1795245259233.742,"stage":"tts_first_chunk","route":"online","model":"deepgram-aura-2-stream"}
+{"requestId":"FCCE3896-737C-4703-83AC-4C886AC9192F","durationMs":2802.340959,"tsMs":1795245259233.7542,"stage":"tts_stream_total","route":"online","model":"deepgram-aura-2-stream"}
+{"tsMs":1795253082950.1628,"durationMs":1028.546583,"model":"deepseek-chat","route":"online","stage":"llm","output":"Yo Nik, what's up?","requestId":"C864E363-B225-4DFB-82D2-9348EE74165E","input":"i"}
+{"tsMs":1795253082950.177,"durationMs":1028.562542,"model":"answer","route":"steps=0","stage":"agent_loop","output":"Yo Nik, what's up?","requestId":"C864E363-B225-4DFB-82D2-9348EE74165E","input":"i"}

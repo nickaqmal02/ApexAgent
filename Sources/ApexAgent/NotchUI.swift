@@ -73,7 +73,7 @@ final class NotchModel: ObservableObject {
     var size: CGSize {
         if hovering || (!expanded && study.showsStatus) {
             let s = statusSides
-            return CGSize(width: s.left + notchWidth + s.right, height: notchHeight + (hovering ? 104 : 0))
+            return CGSize(width: s.left + notchWidth + s.right, height: notchHeight + (hovering ? studyPickerHeight : 0))
         }
         if expanded { return CGSize(width: notchWidth + 96, height: notchHeight + (labelLines == 2 ? 46 : 28)) }
         return CGSize(width: notchWidth, height: notchHeight)
@@ -96,7 +96,7 @@ final class NotchModel: ObservableObject {
 
     // Left side = padding 12 + pill padding 16 + icon 12 + gap 5 + text + 8 breathing room before the camera
     private var statusLeftNeeded: CGFloat {
-        let text: String? = study.subject ?? (study.resting ? "Break" : (study.breakOver ? "Break over" : study.justFinished))
+        let text: String? = study.subjectLabel ?? (study.resting ? "Break" : (study.breakOver ? "Break over" : study.justFinished))
         guard let text else { return 0 }
         return 12 + 16 + 12 + 5 + ceil((text as NSString).size(withAttributes: [.font: statusFont]).width) + 8
     }
@@ -320,7 +320,7 @@ struct NotchView: View {
             if model.hovering {
                 VStack(spacing: 0) {
                     StudyStatusRow(study: study, sides: model.statusSides, notchWidth: model.notchWidth, notchHeight: model.notchHeight)
-                    StudyPicker(study: study).frame(width: size.width, height: 104)
+                    StudyPicker(study: study).frame(width: size.width, height: studyPickerHeight)
                 }
                 .transition(.opacity)
             } else if model.expanded {
@@ -422,7 +422,8 @@ struct NotchView: View {
 
 // The window is a fixed transparent box big enough for the largest look (the study picker)
 let notchPanelWidth: CGFloat = 720   // room for a 24-letter subject on the left
-let notchPanelExtraHeight: CGFloat = 110
+let studyPickerHeight: CGFloat = 134      // category tabs (30) + tiles + buttons
+let notchPanelExtraHeight: CGFloat = 140
 
 // A panel that can take typing (the + box) without activating the app
 final class NotchPanel: NSPanel {
@@ -499,6 +500,7 @@ final class NotchController {
             // Stay open while the mouse is near, or while typing a new subject
             if !model.study.typing && !shapeRect(model.size, margin: 14, offset: model.xOffset).contains(mouse) {
                 model.hovering = false
+                model.study.choosing = nil   // leaving the notch cancels "which prayer?"
                 panel.ignoresMouseEvents = true
                 panel.resignKey()
             }
