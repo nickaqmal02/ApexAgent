@@ -12,6 +12,9 @@
   --bg:#f2f2f7; --card:#ffffff; --ink:#000000; --ink2:#3c3c4399; --ink3:#3c3c434d; --sep:#3c3c4329; --fill:#7878801f;
   --green:#34c759; --orange:#ff9500; --red:#ff3b30; --blue:#007aff; --purple:#af52de; --teal:#30b0c7;
   --bar-bg:#f9f9f9cc;
+  /* glass cards: translucent fill, blurred backdrop, a thin bright rim */
+  --glass:#ffffff8c; --glass-edge:#ffffffb3; --glass-hi:#ffffffcc; --glass-shadow:0 8px 28px #1f26591a;
+  --blob1:#5aa9ff73; --blob2:#34c7594d; --blob3:#af52de4d; --blob4:#ff9f0a33;
   /* categories: validated 4-slot palette (CVD ΔE ≥ 8.4); always shown with an icon and a label */
   --academic:#2a78d6; --health:#1baf7a; --soul:#eda100; --personal:#e87ba4;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#6250d6; --s8:#e34948;
@@ -23,6 +26,8 @@
   --bg:#000000; --card:#1c1c1e; --ink:#ffffff; --ink2:#ebebf599; --ink3:#ebebf54d; --sep:#54545899; --fill:#7878805c;
   --green:#30d158; --orange:#ff9f0a; --red:#ff453a; --blue:#0a84ff; --purple:#bf5af2; --teal:#40c8e0;
   --bar-bg:#1e1e1ecc;
+  --glass:#2c2c2e73; --glass-edge:#ffffff1f; --glass-hi:#ffffff26; --glass-shadow:0 10px 30px #00000066;
+  --blob1:#0a84ff80; --blob2:#30d15838; --blob3:#bf5af266; --blob4:#ff9f0a26;
   --academic:#3987e5; --health:#199e70; --soul:#c98500; --personal:#d55181;
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#0ca30c; --s7:#9085e9; --s8:#e66767;
   color-scheme:dark}}
@@ -37,7 +42,15 @@ h1{font:700 34px/1.15 var(--text);letter-spacing:.01em;margin:2px 0 18px}
 h2{font:700 22px/1.2 var(--text);margin:26px 0 10px;letter-spacing:.01em}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid>*,section>*{min-width:0}
-.card{background:var(--card);border-radius:12px;padding:12px 16px 14px;min-width:0}
+/* soft colour blobs behind everything, so the glass cards have something to blur */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(34vmax 26vmax at 30% 14%,var(--blob1),transparent 70%),
+    radial-gradient(30vmax 24vmax at 72% 22%,var(--blob3),transparent 70%),
+    radial-gradient(42vmax 42vmax at 15% 75%,var(--blob2),transparent 70%),
+    radial-gradient(36vmax 36vmax at 85% 95%,var(--blob4),transparent 70%),var(--bg)}
+.card,.quote{background:var(--glass);border-radius:16px;padding:12px 16px 14px;min-width:0;
+  backdrop-filter:blur(22px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6);
+  border:1px solid var(--glass-edge);box-shadow:inset 0 1px 0 var(--glass-hi),var(--glass-shadow)}
 .card.tap{cursor:default}
 .chead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
 .cat{display:flex;align-items:center;gap:6px;font:600 15px var(--text);color:var(--t)}
@@ -69,24 +82,39 @@ h2{font:700 22px/1.2 var(--text);margin:26px 0 10px;letter-spacing:.01em}
 .legend span{display:inline-flex;align-items:center;gap:5px}
 .legend i{width:9px;height:9px;border-radius:3px;background:var(--c)}
 /* habits: one card per activity, 4 weeks of day squares, today's progress and the streak */
-/* the big all-habits grid on top of Habits: one column per week, one cell per day.
-   Sequential: a single green, light to dark by the share of habits done; full green = every habit */
-.heatwrap{overflow-x:auto;scrollbar-width:none;margin-top:12px;--cs:14px}
-@media (min-width:700px){.heatwrap{--cs:21px}}
-.heat{display:grid;grid-template-columns:auto 1fr;gap:4px 6px;width:max-content;min-width:100%}
-.heat .mrow{grid-column:2;display:grid;grid-auto-flow:column;grid-auto-columns:var(--cs);gap:3px;font-size:11px;color:var(--ink2);height:14px}
-.heat .mrow span{white-space:nowrap;overflow:visible}
-.heat .dlab{display:grid;grid-template-rows:repeat(7,var(--cs));gap:3px;font-size:10px;color:var(--ink3);line-height:var(--cs)}
-.heat .cells{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,var(--cs));grid-auto-columns:var(--cs);gap:3px}
-.heat .c{border-radius:4px;background:var(--fill)}
-.heat .c.l1,.hkey .l1{background:color-mix(in srgb,var(--green) 28%,var(--fill))}
-.heat .c.l2,.hkey .l2{background:color-mix(in srgb,var(--green) 52%,var(--fill))}
-.heat .c.l3,.hkey .l3{background:color-mix(in srgb,var(--green) 76%,var(--fill))}
-.heat .c.l4,.hkey .l4{background:var(--green)}
+/* the big all-habits grid on top of Habits: one column per week (Mon to Sun down), one cell per day.
+   One grid for month names, day letters and cells, so they always line up; the cells stretch to the
+   card width and stay square. Sequential: a single green, one shade per habit count (2 of 6 is darker
+   than 1 of 6); solid green with a tick = every habit done */
+.heatwrap{overflow-x:auto;scrollbar-width:none;margin-top:12px;padding:16px;background:color-mix(in srgb,var(--glass) 70%,transparent);border:1px solid var(--glass-edge);border-radius:12px}
+.heatwrap::-webkit-scrollbar{display:none}
+.heat{display:grid;grid-template-columns:14px repeat(var(--w),minmax(13px,1fr));gap:3px;min-width:calc(17px + var(--w) * 16px)}
+.heat .mon{font-size:11px;line-height:16px;color:var(--ink2);white-space:nowrap;width:0;overflow:visible}
+.heat .dl{font-size:10px;color:var(--ink3);display:grid;align-items:center}
+.heat .c{aspect-ratio:1;border-radius:22%;background:var(--fill);display:grid;place-items:center}
+.heat .c.on,.hkey i.on{background:color-mix(in oklab,var(--green) var(--a),var(--card))}
+.heat .c.all,.hkey i.all{background:var(--green)}
+.heat .c.all svg{width:62%;height:62%;fill:#fff}
+/* hover: the square lifts and glows in its own green, with a soft pulse */
+.heat .c{transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;cursor:default;position:relative}
+.heat .c:hover{transform:scale(1.25);z-index:1;filter:brightness(1.25);animation:glow 1.4s ease-in-out infinite}
+.heat .c.future:hover{filter:none;animation:none;transform:scale(1.12)}
+@keyframes glow{0%,100%{box-shadow:0 0 4px 1px color-mix(in srgb,var(--green) 55%,transparent)}
+  50%{box-shadow:0 0 12px 4px color-mix(in srgb,var(--green) 80%,transparent)}}
+/* idle wave: a soft green shimmer sweeps across the grid diagonally, oldest week to newest, every 6 s.
+   --i is the cell's diagonal (week + weekday), so each diagonal lights up a moment after the last */
+.heat .c::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;
+  background:color-mix(in srgb,var(--green) 55%,transparent);box-shadow:0 0 10px 2px color-mix(in srgb,var(--green) 45%,transparent);
+  animation:wave 6s ease-in-out infinite;animation-delay:calc(var(--i) * 70ms)}
+@keyframes wave{0%,8%,100%{opacity:0}4%{opacity:.32}}   /* a narrow, faint band: empty days never look like done days */
+/* the square itself swells a little as the wave passes, in step with the shimmer (hover's own animation takes over) */
+.heat .c{animation:swell 6s ease-in-out infinite;animation-delay:calc(var(--i) * 70ms)}
+@keyframes swell{0%,8%,100%{transform:scale(1)}4%{transform:scale(1.16)}}
+@media (prefers-reduced-motion:reduce){.heat .c{transition:none}.heat .c,.heat .c::after{animation:none}.heat .c:hover{animation:none;transform:none;box-shadow:0 0 0 2px var(--green)}}
 .heat .c.future{background:transparent;box-shadow:inset 0 0 0 1px var(--sep)}
 .heat .c.now{outline:2px solid var(--ink);outline-offset:1px}
-.hkey{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--ink2);margin-top:10px;justify-content:flex-end}
-.hkey i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.hkey{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--ink2);margin-top:12px;justify-content:flex-end;flex-wrap:wrap}
+.hkey i{width:12px;height:12px;border-radius:3px;display:inline-block;background:var(--fill)}
 .hstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;border-top:.5px solid var(--sep);padding-top:10px;font-size:12.5px;color:var(--ink2)}
 .hstats b{display:block;font:600 20px/1.15 var(--round);color:var(--ink);font-variant-numeric:tabular-nums}
 .today{display:grid;gap:10px}
@@ -155,7 +183,8 @@ svg.chart text{fill:var(--ink2);font:12px var(--text);font-variant-numeric:tabul
 .chip[aria-pressed="true"]{background:var(--blue);color:#fff}
 .chip[aria-pressed="true"] i{background:#fff}
 .ghead{font:600 13px var(--text);color:var(--ink2);text-transform:uppercase;letter-spacing:.02em;margin:20px 16px 6px}
-.list{background:var(--card);border-radius:12px;overflow:hidden}
+.list{background:var(--glass);border-radius:16px;overflow:hidden;backdrop-filter:blur(22px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6);
+  border:1px solid var(--glass-edge);box-shadow:inset 0 1px 0 var(--glass-hi),var(--glass-shadow)}
 .li{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:10px 16px;position:relative}
 .li+.li::before{content:"";position:absolute;top:0;left:50px;right:0;border-top:.5px solid var(--sep)}
 .li .ic{width:24px;height:24px;border-radius:6px;background:var(--c);display:grid;place-items:center;color:#fff;font:700 12px var(--round)}
@@ -167,6 +196,11 @@ svg.chart text{fill:var(--ink2);font:12px var(--text);font-variant-numeric:tabul
 .res{font-size:13px}.res.done{color:var(--green)}.res.stop{color:var(--orange)}.res.tap{color:var(--ink2)}
 .empty{color:var(--ink2);text-align:center;padding:24px 0;font-size:15px}
 .foot{font-size:13px;color:var(--ink2);margin:14px 16px 0}
+/* the motto on top of Habits: compounding, 1.01^365 = 37.8 */
+.quote{margin:0 0 12px;padding:14px 16px}
+.quote p{margin:0;font:600 18px/1.35 var(--text);color:var(--ink)}
+.quote p em{font-style:normal;color:var(--green)}
+.quote small{display:block;margin-top:4px;font-size:12.5px;color:var(--ink2);font-variant-numeric:tabular-nums}
 /* tab bar */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--bar-bg);
   backdrop-filter:saturate(1.8) blur(20px);-webkit-backdrop-filter:saturate(1.8) blur(20px);border-top:.5px solid var(--sep);
@@ -176,7 +210,7 @@ svg.chart text{fill:var(--ink2);font:12px var(--text);font-variant-numeric:tabul
 .tabbar svg{width:26px;height:26px;fill:currentColor}
 .tabbar a[aria-current="page"]{color:var(--blue)}
 .tabbar a:focus-visible,.chip:focus-visible,.seg button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-.tip{position:fixed;pointer-events:none;background:var(--card);color:var(--ink);border-radius:10px;padding:8px 11px;font-size:13px;
+.tip{position:fixed;pointer-events:none;background:var(--glass);backdrop-filter:blur(18px) saturate(1.6);-webkit-backdrop-filter:blur(18px) saturate(1.6);color:var(--ink);border-radius:10px;padding:8px 11px;font-size:13px;
   box-shadow:0 10px 30px rgba(0,0,0,.18),0 0 0 .5px var(--sep);opacity:0;transition:opacity .1s;z-index:20;min-width:150px}
 .tip b{display:block;margin-bottom:3px}.tip .row{display:flex;justify-content:space-between;gap:14px;color:var(--ink2)}
 .tip .sw{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
@@ -192,11 +226,15 @@ section{animation:fade .25s ease-out}
   <h1 id="title">Summary</h1>
 
   <section data-view="habits" hidden>
+    <blockquote class="quote">
+      <p>&ldquo;Get <em>1% better</em> every day and in a year you are <em>37 times better</em>.&rdquo;</p>
+      <small>1.01<sup>365</sup> &asymp; 37.8. Small habits, done daily, compound.</small>
+    </blockquote>
     <div class="card" style="--t:var(--green);margin-bottom:12px">
       <div class="chead"><span class="cat"><svg viewBox="0 0 20 20"><path d="M2 2h4v4H2zm6 0h4v4H8zm6 0h4v4h-4zM2 8h4v4H2zm6 0h4v4H8zm6 0h4v4h-4zM2 14h4v4H2zm6 0h4v4H8zm6 0h4v4h-4z"/></svg>All habits</span><span class="when" id="heat-range"></span></div>
       <div class="hl" id="heat-text"></div>
       <div class="heatwrap" id="heatwrap"><div class="heat" id="heat" role="img"></div></div>
-      <div class="hkey" aria-hidden="true">Fewer <i style="background:var(--fill)"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> All done</div>
+      <div class="hkey" id="heat-key" aria-hidden="true"></div>
       <div class="hstats" id="heat-stats"></div>
     </div>
     <div class="card today" style="--t:var(--green)">
@@ -328,29 +366,40 @@ function show() {
   });
   $("title").textContent = VIEWS[v];
   hideTip(); scrollTo(0, 0);
+  const hw = $("heatwrap"); if (hw) hw.scrollLeft = hw.scrollWidth;   // newest weeks in view on a phone (needs the section visible)
 }
 addEventListener("hashchange", show);
 
 // ---------- Big all-habits grid (on top of Habits) ----------
 (() => {
   const HT = D.heat; if (!HT) return;
-  const lvl = n => n == null ? "future" : !n ? "" : n >= HT.total ? "l4" : n / HT.total > 2 / 3 ? "l3" : n / HT.total > 1 / 3 ? "l2" : "l1";
-  const weeks = HT.days.length / 7;
-  // Month names over the first column of each month
-  const months = Array.from({length: weeks}, (_, w) => { const d = HT.days[w * 7];
-    // The first column gets a name too, unless a new month starts in the next two columns (no "MayJun")
+  const T = HT.total, weeks = HT.days.length / 7;
+  const tick = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8.2 14.6 3.8 10.2l1.6-1.6 2.8 2.8 6.4-6.4 1.6 1.6z"/></svg>';
+  // One shade per count: 1 habit is light, T-1 is dark, all T is solid green. Every count gets its own shade.
+  const shade = n => T <= 1 ? 100 : Math.round(18 + 64 * (n - 1) / Math.max(1, T - 2));
+  const cls = n => n == null ? "future" : !n ? "" : n >= T ? "all" : "on";
+  const sty = n => n && n < T ? ` style="--a:${shade(n)}%"` : "";
+  const at = (r, c) => `grid-row:${r};grid-column:${c}`;
+  const parts = [];
+  // Row 1: month names over the first column of each month (the first column too, unless a month starts right after)
+  for (let w = 0; w < weeks; w++) { const d = HT.days[w * 7];
     const soon = [1, 2].some(k => HT.days[(w + k) * 7] && HT.days[(w + k) * 7].first);
-    return d.first || (w === 0 && !soon) ? `<span>${d.m}</span>` : "<span></span>"; }).join("");
-  const cells = HT.days.map(d => `<div class="c ${lvl(d.n)}${d.today ? " now" : ""}" data-t="${esc(d.d)}|${d.n == null ? "" : d.n}"></div>`).join("");
-  $("heat").innerHTML = `<div></div><div class="mrow">${months}</div>
-    <div class="dlab"><span>M</span><span></span><span>W</span><span></span><span>F</span><span></span><span></span></div><div class="cells">${cells}</div>`;
-  $("heat").setAttribute("aria-label", `Last ${weeks} weeks: ${HT.perfect} days with all ${HT.total} habits done`);
+    if (d.first || (w === 0 && !soon)) parts.push(`<span class="mon" style="${at(1, w + 2)}">${d.m}</span>`); }
+  // Column 1: every weekday letter, Monday on top
+  "MTWTFSS".split("").forEach((l, i) => parts.push(`<span class="dl" style="${at(i + 2, 1)}">${l}</span>`));
+  // The cells: day i of the list sits in week column i/7, weekday row i%7
+  HT.days.forEach((d, i) => parts.push(`<div class="c ${cls(d.n)}${d.today ? " now" : ""}" style="${at(i % 7 + 2, Math.floor(i / 7) + 2)};--i:${Math.floor(i / 7) + i % 7}${d.n && d.n < T ? `;--a:${shade(d.n)}%` : ""}" data-t="${esc(d.d)}|${d.n == null ? "" : d.n}">${d.n && d.n >= T ? tick : ""}</div>`));
+  $("heat").style.setProperty("--w", weeks);
+  $("heat").innerHTML = parts.join("");
+  // Key: one swatch per count, the same shades as the grid
+  $("heat-key").innerHTML = "None " + Array.from({length: T + 1}, (_, n) => `<i class="${cls(n)}"${sty(n)} title="${n} of ${T}"></i>`).join("") + ` All ${T}`;
+  $("heat").setAttribute("aria-label", `Last ${weeks} weeks: ${HT.perfect} days with all ${T} habits done`);
   $("heat-range").textContent = `${weeks} weeks`;
   $("heat-text").textContent = HT.streak > 1 ? `${HT.streak} perfect days in a row. Keep it going.`
-    : HT.perfect ? `${HT.perfect} perfect day${HT.perfect === 1 ? "" : "s"} so far: every habit done.` : `Full green means all ${HT.total} habits done that day.`;
+    : HT.perfect ? `${HT.perfect} perfect day${HT.perfect === 1 ? "" : "s"} so far: every habit done.` : `Darker green means more habits done. Solid green with a tick: all ${T}. Hover a day for its count.`;
   $("heat-stats").innerHTML = `<span><b>${HT.perfect}</b>perfect days</span><span><b>${HT.streak}</b>current streak</span><span><b>${HT.best}</b>best streak</span>`;
   $("heat").querySelectorAll(".c").forEach(c => { const [d, n] = c.dataset.t.split("|");
-    c.addEventListener("mousemove", ev => showTip(ev, `<b>${d}</b>${n === "" ? row("Coming up", "") : row("Habits done", `${n} of ${HT.total}`)}`));
+    c.addEventListener("mousemove", ev => showTip(ev, `<b>${d}</b>${n === "" ? row("Coming up", "") : row("Habits done", `${n} of ${T}`)}`));
     c.addEventListener("mouseleave", hideTip); });
   const w = $("heatwrap"); w.scrollLeft = w.scrollWidth;   // newest weeks in view on a narrow phone
 })();
