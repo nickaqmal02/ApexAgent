@@ -733,3 +733,6 @@
 {"requestId":"FCCE3896-737C-4703-83AC-4C886AC9192F","durationMs":2802.340959,"tsMs":1795245259233.7542,"stage":"tts_stream_total","route":"online","model":"deepgram-aura-2-stream"}
 {"tsMs":1795253082950.1628,"durationMs":1028.546583,"model":"deepseek-chat","route":"online","stage":"llm","output":"Yo Nik, what's up?","requestId":"C864E363-B225-4DFB-82D2-9348EE74165E","input":"i"}
 {"tsMs":1795253082950.177,"durationMs":1028.562542,"model":"answer","route":"steps=0","stage":"agent_loop","output":"Yo Nik, what's up?","requestId":"C864E363-B225-4DFB-82D2-9348EE74165E","input":"i"}
+{"model":"deepgram-nova-2","input":"bypass","route":"online","stage":"stt_final","output":"voice_processing=off","requestId":"62E5EA07-D7B1-4DEE-A122-84F4569F9E93","durationMs":-1,"tsMs":1795363553775.6882}
+{"model":"deepseek-chat","stage":"llm","tsMs":1795363554834.854,"durationMs":1059.110042,"route":"online","requestId":"DE9F8CC2-304F-48C5-87BE-067258DB9E18","input":"bypass","output":"No bypass here, Nik. What do you actually need?"}
+{"model":"answer","stage":"agent_loop","tsMs":1795363554834.8643,"durationMs":1059.121917,"route":"steps=0","requestId":"DE9F8CC2-304F-48C5-87BE-067258DB9E18","input":"bypass","output":"No bypass here, Nik. What do you actually need?"}
