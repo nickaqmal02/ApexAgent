@@ -14,6 +14,5 @@ logs/*.jsonl
 # personal study data from the study notch
 data/
 
-# local tooling, kept on this Mac only
+# Claude Code agents: local tooling, kept on this Mac only
 .claude/
-.github/workflows/
