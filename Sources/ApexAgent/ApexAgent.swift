@@ -2,6 +2,7 @@
 // https://docs.swift.org/swift-book
 import AppKit
 import Foundation
+import NotchCore
 // TODO:
 // FIXME:
 // !!!: Important: 
@@ -57,7 +58,7 @@ struct ApexAgent {
         }
 
         MainActor.assumeIsolated {
-            NotchController.shared.start()
+            NotchController.shared.start(config: apexNotchConfig())
         }
         let app: NSApplication = NSApplication.shared
         app.setActivationPolicy(.accessory)   // no Dock icon, no menu bar takeover

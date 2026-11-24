@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2339" height="1654" viewBox="0 0 2339 1654" font-family="Arial, Helvetica, sans-serif"><rect width="2339" height="1654" fill="#fff"/>
+<rect x="350.25" y="463.43" width="164.82" height="164.82" rx="13.57" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="350.25" y1="490.57" x2="515.07" y2="490.57" stroke="#000" stroke-width="2"/>
+<text x="432.66" y="482.70" font-size="16.29" font-weight="bold" text-anchor="middle">1</text>
+<text x="432.66" y="555.53" font-size="15.51" font-weight="bold" text-anchor="middle">Manage</text>
+<text x="432.66" y="574.15" font-size="15.51" font-weight="bold" text-anchor="middle">Activities</text>
+<rect x="350.25" y="827.00" width="164.82" height="164.82" rx="13.57" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="350.25" y1="854.15" x2="515.07" y2="854.15" stroke="#000" stroke-width="2"/>
+<text x="432.66" y="846.27" font-size="16.29" font-weight="bold" text-anchor="middle">2</text>
+<text x="432.66" y="919.11" font-size="15.51" font-weight="bold" text-anchor="middle">Run Study</text>
+<text x="432.66" y="937.72" font-size="15.51" font-weight="bold" text-anchor="middle">Session</text>
+<rect x="902.88" y="827.00" width="164.82" height="164.82" rx="13.57" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="902.88" y1="854.15" x2="1067.70" y2="854.15" stroke="#000" stroke-width="2"/>
+<text x="985.29" y="846.27" font-size="16.29" font-weight="bold" text-anchor="middle">3</text>
+<text x="985.29" y="919.11" font-size="15.51" font-weight="bold" text-anchor="middle">Build Habit</text>
+<text x="985.29" y="937.72" font-size="15.51" font-weight="bold" text-anchor="middle">Report</text>
+<rect x="1193.74" y="827.00" width="164.82" height="164.82" rx="13.57" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="1193.74" y1="854.15" x2="1358.56" y2="854.15" stroke="#000" stroke-width="2"/>
+<text x="1276.15" y="846.27" font-size="16.29" font-weight="bold" text-anchor="middle">4</text>
+<text x="1276.15" y="919.11" font-size="15.51" font-weight="bold" text-anchor="middle">Publish</text>
+<text x="1276.15" y="937.72" font-size="15.51" font-weight="bold" text-anchor="middle">Report</text>
+<rect x="1843.32" y="870.63" width="164.82" height="164.82" rx="13.57" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="1843.32" y1="897.78" x2="2008.14" y2="897.78" stroke="#000" stroke-width="2"/>
+<text x="1925.73" y="889.90" font-size="16.29" font-weight="bold" text-anchor="middle">5</text>
+<text x="1925.73" y="962.73" font-size="15.51" font-weight="bold" text-anchor="middle">Serve Shared</text>
+<text x="1925.73" y="981.35" font-size="15.51" font-weight="bold" text-anchor="middle">Report</text>
+<rect x="40.00" y="851.24" width="145.43" height="116.34" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="39.00" y1="852.74" x2="186.43" y2="852.74" stroke="#000" stroke-width="5"/>
+<line x1="41.50" y1="851.24" x2="41.50" y2="967.58" stroke="#000" stroke-width="5"/>
+<text x="112.71" y="914.84" font-size="15.51" font-weight="bold" text-anchor="middle">Student</text>
+<rect x="2153.57" y="909.41" width="145.43" height="116.34" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="2152.57" y1="910.91" x2="2300.00" y2="910.91" stroke="#000" stroke-width="5"/>
+<line x1="2155.07" y1="909.41" x2="2155.07" y2="1025.75" stroke="#000" stroke-width="5"/>
+<text x="2226.29" y="963.70" font-size="15.51" font-weight="bold" text-anchor="middle">Report</text>
+<text x="2226.29" y="982.32" font-size="15.51" font-weight="bold" text-anchor="middle">Viewer</text>
+<path d="M873.79,528.39 L660.50,528.39 L660.50,563.29 L873.79,563.29" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="699.28" y1="528.39" x2="699.28" y2="563.29" stroke="#000" stroke-width="2"/>
+<text x="679.89" y="551.27" font-size="15.51" font-weight="bold" text-anchor="middle">D1</text>
+<text x="786.54" y="551.27" font-size="15.51" text-anchor="middle">Activities</text>
+<path d="M873.79,1124.65 L660.50,1124.65 L660.50,1159.55 L873.79,1159.55" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="699.28" y1="1124.65" x2="699.28" y2="1159.55" stroke="#000" stroke-width="2"/>
+<text x="679.89" y="1147.53" font-size="15.51" font-weight="bold" text-anchor="middle">D2</text>
+<text x="786.54" y="1147.53" font-size="15.51" text-anchor="middle">Study Sessions</text>
+<path d="M1707.59,872.57 L1494.29,872.57 L1494.29,907.47 L1707.59,907.47" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="1533.07" y1="872.57" x2="1533.07" y2="907.47" stroke="#000" stroke-width="2"/>
+<text x="1513.68" y="895.45" font-size="15.51" font-weight="bold" text-anchor="middle">D3</text>
+<text x="1620.33" y="895.45" font-size="15.51" text-anchor="middle">User Accounts</text>
+<path d="M1707.59,940.43 L1494.29,940.43 L1494.29,975.34 L1707.59,975.34" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="1533.07" y1="940.43" x2="1533.07" y2="975.34" stroke="#000" stroke-width="2"/>
+<text x="1513.68" y="963.32" font-size="15.51" font-weight="bold" text-anchor="middle">D4</text>
+<text x="1620.33" y="963.32" font-size="15.51" text-anchor="middle">Report Files</text>
+<path d="M1707.59,1085.86 L1494.29,1085.86 L1494.29,1120.77 L1707.59,1120.77" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="1533.07" y1="1085.86" x2="1533.07" y2="1120.77" stroke="#000" stroke-width="2"/>
+<text x="1513.68" y="1108.74" font-size="15.51" font-weight="bold" text-anchor="middle">D5</text>
+<text x="1620.33" y="1108.74" font-size="15.51" text-anchor="middle">Share Links</text>
+<text x="40.00" y="323.43" font-size="15.51" font-weight="bold" text-anchor="start">DFD Level 1: explosion of process 0 "Track Study Habits" (1-5)</text>
+<path d="M166.04,851.24 L166.04,560.38 L350.25,560.38" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="350.25,560.38 339.58,564.74 339.58,556.02" fill="#000"/>
+<text x="258.14" y="553.59" font-size="15.51" text-anchor="middle">Activity details</text>
+<path d="M185.43,890.02 L350.25,890.02" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="350.25,890.02 339.58,894.38 339.58,885.66" fill="#000"/>
+<text x="267.84" y="883.23" font-size="15.51" text-anchor="middle">Session command</text>
+<path d="M350.25,938.50 L185.43,938.50" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="185.43,938.50 196.09,934.13 196.09,942.86" fill="#000"/>
+<text x="267.84" y="931.71" font-size="15.51" text-anchor="middle">Notch status</text>
+<path d="M515.07,545.84 L660.50,545.84" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="660.50,545.84 649.83,550.20 649.83,541.47" fill="#000"/>
+<text x="587.78" y="539.05" font-size="15.51" text-anchor="middle">Activity record</text>
+<path d="M699.28,563.29 L699.28,948.19 L515.07,948.19" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="515.07,948.19 525.73,943.83 525.73,952.55" fill="#000"/>
+<text x="607.17" y="941.40" font-size="15.51" text-anchor="middle">Activity settings</text>
+<path d="M873.79,545.84 L941.66,545.84 L941.66,827.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="941.66,827.00 937.30,816.34 946.02,816.34" fill="#000"/>
+<text x="895.78" y="691.85" font-size="15.51" text-anchor="middle">Activity list</text>
+<path d="M432.66,991.82 L432.66,1142.10 L660.50,1142.10" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="660.50,1142.10 649.83,1146.46 649.83,1137.73" fill="#000"/>
+<text x="546.09" y="1135.31" font-size="15.51" text-anchor="middle">Session record</text>
+<path d="M873.79,1142.10 L951.36,1142.10 L951.36,991.82" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="951.36,991.82 955.72,1002.48 946.99,1002.48" fill="#000"/>
+<text x="889.50" y="1071.90" font-size="15.51" text-anchor="middle">Session history</text>
+<path d="M156.34,967.58 L156.34,1287.53 L1009.53,1287.53 L1009.53,991.82" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1009.53,991.82 1013.89,1002.48 1005.17,1002.48" fill="#000"/>
+<text x="582.94" y="1280.74" font-size="15.51" text-anchor="middle">Report request</text>
+<path d="M1048.31,827.00 L1048.31,424.65 L127.26,424.65 L127.26,851.24" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="127.26,851.24 122.89,840.57 131.62,840.57" fill="#000"/>
+<text x="587.78" y="417.86" font-size="15.51" text-anchor="middle">Habit report</text>
+<path d="M1067.70,890.02 L1193.74,890.02" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1193.74,890.02 1183.07,894.38 1183.07,885.66" fill="#000"/>
+<text x="1130.72" y="883.23" font-size="15.51" text-anchor="middle">Report file</text>
+<path d="M88.48,967.58 L88.48,1345.70 L1242.21,1345.70 L1242.21,991.82" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1242.21,991.82 1246.58,1002.48 1237.85,1002.48" fill="#000"/>
+<text x="665.35" y="1338.91" font-size="15.51" text-anchor="middle">Login details</text>
+<path d="M1276.15,827.00 L1276.15,376.17 L69.09,376.17 L69.09,851.24" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="69.09,851.24 64.72,840.57 73.45,840.57" fill="#000"/>
+<text x="672.13" y="369.38" font-size="15.51" text-anchor="middle">Share link</text>
+<path d="M1358.56,877.42 L1494.29,877.42" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1494.29,877.42 1483.63,881.78 1483.63,873.05" fill="#000"/>
+<text x="1426.42" y="870.63" font-size="15.51" text-anchor="middle">New account</text>
+<path d="M1494.29,902.62 L1358.56,902.62" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1358.56,902.62 1369.22,898.26 1369.22,906.99" fill="#000"/>
+<text x="1426.42" y="920.27" font-size="15.51" text-anchor="middle">Account record</text>
+<path d="M1358.56,962.73 L1494.29,962.73" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1494.29,962.73 1483.63,967.10 1483.63,958.37" fill="#000"/>
+<text x="1426.42" y="980.38" font-size="15.51" text-anchor="middle">Report file</text>
+<path d="M1329.47,991.82 L1329.47,1103.32 L1494.29,1103.32" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1494.29,1103.32 1483.63,1107.68 1483.63,1098.95" fill="#000"/>
+<text x="1411.88" y="1096.53" font-size="15.51" text-anchor="middle">Share entry</text>
+<path d="M1707.59,957.89 L1843.32,957.89" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1843.32,957.89 1832.66,962.25 1832.66,953.52" fill="#000"/>
+<text x="1775.45" y="951.10" font-size="15.51" text-anchor="middle">Stored report</text>
+<path d="M1707.59,1103.32 L1775.45,1103.32 L1775.45,1006.36 L1843.32,1006.36" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1843.32,1006.36 1832.66,1010.73 1832.66,1002.00" fill="#000"/>
+<text x="1726.16" y="1062.21" font-size="15.51" text-anchor="middle">Share entry</text>
+<path d="M2153.57,938.50 L2008.14,938.50" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="2008.14,938.50 2018.81,934.13 2018.81,942.86" fill="#000"/>
+<text x="2080.86" y="931.71" font-size="15.51" text-anchor="middle">Share link</text>
+<path d="M2008.14,996.67 L2153.57,996.67" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="2153.57,996.67 2142.91,1001.03 2142.91,992.30" fill="#000"/>
+<text x="2080.86" y="989.88" font-size="15.51" text-anchor="middle">Report page</text>
+</svg>

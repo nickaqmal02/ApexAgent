@@ -1,0 +1,425 @@
+<title>Study Notch Data Flow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a working drawing. The Gane & Sarson diagram is the page; scenarios play over it step by step,
+   with the narration and the live contents of each data store underneath. */
+:root{
+  --bg:#eef1f5; --paper:#ffffff; --ink:#151a22; --ink2:#4b5563; --ink3:#8a94a3; --line:#d5dbe4;
+  --accent:#d9480f; --accent-soft:#fde7dc; --mac:#e3ecfa; --mac-ink:#1f4f99; --aws:#fdf0e1; --aws-ink:#9a4a07;
+  --ok:#1d7a46;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1318; --paper:#171c23; --ink:#e7ebf0; --ink2:#a7b0bd; --ink3:#6b7684; --line:#2a313b;
+  --accent:#ff7a3d; --accent-soft:#3a2216; --mac:#17243a; --mac-ink:#8fb4ee; --aws:#2c2014; --aws-ink:#f0b27a;
+  --ok:#5fd394; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1318; --paper:#171c23; --ink:#e7ebf0; --ink2:#a7b0bd; --ink3:#6b7684; --line:#2a313b;
+  --accent:#ff7a3d; --accent-soft:#3a2216; --mac:#17243a; --mac-ink:#8fb4ee; --aws:#2c2014; --aws-ink:#f0b27a;
+  --ok:#5fd394; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans)}
+.wrap{max-width:1280px;margin:0 auto;padding-block:24px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:16px}
+header{display:grid;gap:6px}
+.eyebrow{font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+h1{margin:0;font:700 clamp(24px,3.2vw,34px)/1.15 var(--sans);letter-spacing:-.01em;text-wrap:balance}
+.lede{margin:0;color:var(--ink2);max-width:70ch}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{font:500 14px var(--sans);border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.chip .k{font:600 12px var(--mono);color:var(--ink3)}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.chip[aria-pressed="true"] .k{color:var(--accent)}
+.chip:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.spacer{flex:1}
+.toggle{font:500 13px var(--sans);color:var(--ink2);display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.stage{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.scroll{overflow-x:auto}
+svg.dfd{display:block;width:100%;min-width:860px;height:auto}
+.dfd text{font-family:var(--sans);fill:var(--ink)}
+.dfd .shape{fill:var(--paper);stroke:var(--ink);stroke-width:1.6}
+.dfd .thick{stroke:var(--ink);stroke-width:5}
+.dfd .rule{stroke:var(--ink);stroke-width:1.4}
+.dfd .num{font-weight:700;font-size:14px}
+.dfd .nm{font-weight:600;font-size:14px}
+.dfd .sid{font-weight:700;font-size:13px}
+.dfd .snm{font-size:13.5px}
+.dfd .flow{fill:none;stroke:var(--ink2);stroke-width:1.4}
+.dfd .flab{font-size:12.5px;fill:var(--ink2);paint-order:stroke;stroke:var(--paper);stroke-width:5px;stroke-linejoin:round}
+.dfd .arrow{fill:var(--ink2)}
+.dfd .node{cursor:pointer}
+.dfd .node:hover .shape{stroke:var(--accent)}
+.dfd .flowg{cursor:pointer}
+.dfd .flowg .hit{fill:none;stroke:transparent;stroke-width:14}
+.dfd .flowg:hover .flow{stroke:var(--ink)}
+.dfd .on .flow{stroke:var(--accent);stroke-width:2.6;stroke-dasharray:8 6;animation:dash .9s linear infinite}
+.dfd .on .flab{fill:var(--accent);font-weight:600}
+.dfd .on .arrow{fill:var(--accent)}
+.dfd .node.on .shape{stroke:var(--accent);stroke-width:2.6}
+.dfd .dim{opacity:.38}
+.dfd .band rect{stroke:none}
+.dfd .band text{font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.dfd .band.mac rect{fill:var(--mac)} .dfd .band.mac text{fill:var(--mac-ink)}
+.dfd .band.aws rect{fill:var(--aws)} .dfd .band.aws text{fill:var(--aws-ink)}
+.dfd .token{fill:var(--accent)}
+.bands-off .band{display:none}
+@keyframes dash{to{stroke-dashoffset:-14}}
+@media (prefers-reduced-motion:reduce){.dfd .on .flow{animation:none;stroke-dasharray:none}.dfd .token{display:none}}
+
+.panel{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px}
+@media (max-width:860px){.panel{grid-template-columns:1fr}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.step-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.count{font:600 12px var(--mono);color:var(--ink3)}
+.where{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
+.where.mac{background:var(--mac);color:var(--mac-ink)} .where.aws{background:var(--aws);color:var(--aws-ink)}
+.card h2{margin:6px 0 4px;font:700 19px/1.3 var(--sans);text-wrap:balance}
+.card p{margin:0 0 8px;color:var(--ink2);max-width:65ch}
+.tech{font:500 13px/1.5 var(--mono);color:var(--ink);background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:8px;overflow-wrap:anywhere}
+.nav{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.btn{font:600 14px var(--sans);padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+.hint{font-size:13px;color:var(--ink3);margin-top:8px}
+.stores{display:grid;gap:10px}
+.store{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.store .sh{display:flex;gap:8px;align-items:center;padding:6px 10px;border-bottom:1px solid var(--line);font:600 13px var(--sans)}
+.store .sh b{font-family:var(--mono)}
+.store .sh .where{margin-left:auto}
+.store.flash{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.rows{font:12px/1.55 var(--mono);padding:6px 10px;color:var(--ink2);overflow-x:auto;white-space:pre}
+.rows .new{color:var(--accent);font-weight:600}
+.rows .empty{color:var(--ink3);font-style:italic;font-family:var(--sans)}
+.notch{display:flex;justify-content:center;padding:10px 0 0}
+.pill{background:#000;color:#fff;border-radius:0 0 18px 18px;min-width:220px;padding:8px 18px;font:600 13px var(--mono);text-align:center;transition:min-width .3s}
+.pill.live{min-width:300px}
+.pill .t{color:#ffb380}
+footer{font-size:13px;color:var(--ink3)}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">ApexAgent · study notch · DFD Level 1 (explosion of process 0)</div>
+    <h1>How the study notch moves your data</h1>
+    <p class="lede">Pick a scenario and step through it. Orange arrows show the data moving right now; the store contents underneath change as it is written. Click any process, store or arrow to see what it holds and what builds it.</p>
+  </header>
+
+  <div class="bar" role="group" aria-label="Scenarios" id="scen"></div>
+
+  <div class="stage">
+    <div class="notch" aria-live="polite"><div class="pill" id="pill">Notch idle · hover to start</div></div>
+    <div class="scroll"><svg class="dfd" id="dfd" viewBox="-30 -55 1530 1075" role="img" aria-label="Gane and Sarson Level 1 data flow diagram of the study notch"></svg></div>
+  </div>
+
+  <div class="bar">
+    <label class="toggle"><input type="checkbox" id="bands" checked> Show where each part runs (Mac or AWS)</label>
+    <span class="spacer"></span>
+    <button class="btn" id="reset" type="button">Reset data</button>
+  </div>
+
+  <div class="panel">
+    <section class="card" aria-live="polite" id="story">
+      <div class="step-top"><span class="count" id="count"></span><span class="where" id="where"></span></div>
+      <h2 id="stitle"></h2>
+      <p id="stext"></p>
+      <div class="tech" id="stech"></div>
+      <div class="nav">
+        <button class="btn" id="prev" type="button">← Back</button>
+        <button class="btn primary" id="next" type="button">Next step →</button>
+        <button class="btn" id="play" type="button">▶ Play</button>
+      </div>
+      <div class="hint">Keys: ← → to step, space to play or pause.</div>
+    </section>
+    <section class="card">
+      <div class="eyebrow" style="margin-bottom:8px">Data stores, live</div>
+      <div class="stores" id="stores"></div>
+    </section>
+  </div>
+  <footer>Symbols follow Gane &amp; Sarson: rounded squares are processes (number on top), open-ended boxes are data stores, boxes with a thick top and left edge are external entities, arrows carry nouns. The Mac and AWS shading is an overlay for this explainer, not part of the notation. Sample data only.</footer>
+</div>
+
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("dfd");
+const PS = 130, HDR = 24;
+
+// ---------- Diagram model (same structure as notch-level1-gane-sarson.drawio, re-laid out for the screen) ----------
+const NODES = {
+  student: {kind: "ent", name: ["Student"], x: 20, y: 250, w: 120, h: 96, where: "mac",
+    info: "External entity. The person using the notch on their Mac. Sends activity details, session commands, report requests and login details; receives the notch status, the habit report and the share link."},
+  viewer: {kind: "ent", name: ["Report", "Viewer"], x: 1300, y: 900, w: 120, h: 96, where: "aws",
+    info: "External entity. Anyone the student sends the link to (a friend, a mentor). Reads one shared report in a browser and can do nothing else."},
+  p1: {kind: "proc", num: "1", name: ["Manage", "Activities"], x: 270, y: 40, where: "mac",
+    info: "Process 1. Adds, edits and removes activities (Swift, the notch editor). Writes D1.", tech: "StudyNotch.swift · editor UI → StudyStore.saveSubjects()"},
+  p2: {kind: "proc", num: "2", name: ["Run Study", "Session"], x: 270, y: 233, where: "mac",
+    info: "Process 2. Runs the pomodoro timer and the break, handles ✓ check-ins, and saves one row per session to D2.", tech: "StudyNotch.swift · timer + StudyStore.appendSession()"},
+  p3: {kind: "proc", num: "3", name: ["Build Habit", "Report"], x: 770, y: 233, where: "mac",
+    info: "Process 3. Reads activities and sessions and builds the HTML report (habit grid, weeks, streaks). Today this is study_report.py; for other users it becomes Swift.", tech: "study_report.py today → ReportBuilder.swift + bundled template"},
+  p4: {kind: "proc", num: "4", name: ["Publish", "Report"], x: 770, y: 640, where: "aws",
+    info: "Process 4. Signs the student in, uploads the finished report to their own folder and creates a share id. The app talks to AWS; no AWS keys live in the app.", tech: "Cognito sign-in → API Gateway (JWT check) → Lambda presigned PUT → S3; DynamoDB put"},
+  p5: {kind: "proc", num: "5", name: ["Serve Shared", "Report"], x: 1310, y: 700, where: "aws",
+    info: "Process 5. Answers a share link: checks the share id is live, then serves the stored report page.", tech: "CloudFront → private S3 (Origin Access Control); share id checked against DynamoDB"},
+  d1: {kind: "store", id: "D1", name: "Activities", x: 520, cy: 105, where: "mac", info: "Data store on the Mac: the activity list.", tech: "~/Library/Application Support/StudyNotch/subjects.json"},
+  d2: {kind: "store", id: "D2", name: "Study Sessions", x: 520, cy: 470, where: "mac", info: "Data store on the Mac: one row per finished or stopped session. Raw sessions never leave the Mac.", tech: "…/StudyNotch/study_sessions.csv"},
+  d3: {kind: "store", id: "D3", name: "User Accounts", x: 1020, cy: 685, where: "aws", info: "Data store in AWS: login identities.", tech: "Amazon Cognito user pool (free up to 10,000 monthly users)"},
+  d4: {kind: "store", id: "D4", name: "Report Files", x: 1020, cy: 742, where: "aws", info: "Data store in AWS: each user's latest report page, about 300 KB.", tech: "S3 private bucket, key u/<share-id>/index.html"},
+  d5: {kind: "store", id: "D5", name: "Share Links", x: 1020, cy: 850, where: "aws", info: "Data store in AWS: one small row per share link.", tech: "DynamoDB table: shareId → userId, created, revoked"},
+};
+for (const n of Object.values(NODES)) {
+  if (n.kind === "proc") { n.w = PS; n.h = PS; }
+  if (n.kind === "store") { n.w = 170; n.h = 30; n.y = n.cy - 15; }
+}
+
+// [id, from, to, label, points, [labelX, labelY, side], meaning]
+const FLOWS = [
+  ["f1", "student", "p1", "Activity details", [[120, 250], [120, 120], [270, 120]], [195, 120, "above"], "Name, category, minutes, options, habit or time-only."],
+  ["f2", "student", "p2", "Session command", [[140, 280], [270, 280]], [205, 280, "above"], "Start, pause, stop, or a ✓ check-in from the notch."],
+  ["f3", "p2", "student", "Notch status", [[270, 320], [140, 320]], [205, 320, "above"], "Countdown, current activity, study or break."],
+  ["f4", "p1", "d1", "Activity record", [[400, 105], [520, 105]], [460, 105, "above"], "One saved activity entry."],
+  ["f5", "d1", "p2", "Activity settings", [[550, 120], [550, 330], [400, 330]], [475, 330, "above"], "The chosen activity's length, category and options."],
+  ["f6", "d1", "p3", "Activity list", [[690, 105], [810, 105], [810, 233]], [810, 170, "left"], "All activities with categories, to group the report."],
+  ["f7", "p2", "d2", "Session record", [[335, 363], [335, 470], [520, 470]], [428, 470, "above"], "id, activity, planned and actual minutes, start, end, completed, category, detail."],
+  ["f8", "d2", "p3", "Session history", [[690, 470], [820, 470], [820, 363]], [820, 416, "left"], "Every session row, to count days, streaks and totals."],
+  ["f9", "student", "p3", "Report request", [[110, 346], [110, 530], [860, 530], [860, 363]], [485, 530, "above"], "The student opening their report."],
+  ["f10", "p3", "student", "Habit report", [[880, 233], [880, 10], [80, 10], [80, 250]], [480, 10, "above"], "The report page: habit grid, weeks, streaks, totals."],
+  ["f11", "p3", "p4", "Report file", [[880, 363], [880, 640]], [880, 596, "right"], "The finished report HTML, ready to upload."],
+  ["f12", "student", "p4", "Login details", [[50, 346], [50, 690], [770, 690]], [410, 690, "above"], "Email and password, or a saved sign-in token."],
+  ["f13", "p4", "student", "Share link", [[770, 740], [30, 740], [30, 346]], [400, 740, "above"], "The public URL with a random share id."],
+  ["f14", "p4", "d3", "New account", [[900, 678], [1020, 678]], [960, 678, "above"], "A first-time user's login identity."],
+  ["f15", "d3", "p4", "Account record", [[1020, 694], [900, 694]], [960, 694, "below"], "The signed-in user's verified id."],
+  ["f16", "p4", "d4", "Report file", [[900, 742], [1020, 742]], [960, 742, "below"], "The report HTML, uploaded with a 5-minute presigned link."],
+  ["f17", "p4", "d5", "Share entry", [[840, 770], [840, 850], [1020, 850]], [930, 850, "above"], "Share id, owner, created date, revoked flag."],
+  ["f18", "d4", "p5", "Stored report", [[1190, 742], [1310, 742]], [1250, 742, "above"], "The report HTML read back from S3."],
+  ["f19", "d5", "p5", "Share entry", [[1190, 850], [1250, 850], [1250, 795], [1310, 795]], [1250, 822, "left"], "Whether this share id exists and is still live."],
+  ["f20", "viewer", "p5", "Share link", [[1335, 900], [1335, 830]], [1335, 865, "left"], "The link the student sent."],
+  ["f21", "p5", "viewer", "Report page", [[1385, 830], [1385, 900]], [1385, 865, "right"], "The shared report shown in the viewer's browser."],
+];
+
+// ---------- Sample data (examples, not your real records) ----------
+const START = () => ({
+  d1: ["SQL          · Academic · 25 min", "Pray         · Soul     · 5 options", "Room Cleaning · Personal · 10 min"],
+  d2: ["412,SQL,25,25.0,2026-11-24 09:00,09:25,1,academic,", "413,Pray,5,4.1,2026-11-24 13:10,13:14,1,soul,Zohor"],
+  d3: [], d4: [], d5: [], fresh: {}
+});
+let DATA = START();
+
+// ---------- Scenarios: each step lights flows and nodes and may write to a store ----------
+const SCEN = [
+  {key: "add", label: "Add an activity", steps: [
+    {f: ["f1"], n: ["student", "p1"], where: "mac", t: "You add a new activity", x: "In the notch editor you type “Brisk walk”, pick Health, 30 minutes, habit on. That is the Activity details flow into process 1.", tech: "SwiftUI editor in the notch panel"},
+    {f: ["f4"], n: ["p1", "d1"], where: "mac", t: "Process 1 saves it to D1", x: "Manage Activities writes one Activity record into subjects.json. Nothing goes to the internet.", tech: "StudyStore.saveSubjects() → subjects.json",
+      write: d => d.d1.push("Brisk walk   · Health   · 30 min"), store: "d1"},
+  ]},
+  {key: "study", label: "Study one pomodoro", steps: [
+    {f: ["f2"], n: ["student", "p2"], where: "mac", t: "You tap SQL in the notch", x: "A Session command (start) goes to Run Study Session.", tech: "Hover the notch → tap the SQL tile", notch: "SQL · starting…"},
+    {f: ["f5"], n: ["d1", "p2"], where: "mac", t: "Process 2 reads the activity's settings", x: "It reads Activity settings from D1: 25 minutes, Academic. That decides the timer length and the colour.", tech: "subjects.json → minutes, category", notch: "SQL · 25:00"},
+    {f: ["f3"], n: ["p2", "student"], where: "mac", t: "The notch counts down", x: "Notch status flows back to you every second: activity, time left, study or break.", tech: "Published timer state → NotchUI", notch: "live"},
+    {f: ["f7"], n: ["p2", "d2"], where: "mac", t: "The finished session is saved to D2", x: "When the 25 minutes end (or you stop early) one Session record is appended to the CSV. Then the break starts by itself.", tech: "StudyStore.appendSession() → study_sessions.csv",
+      write: d => d.d2.push("414,SQL,25,25.0,2026-11-24 15:00,15:25,1,academic,"), store: "d2", notch: "Break · 5:00"},
+  ]},
+  {key: "report", label: "Open my report", steps: [
+    {f: ["f9"], n: ["student", "p3"], where: "mac", t: "You open your report", x: "A Report request goes to Build Habit Report, from the notch menu or after a session.", tech: "Menu: Open report", notch: "idle"},
+    {f: ["f6", "f8"], n: ["d1", "d2", "p3"], where: "mac", t: "Process 3 reads both stores", x: "Activity list from D1 (to group by Academic, Health, Soul, Personal) and Session history from D2 (to count days, streaks and minutes).", tech: "ReportBuilder reads subjects.json + study_sessions.csv"},
+    {f: ["f10"], n: ["p3", "student"], where: "mac", t: "The habit report opens", x: "The Habit report page opens in your browser: the All habits grid, this week and last week, streaks. Built on your Mac, so it works offline.", tech: "Template + JSON → report.html → default browser"},
+  ]},
+  {key: "share", label: "Publish and share", steps: [
+    {f: ["f12", "f14"], n: ["student", "p4", "d3"], where: "aws", t: "You sign in (first time: an account is made)", x: "Login details go to Publish Report. On first use a New account is written to D3. The app gets a sign-in token, never AWS keys.", tech: "Amazon Cognito: sign-up / sign-in → JWT",
+      write: d => { if (!d.d3.length) d.d3.push("user 7f3a… · student@example.com · verified"); }, store: "d3"},
+    {f: ["f15"], n: ["d3", "p4"], where: "aws", t: "Your identity is checked", x: "API Gateway checks the token; Lambda reads the Account record so it only ever writes to your own folder.", tech: "API Gateway JWT authorizer → Lambda (userId from the token)"},
+    {f: ["f11", "f16"], n: ["p3", "p4", "d4"], where: "aws", t: "The report file is uploaded", x: "Process 3 hands over the Report file. Lambda returns a presigned link valid for 5 minutes, capped at 2 MB, and the app uploads straight to S3.", tech: "Lambda → presigned PUT → s3://reports/u/k9Q2…/index.html",
+      write: d => { d.d4 = ["u/k9Q2xT8e/index.html · 312 KB · updated 15:31"]; }, store: "d4"},
+    {f: ["f17"], n: ["p4", "d5"], where: "aws", t: "A share entry is created", x: "A Share entry with a long random id is saved to D5, so links cannot be guessed and can be revoked.", tech: "DynamoDB PutItem { shareId, userId, created, revoked:false }",
+      write: d => { if (!d.d5.length) d.d5.push("k9Q2xT8e → user 7f3a… · created 24 Nov · live"); }, store: "d5"},
+    {f: ["f13"], n: ["p4", "student"], where: "aws", t: "You get your share link", x: "The Share link comes back to the notch app; you copy it and send it to a friend.", tech: "https://reports.example.app/u/k9Q2xT8e/"},
+  ]},
+  {key: "view", label: "A friend opens the link", steps: [
+    {f: ["f20"], n: ["viewer", "p5"], where: "aws", t: "Your friend opens the link", x: "The Report Viewer's browser sends the Share link to Serve Shared Report.", tech: "GET /u/k9Q2xT8e/ → CloudFront"},
+    {f: ["f19"], n: ["d5", "p5"], where: "aws", t: "The share id is checked", x: "Process 5 reads the Share entry from D5. A revoked or unknown id gets a “link no longer active” page.", tech: "DynamoDB GetItem (or a CloudFront function)"},
+    {f: ["f18"], n: ["d4", "p5"], where: "aws", t: "The stored report is fetched", x: "Stored report is read from the private bucket. Only CloudFront may read it; the bucket is never public.", tech: "CloudFront Origin Access Control → S3 GetObject"},
+    {f: ["f21"], n: ["p5", "viewer"], where: "aws", t: "Your friend sees your habits", x: "The Report page shows in their browser, with the same glass cards and habit grid you see. They cannot see your raw sessions.", tech: "Cached at the edge; repeat views cost almost nothing"},
+  ]},
+];
+const ALL = SCEN.flatMap((s, si) => s.steps.map((st, i) => ({...st, si, i})));
+
+// ---------- Drawing ----------
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); (parent || svg).appendChild(e); return e; };
+const txt = (s, attrs, parent) => { const t = el("text", attrs, parent); t.textContent = s; return t; };
+
+const defs = el("defs", {});
+const mk = el("marker", {id: "ah", viewBox: "0 0 10 10", refX: "10", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto-start-reverse"}, defs);
+el("path", {d: "M0,0 L10,5 L0,10 z", class: "arrow"}, mk);
+const mkOn = el("marker", {id: "ahOn", viewBox: "0 0 10 10", refX: "10", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto-start-reverse"}, defs);
+el("path", {d: "M0,0 L10,5 L0,10 z", class: "arrow", style: "fill:var(--accent)"}, mkOn);
+
+const bands = el("g", {});
+const bm = el("g", {class: "band mac"}, bands); el("rect", {x: -25, y: -48, width: 1520, height: 618, rx: 14}, bm);
+txt("On the student's Mac", {x: 1478, y: -26, "text-anchor": "end"}, bm);
+const ba = el("g", {class: "band aws"}, bands); el("rect", {x: -25, y: 588, width: 1520, height: 427, rx: 14}, ba);
+txt("In AWS · serverless", {x: 1478, y: 610, "text-anchor": "end"}, ba);
+
+const flowG = {}, nodeG = {};
+for (const [id, a, b, label, pts, [lx, ly, side]] of FLOWS) {
+  const g = el("g", {class: "flowg", tabindex: "0", role: "button", "aria-label": `Flow: ${label}`});
+  const d = "M" + pts.map(p => p.join(",")).join(" L");
+  el("path", {d, class: "hit"}, g);
+  const path = el("path", {d, class: "flow", "marker-end": "url(#ah)"}, g);
+  const at = side === "above" ? {x: lx, y: ly - 6, "text-anchor": "middle"} : side === "below" ? {x: lx, y: ly + 15, "text-anchor": "middle"}
+    : side === "left" ? {x: lx - 7, y: ly + 4, "text-anchor": "end"} : {x: lx + 7, y: ly + 4, "text-anchor": "start"};
+  txt(label, {...at, class: "flab"}, g);
+  g.addEventListener("click", () => showInfo("flow", id));
+  g.addEventListener("keydown", e => { if (e.key === "Enter") showInfo("flow", id); });
+  flowG[id] = {g, path};
+}
+for (const [key, n] of Object.entries(NODES)) {
+  const g = el("g", {class: "node", tabindex: "0", role: "button", "aria-label": `${n.kind === "store" ? n.id + " " + n.name : (n.num ? "Process " + n.num + " " : "") + n.name.join(" ")}`});
+  if (n.kind === "proc") {
+    el("rect", {x: n.x, y: n.y, width: n.w, height: n.h, rx: 12, class: "shape"}, g);
+    el("line", {x1: n.x, y1: n.y + HDR, x2: n.x + n.w, y2: n.y + HDR, class: "rule"}, g);
+    txt(n.num, {x: n.x + n.w / 2, y: n.y + 17, "text-anchor": "middle", class: "num"}, g);
+    n.name.forEach((l, i) => txt(l, {x: n.x + n.w / 2, y: n.y + HDR + (n.h - HDR) / 2 + (i - (n.name.length - 1) / 2) * 17 + 5, "text-anchor": "middle", class: "nm"}, g));
+  } else if (n.kind === "ent") {
+    el("rect", {x: n.x, y: n.y, width: n.w, height: n.h, class: "shape"}, g);
+    el("line", {x1: n.x - .8, y1: n.y + 1.7, x2: n.x + n.w + .8, y2: n.y + 1.7, class: "thick"}, g);
+    el("line", {x1: n.x + 1.7, y1: n.y, x2: n.x + 1.7, y2: n.y + n.h, class: "thick"}, g);
+    n.name.forEach((l, i) => txt(l, {x: n.x + n.w / 2, y: n.y + n.h / 2 + (i - (n.name.length - 1) / 2) * 17 + 5, "text-anchor": "middle", class: "nm"}, g));
+  } else {
+    el("path", {d: `M${n.x + n.w},${n.y} L${n.x},${n.y} L${n.x},${n.y + n.h} L${n.x + n.w},${n.y + n.h}`, class: "shape"}, g);
+    el("line", {x1: n.x + 34, y1: n.y, x2: n.x + 34, y2: n.y + n.h, class: "rule"}, g);
+    txt(n.id, {x: n.x + 17, y: n.y + 20, "text-anchor": "middle", class: "sid"}, g);
+    txt(n.name, {x: n.x + 34 + (n.w - 34) / 2, y: n.y + 20, "text-anchor": "middle", class: "snm"}, g);
+  }
+  g.addEventListener("click", () => showInfo("node", key));
+  g.addEventListener("keydown", e => { if (e.key === "Enter") showInfo("node", key); });
+  nodeG[key] = g;
+}
+const tokenLayer = el("g", {});
+
+// ---------- State and rendering ----------
+const $ = id => document.getElementById(id);
+let pos = 0, timer = null, raf = null, countdown = null;
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const scenBar = $("scen");
+SCEN.forEach((s, si) => {
+  const b = document.createElement("button");
+  b.className = "chip"; b.type = "button"; b.innerHTML = `<span class="k">${si + 1}</span>${s.label}`;
+  b.addEventListener("click", () => { stop(); go(ALL.findIndex(x => x.si === si)); });
+  scenBar.appendChild(b);
+});
+
+function light(fl, nodes) {
+  const any = fl.length || nodes.length;
+  for (const [id, {g, path}] of Object.entries(flowG)) {
+    const on = fl.includes(id);
+    g.classList.toggle("on", on); g.classList.toggle("dim", any && !on);
+    path.setAttribute("marker-end", on ? "url(#ahOn)" : "url(#ah)");
+  }
+  for (const [k, g] of Object.entries(nodeG)) { const on = nodes.includes(k); g.classList.toggle("on", on); g.classList.toggle("dim", any && !on); }
+}
+
+function tokens(fl) {
+  cancelAnimationFrame(raf); tokenLayer.innerHTML = "";
+  if (reduce) return;
+  const ts = fl.map(id => ({p: flowG[id].path, c: el("circle", {r: 6, class: "token"}, tokenLayer)}));
+  const t0 = performance.now();
+  const tick = now => {
+    const k = ((now - t0) / 1600) % 1;
+    for (const {p, c} of ts) { const L = p.getTotalLength(), q = p.getPointAtLength(k * L); c.setAttribute("cx", q.x); c.setAttribute("cy", q.y); }
+    raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+}
+
+function setNotch(state) {
+  const pill = $("pill"); clearInterval(countdown); pill.classList.remove("live");
+  if (state === "live") {
+    let s = 25 * 60; pill.classList.add("live");
+    const show = () => { pill.innerHTML = `SQL · <span class="t">${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}</span> · Academic`; };
+    show(); countdown = setInterval(() => { s = Math.max(0, s - 7); show(); }, 120);
+  } else if (state && state !== "idle") { pill.textContent = state; pill.classList.add("live"); }
+  else pill.textContent = "Notch idle · hover to start";
+}
+
+function replayTo(n) {   // stores reflect every write up to and including step n
+  DATA = START();
+  for (let i = 0; i <= n; i++) if (ALL[i].write) { ALL[i].write(DATA); DATA.fresh = {[ALL[i].store]: true}; }
+  if (!ALL[n].write) DATA.fresh = {};
+}
+
+function renderStores(flash) {
+  const box = $("stores"); box.innerHTML = "";
+  for (const k of ["d1", "d2", "d3", "d4", "d5"]) {
+    const n = NODES[k], rows = DATA[k];
+    const s = document.createElement("div"); s.className = "store" + (flash === k ? " flash" : "");
+    s.innerHTML = `<div class="sh"><b>${n.id}</b>${n.name}<span class="where ${n.where}">${n.where === "mac" ? "Mac" : "AWS"}</span></div>`;
+    const r = document.createElement("div"); r.className = "rows";
+    if (!rows.length) r.innerHTML = `<span class="empty">Empty until someone publishes.</span>`;
+    else rows.forEach((row, i) => { const line = document.createElement("div"); line.textContent = row;
+      if (flash === k && i === rows.length - 1) line.className = "new"; r.appendChild(line); });
+    s.appendChild(r); box.appendChild(s);
+  }
+}
+
+function go(n) {
+  pos = Math.max(0, Math.min(ALL.length - 1, n));
+  const st = ALL[pos], sc = SCEN[st.si];
+  [...scenBar.children].forEach((b, i) => b.setAttribute("aria-pressed", String(i === st.si)));
+  light(st.f, st.n); tokens(st.f);
+  replayTo(pos); renderStores(st.write ? st.store : null);
+  $("count").textContent = `${sc.label} · step ${st.i + 1} of ${sc.steps.length}`;
+  const w = $("where"); w.className = "where " + st.where; w.textContent = st.where === "mac" ? "Runs on the Mac" : "Runs in AWS";
+  $("stitle").textContent = st.t; $("stext").textContent = st.x; $("stech").textContent = st.tech;
+  $("prev").disabled = pos === 0; $("next").disabled = pos === ALL.length - 1;
+  if (st.notch !== undefined) setNotch(st.notch); else if (st.si !== 1) setNotch("idle");
+}
+
+function showInfo(kind, id) {
+  stop();
+  if (kind === "flow") {
+    const f = FLOWS.find(x => x[0] === id); const [, a, b, label] = f;
+    light([id], [a, b]); tokens([id]);
+    const fromTo = [a, b].map(k => NODES[k].kind === "store" ? `${NODES[k].id} ${NODES[k].name}` : (NODES[k].num ? `${NODES[k].num} ` : "") + NODES[k].name.join(" "));
+    $("count").textContent = "Data flow"; const w = $("where");
+    const wh = NODES[a].where === "aws" || NODES[b].where === "aws" ? "aws" : "mac";
+    w.className = "where " + wh; w.textContent = wh === "mac" ? "Mac" : "Touches AWS";
+    $("stitle").textContent = label; $("stext").textContent = f[6]; $("stech").textContent = `${fromTo[0]}  →  ${fromTo[1]}`;
+  } else {
+    const n = NODES[id];
+    const touching = FLOWS.filter(f => f[1] === id || f[2] === id);
+    light(touching.map(f => f[0]), [id]); tokens([]);
+    $("count").textContent = n.kind === "proc" ? "Process" : n.kind === "store" ? "Data store" : "External entity";
+    const w = $("where"); w.className = "where " + n.where; w.textContent = n.kind === "ent" ? "Outside the system" : n.where === "mac" ? "Runs on the Mac" : "Runs in AWS";
+    $("stitle").textContent = n.kind === "store" ? `${n.id} ${n.name}` : (n.num ? `${n.num} ` : "") + n.name.join(" ");
+    $("stext").textContent = n.info;
+    $("stech").textContent = n.tech || `${touching.length} flows: ${touching.map(f => f[3]).join(", ")}`;
+  }
+}
+
+function stop() { clearInterval(timer); timer = null; $("play").textContent = "▶ Play"; }
+function play() {
+  if (timer) return stop();
+  if (pos === ALL.length - 1) go(0);
+  $("play").textContent = "❚❚ Pause";
+  timer = setInterval(() => { if (pos >= ALL.length - 1) return stop(); go(pos + 1); }, 2600);
+}
+
+$("next").addEventListener("click", () => { stop(); go(pos + 1); });
+$("prev").addEventListener("click", () => { stop(); go(pos - 1); });
+$("play").addEventListener("click", play);
+$("reset").addEventListener("click", () => { stop(); go(0); });
+$("bands").addEventListener("change", e => { svg.classList.toggle("bands-off", !e.target.checked);
+  try { localStorage.setItem("notch-dfd-bands", e.target.checked ? "1" : "0"); } catch (_) {} });
+try { if (localStorage.getItem("notch-dfd-bands") === "0") { $("bands").checked = false; svg.classList.add("bands-off"); } } catch (_) {}
+addEventListener("keydown", e => {
+  if (e.target.closest && e.target.closest("input,button,[role=button]") && e.key === " ") return;
+  if (e.key === "ArrowRight") { stop(); go(pos + 1); }
+  else if (e.key === "ArrowLeft") { stop(); go(pos - 1); }
+  else if (e.key === " ") { e.preventDefault(); play(); }
+});
+
+// Open on a real moment: the pomodoro running, so the first frame already shows how it works
+go(ALL.findIndex(s => s.notch === "live"));
+</script>

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2339" height="1654" viewBox="0 0 2339 1654" font-family="Arial, Helvetica, sans-serif"><rect width="2339" height="1654" fill="#fff"/>
+<rect x="1104.50" y="802.00" width="170.00" height="170.00" rx="14.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="1104.50" y1="830.00" x2="1274.50" y2="830.00" stroke="#000" stroke-width="2"/>
+<text x="1189.50" y="821.88" font-size="16.8" font-weight="bold" text-anchor="middle">0</text>
+<text x="1189.50" y="897.00" font-size="16" font-weight="bold" text-anchor="middle">Track Study</text>
+<text x="1189.50" y="916.20" font-size="16" font-weight="bold" text-anchor="middle">Habits</text>
+<rect x="644.50" y="827.00" width="150.00" height="120.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="643.50" y1="828.50" x2="795.50" y2="828.50" stroke="#000" stroke-width="5"/>
+<line x1="646.00" y1="827.00" x2="646.00" y2="947.00" stroke="#000" stroke-width="5"/>
+<text x="719.50" y="892.60" font-size="16" font-weight="bold" text-anchor="middle">Student</text>
+<rect x="1544.50" y="827.00" width="150.00" height="120.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="1543.50" y1="828.50" x2="1695.50" y2="828.50" stroke="#000" stroke-width="5"/>
+<line x1="1546.00" y1="827.00" x2="1546.00" y2="947.00" stroke="#000" stroke-width="5"/>
+<text x="1619.50" y="883.00" font-size="16" font-weight="bold" text-anchor="middle">Report</text>
+<text x="1619.50" y="902.20" font-size="16" font-weight="bold" text-anchor="middle">Viewer</text>
+<text x="644.50" y="622.60" font-size="16" font-weight="bold" text-anchor="start">Context diagram: study notch with AWS-hosted habit reports</text>
+<path d="M794.50,852.00 L1104.50,852.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1104.50,852.00 1093.50,856.50 1093.50,847.50" fill="#000"/>
+<text x="949.50" y="845.00" font-size="16" text-anchor="middle">Activity details</text>
+<path d="M794.50,887.00 L1104.50,887.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1104.50,887.00 1093.50,891.50 1093.50,882.50" fill="#000"/>
+<text x="949.50" y="880.00" font-size="16" text-anchor="middle">Session command</text>
+<path d="M794.50,922.00 L1104.50,922.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1104.50,922.00 1093.50,926.50 1093.50,917.50" fill="#000"/>
+<text x="949.50" y="915.00" font-size="16" text-anchor="middle">Report request</text>
+<path d="M1144.50,802.00 L1144.50,747.00 L759.50,747.00 L759.50,827.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="759.50,827.00 755.00,816.00 764.00,816.00" fill="#000"/>
+<text x="951.50" y="740.00" font-size="16" text-anchor="middle">Notch status</text>
+<path d="M1234.50,802.00 L1234.50,697.00 L709.50,697.00 L709.50,827.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="709.50,827.00 705.00,816.00 714.00,816.00" fill="#000"/>
+<text x="971.50" y="690.00" font-size="16" text-anchor="middle">Habit report</text>
+<path d="M709.50,947.00 L709.50,1047.00 L1234.50,1047.00 L1234.50,972.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1234.50,972.00 1239.00,983.00 1230.00,983.00" fill="#000"/>
+<text x="971.50" y="1040.00" font-size="16" text-anchor="middle">Login details</text>
+<path d="M1144.50,972.00 L1144.50,1007.00 L759.50,1007.00 L759.50,947.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="759.50,947.00 764.00,958.00 755.00,958.00" fill="#000"/>
+<text x="951.50" y="1000.00" font-size="16" text-anchor="middle">Share link</text>
+<path d="M1544.50,857.00 L1274.50,857.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1274.50,857.00 1285.50,852.50 1285.50,861.50" fill="#000"/>
+<text x="1409.50" y="850.00" font-size="16" text-anchor="middle">Share link</text>
+<path d="M1274.50,917.00 L1544.50,917.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1544.50,917.00 1533.50,921.50 1533.50,912.50" fill="#000"/>
+<text x="1409.50" y="910.00" font-size="16" text-anchor="middle">Report page</text>
+</svg>

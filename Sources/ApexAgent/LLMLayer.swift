@@ -1,4 +1,5 @@
 import Foundation
+import NotchCore
 
 // THE FIFO QUEUE FOR THE LLM BRAIN
 let brainQueue = DispatchQueue(label: "com.apexagent.brain")

@@ -1,7 +1,9 @@
 import Foundation
 
 // What the agent is doing right now. The pipeline sets it; the notch only reads it.
-enum AgentState: Equatable, Sendable {
+// Public because the voice agent (the ApexAgent target) drives it; the StudyNotch app never sets it,
+// so there the notch simply stays idle apart from study sessions.
+public enum AgentState: Equatable, Sendable {
     case idle
     case listening(String?)                  // your words so far while you talk, nil while waiting
     case thinking(String?)                   // what it heard (or what you typed) while the LLM works
@@ -23,7 +25,7 @@ nonisolated(unsafe) var currentAgentState: AgentState = .idle
 nonisolated(unsafe) var agentStateObserver: (@Sendable (AgentState) -> Void)?
 let agentStateQueue: DispatchQueue = DispatchQueue(label: "com.apexagent.state")
 
-func setAgentState(_ state: AgentState) {
+public func setAgentState(_ state: AgentState) {
     agentStateQueue.async {
         var state: AgentState = state
         // Speech right after a tool ran keeps the tool's colour and check, but shows the spoken words
@@ -39,9 +41,4 @@ func setAgentState(_ state: AgentState) {
         }
         agentStateObserver?(state)
     }
-}
-
-// Where to go after a turn finishes: back to listening if the mic is on, otherwise idle.
-func restingAgentState() -> AgentState {
-    return voiceActive ? .listening(nil) : .idle
 }
