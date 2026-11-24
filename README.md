@@ -2,6 +2,19 @@
 
 > A macOS native voice agent built in Swift. Local LLM inference. Online/offline fallback. 100% terminal-built. One week, hardcore mode.
 
+## Install StudyNotch
+
+The study notch on its own: a pomodoro timer and habit tracker in your MacBook notch. macOS 13 or later.
+
+```
+brew install nickaqmal02/tap/studynotch
+brew services start studynotch     # start it now and at every login
+```
+
+Homebrew builds it on your Mac (it needs Apple's Command Line Tools: `xcode-select --install`).
+Your data stays on your Mac in `~/Library/Application Support/StudyNotch/`.
+Stop it with `brew services stop studynotch`; remove it with `brew uninstall studynotch`.
+
 ## Package layout
 
 One Swift package, three parts:
