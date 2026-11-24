@@ -148,6 +148,16 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   border:1px solid color-mix(in srgb,var(--c) 55%,transparent);color:var(--ink2)}
 .opt.on{background:var(--c);border-color:var(--c);color:#fff}
 .opt svg{width:10px;height:10px;fill:currentColor}
+/* A habit alone on its row (the only one in its category, or the odd one out) spans both columns
+   and shows last week next to this week. On a phone the grid is one column, so last week is hidden. */
+.habit.wide{grid-column:1/-1}
+.weeks{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.weeks>div{min-width:0}
+.weeks>div+div{border-left:.5px solid var(--sep);padding-left:14px}
+.wlab{font:600 11px var(--text);color:var(--ink2);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px}
+.wlab b{font-weight:600;color:var(--ink);margin-left:4px;text-transform:none;letter-spacing:0;font-variant-numeric:tabular-nums}
+.week.past .dot{opacity:.85}
+@media (max-width:640px){.weeks{grid-template-columns:1fr}.weeks>.lastwk{display:none}.weeks>div+div{border-left:0;padding-left:0}}
 .hfoot{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:.5px solid var(--sep);padding-top:10px;font-size:12.5px;color:var(--ink2)}
 .hfoot b{display:block;font:600 18px/1.15 var(--round);color:var(--ink);font-variant-numeric:tabular-nums}
 .gh{display:flex;align-items:center;gap:8px}
@@ -243,7 +253,7 @@ section{animation:fade .25s ease-out}
       <div class="dots" id="h-dots"></div>
     </div>
     <div id="h-cards"></div>
-    <p class="foot">This week, Monday to Sunday. A filled dot is a day done (Study: any study that day; Pray: all five prayers); a faint one is a day started but not finished. The number under each dot is that day's time. Check in from the notch.</p>
+    <p class="foot">This week, Monday to Sunday. A habit alone on its row also shows last week (on a wide screen). A filled dot is a day done (Study: any study that day; Pray: all five prayers); a faint one is a day started but not finished. The number under each dot is that day's time. Check in from the notch.</p>
   </section>
 
   <section data-view="overview" hidden>
@@ -333,12 +343,16 @@ const ICON = {
   soul: "M11.6 2.2A8 8 0 1 0 17.8 12 6.5 6.5 0 0 1 11.6 2.2z",
   personal: "M10 1.5s-5.5 6.2-5.5 10a5.5 5.5 0 0 0 11 0c0-3.8-5.5-10-5.5-10z",
 };
+// A user-added category has no icon of its own on the web (the notch uses SF Symbols): a plain star
+const CUSTOM_ICON = "M10 1.8l2.4 5 5.4.7-4 3.8 1 5.4L10 14.1l-4.8 2.6 1-5.4-4-3.8 5.4-.7z";
 const CATS = D.categories;
+// Custom categories bring their own colour: define --<key> so ccol() works for them like the built-in four
+CATS.forEach(c => { if (c.color) document.documentElement.style.setProperty(`--${c.key}`, c.color); });
 const CAT = Object.fromEntries(CATS.map(c => [c.key, c]));
 const catOf = s => (D.subjectCategory && D.subjectCategory[s]) || "academic";
 const ccol = k => `var(--${k})`;
 const color = s => ccol(catOf(s));
-const icon = k => `<svg viewBox="0 0 20 20" aria-hidden="true"><path d="${ICON[k]}"/></svg>`;
+const icon = k => `<svg viewBox="0 0 20 20" aria-hidden="true"><path d="${ICON[k] || CUSTOM_ICON}"/></svg>`;
 const fmt = m => { m = Math.round(m); return m >= 60 ? `${Math.floor(m/60)}h` + (m % 60 ? ` ${m % 60}m` : "") : `${m}m`; };
 // Health-style value: big numbers, small units ("1 h 39 min")
 const big = m => { m = Math.round(m); const h = Math.floor(m / 60), r = m % 60;
@@ -424,7 +438,7 @@ addEventListener("hashchange", show);
     const tip = anyMode(h) ? `${h.todayOptions.length} done` : h.options.length ? `${h.todayOptions.length} of ${h.options.length}` : `${fmt(h.today)} of ${fmt(h.target)}`;
     return `<span class="${s === 2 ? "on" : p ? "half" : ""}" style="--c:${ccol(h.category)};--p:${p}%" title="${esc(h.name)}: ${tip}"></span>`; }).join("");
   const tickPath = "M7.8 15.2 3 10.4l1.8-1.8 3 3 7.4-7.4L17 6z";
-  const cardOf = h => {
+  const cardOf = (h, wide) => {
     const isStudy = h.name === "Study" && h.category === "academic";
     // Study: the day's dot fills as soon as you study, but the circle only ticks at the daily goal
     const done = isStudy ? h.today >= h.target : todayOf(h).s === 2;
@@ -438,24 +452,31 @@ addEventListener("hashchange", show);
              : `<circle cx="20" cy="20" r="17" transform="rotate(-90 20 20)" style="stroke:var(--c);stroke-dasharray:${len};stroke-dashoffset:${len * (1 - p)}"/>`}
       </svg>${done ? `<svg class="tick" viewBox="0 0 20 20" aria-hidden="true"><path d="${tickPath}"/></svg>` : ""}</div>`;
     // The week: weekday, a dot per day, and that day's amount underneath (Pray: prayers, others: time)
-    const week = h.days.map(x => {
+    const weekOf = days => days.map(x => {
       const amt = x.future ? "" : anyMode(h) ? (x.n ? `${x.n}` : "–") : hasOpts ? `${x.n}/${h.options.length}` : short(x.m);
       const zero = !x.future && (hasOpts ? !x.n : x.m < 1);
       return `<div><div class="wd${x.today ? " now" : ""}">${x.wd[0]}</div>
         <div class="dot s${x.future ? 0 : x.s}${x.today ? " now" : ""}${x.future ? " future" : ""}" data-t="${esc(x.d)}|${x.m}|${hasOpts ? `${x.n}/${h.options.length}` : ""}|${x.future ? 1 : ""}">${x.s === 2 && !x.future ? `<svg viewBox="0 0 20 20" aria-hidden="true"><path d="${tickPath}"/></svg>` : ""}</div>
         <div class="amt${zero ? " zero" : ""}">${amt}</div></div>`; }).join("");
+    const thisWeek = `<div class="week" role="img" aria-label="${esc(h.name)} this week: ${h.weekDone} of 7 days done, ${fmt(h.weekMin)}">${weekOf(h.days)}</div>`;
+    // Wide card: last week | this week, each with its own small label and done count
+    const weeks = wide && h.prevDays
+      ? `<div class="weeks"><div class="lastwk"><div class="wlab">Last week<b>${h.prevDone}/7</b></div>
+           <div class="week past" role="img" aria-label="${esc(h.name)} last week: ${h.prevDone} of 7 days done, ${fmt(h.prevMin)}">${weekOf(h.prevDays)}</div></div>
+         <div><div class="wlab">This week<b>${h.weekDone}/7</b></div>${thisWeek}</div></div>`
+      : thisWeek;
     const meta = anyMode(h) ? `any of ${h.options.length}` : hasOpts ? `${h.options.length} a day` : isStudy ? `goal ${fmt(h.target)} a day · all subjects` : `${fmt(h.target)} a day`;
-    return `<div class="card habit" style="--c:${ccol(h.category)}">
+    return `<div class="card habit${wide ? " wide" : ""}" style="--c:${ccol(h.category)}">
       <div class="hhead"><span class="cico">${icon(h.category)}</span>
         <div><div class="hname">${esc(h.name)}</div><div class="hmeta">${meta} · ${CAT[h.category].label}</div></div>${stat}</div>
       ${opts}
-      <div class="week" role="img" aria-label="${esc(h.name)} this week: ${h.weekDone} of 7 days done, ${fmt(h.weekMin)}">${week}</div>
+      ${weeks}
       <div class="hfoot"><span><b>${h.streak}</b>day streak</span><span><b>${h.weekDone}<small style="font-size:13px;color:var(--ink2)">/7</small></b>days this week</span><span><b>${fmt(h.weekMin)}</b>this week</span></div>
     </div>`;
   };
   $("h-cards").innerHTML = CATS.map(c => { const mine = H.filter(h => h.category === c.key); if (!mine.length) return "";
     return `<h2 class="gh" style="--c:${ccol(c.key)}"><span class="cico">${icon(c.key)}</span>${c.label}<span class="n">${mine.length} habit${mine.length === 1 ? "" : "s"}</span></h2>
-      <div class="grid">${mine.map(cardOf).join("")}</div>`; }).join("");
+      <div class="grid">${mine.map((h, i) => cardOf(h, i === mine.length - 1 && mine.length % 2 === 1)).join("")}</div>`; }).join("");
   $("h-cards").querySelectorAll(".dot").forEach(el => {
     const [d, m, n, future] = el.dataset.t.split("|");
     el.addEventListener("mousemove", ev => showTip(ev, `<b>${d}</b>${future ? row("Coming up", "") : (n ? row("Done", n) : "") + row("Logged", fmt(+m))}`));
@@ -468,10 +489,13 @@ $("gen").textContent = D.generated;
 
 (() => { // rings: each category's today against its own daily goal, outside in; capped at a full ring
   const svg = $("ring"), progs = [];
-  CATS.forEach((c, i) => { const r = 58 - i * 13.5, len = 2 * Math.PI * r, p = Math.min(1, c.today / (c.goal || 1));
-    el("circle", {cx: 66, cy: 66, r, style: `stroke:${ccol(c.key)};opacity:.2`}, svg);
+  // Rings fit inside r 58..14 however many categories there are (13.5 apart for the usual four)
+  const step = CATS.length > 1 ? Math.min(13.5, 44 / (CATS.length - 1)) : 0;
+  const sw = step ? Math.min(11, step - 2.5) : 11;   // thinner rings when there are more of them
+  CATS.forEach((c, i) => { const r = 58 - i * step, len = 2 * Math.PI * r, p = Math.min(1, c.today / (c.goal || 1));
+    el("circle", {cx: 66, cy: 66, r, style: `stroke:${ccol(c.key)};opacity:.2;stroke-width:${sw}`}, svg);
     const pr = el("circle", {class: "prog", cx: 66, cy: 66, r, transform: "rotate(-90 66 66)",
-      style: `stroke:${ccol(c.key)};stroke-dasharray:${len};stroke-dashoffset:${len}`}, svg);
+      style: `stroke:${ccol(c.key)};stroke-width:${sw};stroke-dasharray:${len};stroke-dashoffset:${len}`}, svg);
     progs.push([pr, len * (1 - p)]); });
   requestAnimationFrame(() => requestAnimationFrame(() => progs.forEach(([pr, off]) => pr.style.strokeDashoffset = off)));
   $("ring-legend").innerHTML = CATS.map(c => `<div class="rl" style="--c:${ccol(c.key)}">

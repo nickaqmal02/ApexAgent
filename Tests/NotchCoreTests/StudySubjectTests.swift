@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import ApexAgent
+@testable import NotchCore
 
 // subjects.json saved before break times existed must still load, with a 5-minute break
 @Test func oldSubjectFileGetsDefaultBreak() throws {

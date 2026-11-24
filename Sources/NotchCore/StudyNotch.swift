@@ -3,20 +3,41 @@ import SwiftUI
 
 // Study sessions in the notch: hover the notch, pick a subject, a pomodoro starts,
 // and every finished or stopped session is saved as one CSV row.
-// Data (personal, git-ignored), in the folder ApexAgent is started from:
-//   data/subjects.json        the subject list
-//   data/study_sessions.csv   one row per session
+// Data (personal) lives in the folder the host app passes in NotchConfig.dataFolder:
+//   ApexAgent:  data/ in the folder it is started from (git-ignored)
+//   StudyNotch: ~/Library/Application Support/StudyNotch/
+//   subjects.json        the subject list
+//   study_sessions.csv   one row per session
 // After a finished pomodoro, the subject's break starts by itself (breaks are not saved to the CSV).
 // APEX_STUDY_MINUTES=0.2 makes every study block and break 12 seconds, for testing.
 
 // MARK: - Storage
 
-// The four parts of the day the notch tracks. Each activity (a "subject") belongs to one.
-// Saved by its raw value in subjects.json, so the order and labels can change freely.
-enum StudyCategory: String, Codable, CaseIterable, Identifiable {
-    case academic, health, soul, personal
+// The parts of the day the notch tracks. Each activity (a "subject") belongs to one.
+// Four are built in (Academic, Health, Soul, Personal); the user can add their own from the notch
+// (the + after the tabs). Saved by its key (rawValue) in subjects.json and on every CSV row, so labels
+// can change freely. Custom ones are kept in categories.json next to subjects.json.
+// A struct, not an enum, so a category added at run time is a real category everywhere.
+struct StudyCategory: Hashable, Identifiable, Codable, Sendable {
+    let rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+
+    static let academic = StudyCategory(rawValue: "academic")
+    static let health = StudyCategory(rawValue: "health")
+    static let soul = StudyCategory(rawValue: "soul")
+    static let personal = StudyCategory(rawValue: "personal")
+    static let builtIn: [StudyCategory] = [.academic, .health, .soul, .personal]
+
+    // The user's own categories, loaded from categories.json at start. Only the main thread changes it
+    // (StudyModel), same pattern as the other app-wide state in this project.
+    nonisolated(unsafe) static var custom: [CustomCategory] = []
+
+    // Tab order: the four built-in ones, then the user's in the order they were added
+    static var allCases: [StudyCategory] { builtIn + custom.map { StudyCategory(rawValue: $0.key) } }
 
     var id: String { rawValue }
+    var isBuiltIn: Bool { Self.builtIn.contains(self) }
+    private var customInfo: CustomCategory? { Self.custom.first { $0.key == rawValue } }
 
     var label: String {
         switch self {
@@ -24,6 +45,7 @@ enum StudyCategory: String, Codable, CaseIterable, Identifiable {
         case .health: return "Health"
         case .soul: return "Soul"
         case .personal: return "Personal"
+        default: return customInfo?.label ?? rawValue.capitalized   // a removed category still reads sensibly
         }
     }
 
@@ -33,23 +55,65 @@ enum StudyCategory: String, Codable, CaseIterable, Identifiable {
         case .health: return "figure.walk"
         case .soul: return "moon.stars.fill"
         case .personal: return "drop.fill"
+        default: return customInfo?.icon ?? "circle.fill"
         }
     }
 
-    // Same four colours as the web report's dark mode (checked for colour-blind separation there):
-    // blue #3987e5, teal #199e70, gold #c98500, pink #d55181
+    // Built-in: the same four colours as the web report's dark mode (checked for colour-blind separation there):
+    // blue #3987e5, teal #199e70, gold #c98500, pink #d55181. Custom: from CustomCategory.palette.
     var color: Color {
         switch self {
         case .academic: return Color(red: 0x39 / 255, green: 0x87 / 255, blue: 0xe5 / 255)
         case .health: return Color(red: 0x19 / 255, green: 0x9e / 255, blue: 0x70 / 255)
         case .soul: return Color(red: 0xc9 / 255, green: 0x85 / 255, blue: 0x00 / 255)
         case .personal: return Color(red: 0xd5 / 255, green: 0x51 / 255, blue: 0x81 / 255)
+        default: return Color(hex: customInfo?.color ?? "#8e8e93")
         }
     }
 
     var next: StudyCategory {
         let all = Self.allCases
-        return all[(all.firstIndex(of: self)! + 1) % all.count]
+        guard let i = all.firstIndex(of: self) else { return .academic }
+        return all[(i + 1) % all.count]
+    }
+
+    // Saved as a plain string ("academic", "c-quran-club"), exactly like the old enum, so old files still load
+    init(from decoder: Decoder) throws { rawValue = try decoder.singleValueContainer().decode(String.self) }
+    func encode(to encoder: Encoder) throws { var c = encoder.singleValueContainer(); try c.encode(rawValue) }
+}
+
+// A category the user added: its key (stable, saved on rows), the name shown, an SF Symbol and a colour.
+struct CustomCategory: Codable, Hashable, Sendable {
+    var key: String
+    var label: String
+    var icon: String
+    var color: String   // "#rrggbb", also read by the web report
+
+    static let maxLabelLength: Int = 16
+
+    // Colours and icons handed out in turn to new categories. Chosen to stay apart from the four built-in hues.
+    static let palette: [(color: String, icon: String)] = [
+        ("#8e6be8", "star.fill"), ("#e8743b", "flame.fill"), ("#2aa8c4", "leaf.fill"),
+        ("#e0574f", "heart.fill"), ("#7fae2e", "bolt.fill"), ("#5b6ee1", "music.note"),
+    ]
+
+    // "Quran Club" -> "c-quran-club"; the "c-" prefix can never clash with a built-in key
+    static func key(for label: String, taken: Set<String>) -> String {
+        let slug = label.lowercased().map { $0.isLetter || $0.isNumber ? String($0) : "-" }.joined()
+            .split(separator: "-").joined(separator: "-")
+        let base = "c-" + (slug.isEmpty ? "category" : slug)
+        var key = base, n = 2
+        while taken.contains(key) { key = "\(base)-\(n)"; n += 1 }
+        return key
+    }
+}
+
+extension Color {
+    // "#rrggbb" -> Color; anything unreadable becomes grey
+    init(hex: String) {
+        let s = hex.trimmingCharacters(in: CharacterSet(charactersIn: "# "))
+        guard s.count == 6, let v = UInt32(s, radix: 16) else { self = Color.gray; return }
+        self = Color(red: Double((v >> 16) & 0xff) / 255, green: Double((v >> 8) & 0xff) / 255, blue: Double(v & 0xff) / 255)
     }
 }
 
@@ -114,12 +178,13 @@ struct StudyStore {
     let folder: URL
     var subjectsURL: URL { folder.appendingPathComponent("subjects.json") }
     var sessionsURL: URL { folder.appendingPathComponent("study_sessions.csv") }
+    var categoriesURL: URL { folder.appendingPathComponent("categories.json") }
     static let header: String = "id,subject,planned_min,actual_min,started_at,ended_at,completed,category,detail\n"
     static let headerBeforeCategories: String = "id,subject,planned_min,actual_min,started_at,ended_at,completed"
     static let headerBeforeDetail: String = "id,subject,planned_min,actual_min,started_at,ended_at,completed,category"
 
-    init() {
-        folder = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("data")
+    init(folder: URL) {
+        self.folder = folder
         try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
     }
 
@@ -131,6 +196,18 @@ struct StudyStore {
         // older file: just names, so give each the default 25 minutes
         if let names = try? JSONDecoder().decode([String].self, from: data) { return names.map { Subject(name: $0, minutes: 25) } }
         return []
+    }
+
+    // The user's own categories. Missing file = none yet.
+    func loadCategories() -> [CustomCategory] {
+        guard let data = try? Data(contentsOf: categoriesURL) else { return [] }
+        return (try? JSONDecoder().decode([CustomCategory].self, from: data)) ?? []
+    }
+
+    func saveCategories(_ list: [CustomCategory]) {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        if let data = try? encoder.encode(list) { try? data.write(to: categoriesURL) }
     }
 
     func saveSubjects(_ list: [Subject]) {
@@ -266,6 +343,11 @@ final class StudyModel: ObservableObject {
     @Published var editIsHabit: Bool = true         // off = time only (toilet, coffee)
     // The category tab open in the picker; new activities go into it
     @Published var category: StudyCategory = .academic
+    // Every tab, built-in then custom. Published so a new category shows up at once.
+    @Published var categories: [StudyCategory] = StudyCategory.allCases
+    // Typing a new category name (the + after the tabs)
+    @Published var addingCategory: Bool = false
+    @Published var newCategoryName: String = ""
     // The break after a finished pomodoro: whose break it is, and a short "break over" notice
     @Published var breakFor: String? = nil
     @Published var breakOver: Bool = false
@@ -282,14 +364,20 @@ final class StudyModel: ObservableObject {
     // APEX_STUDY_MINUTES (testing) overrides every subject's length
     let testMinutes: Double? = Double(ProcessInfo.processInfo.environment["APEX_STUDY_MINUTES"] ?? "")
     private(set) var plannedMinutes: Double = 25   // length of the running session
-    let store = StudyStore()
+    let store: StudyStore
+    // Set by the host app: rebuild (and maybe upload) the report. nil = no report builder.
+    private let onReportNeeded: (@Sendable () -> Void)?
     // Set by the notch window: typing a new subject needs the keyboard
     var onNeedKeyboard: (() -> Void)?
     private var endDate: Date? = nil
     private var startedAt: Date? = nil
     private var tick: Timer? = nil
 
-    init() {
+    init(store: StudyStore, onReportNeeded: (@Sendable () -> Void)? = nil) {
+        self.store = store
+        self.onReportNeeded = onReportNeeded
+        StudyCategory.custom = store.loadCategories()
+        categories = StudyCategory.allCases
         let loaded = store.loadSubjects()
         subjects = loaded
         store.upgradeSessionsIfNeeded { name in loaded.first { $0.name == name }?.category ?? .academic }
@@ -302,7 +390,7 @@ final class StudyModel: ObservableObject {
     var resting: Bool { breakFor != nil }
     var showsStatus: Bool { running || resting || justFinished != nil || breakOver }
     // Typing in the + or edit box: keep the notch open even if the mouse wanders off
-    var typing: Bool { adding || editing != nil }
+    var typing: Bool { adding || addingCategory || editing != nil }
 
     // Tiles shown under the open category tab
     var visibleSubjects: [Subject] { subjects.filter { $0.category == category } }
@@ -414,24 +502,10 @@ final class StudyModel: ObservableObject {
         }
     }
 
-    // Publish the study report online after a session (opt-in: APEX_STUDY_UPLOAD=1).
-    // Runs scripts/study_report.py --upload, which needs STUDY_BUCKET / STUDY_DIST_ID / STUDY_URL
-    // in the environment, so start ApexAgent from a terminal that loaded ~/.zshrc.
-    // Serial background queue: the notch never waits, and two quick stops upload one after another.
-    // Offline is fine: the upload fails, gets logged, and the next one sends the whole report again.
-    private let uploadQueue = DispatchQueue(label: "study.upload")
-
-    // Rebuilds data/study_report.html, and uploads it too when APEX_STUDY_UPLOAD=1.
-    // Without the upload setting it still rebuilds the local file, so the page on disk is never stale.
+    // Ask the host app to rebuild the report (ApexAgent: study_report.py, optionally uploading it).
+    // The host does the slow work on its own background queue, so the notch never waits.
     private func uploadReport() {
-        let upload: Bool = ProcessInfo.processInfo.environment["APEX_STUDY_UPLOAD"] == "1"
-        uploadQueue.async {
-            let args = ["python3", "scripts/study_report.py", "--no-open"] + (upload ? ["--upload"] : [])
-            let out = runShell("/usr/bin/env", args: args)
-            let last = out.split(separator: "\n").last.map(String.init) ?? "(no output)"
-            if !upload { print("📄 report rebuilt locally: \(last)") }
-            else { print(last.hasPrefix("Live at") ? "☁️ report: \(last)" : "☁️ report upload failed: \(last)") }
-        }
+        onReportNeeded?()
     }
 
     // After adding, editing or removing an activity: rebuild the report so new names, categories,
@@ -509,6 +583,48 @@ final class StudyModel: ObservableObject {
         editing = nil
         adding = true
         onNeedKeyboard?()
+    }
+
+    func beginAddingCategory() {
+        adding = false
+        newCategoryName = ""
+        addingCategory = true
+        onNeedKeyboard?()
+    }
+
+    // Adds the typed category, gives it the next colour and icon, and opens its tab.
+    // Returns why not, so the field can say so (empty, too long, or the name is already a tab).
+    @discardableResult
+    func addCategory() -> String? {
+        let name = newCategoryName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if name.isEmpty { return "Type a name first" }
+        if name.count > CustomCategory.maxLabelLength { return "Keep it to \(CustomCategory.maxLabelLength) letters" }
+        if StudyCategory.allCases.contains(where: { $0.label.lowercased() == name.lowercased() }) { return "\(name) is already a tab" }
+        let look = CustomCategory.palette[StudyCategory.custom.count % CustomCategory.palette.count]
+        let key = CustomCategory.key(for: name, taken: Set(StudyCategory.allCases.map(\.rawValue)))
+        StudyCategory.custom.append(CustomCategory(key: key, label: name, icon: look.icon, color: look.color))
+        store.saveCategories(StudyCategory.custom)
+        categories = StudyCategory.allCases
+        category = StudyCategory(rawValue: key)
+        newCategoryName = ""
+        addingCategory = false
+        reportSoon()   // the web report gets the new section too
+        return nil
+    }
+
+    // Only a custom category with no activities left can go; built-in ones always stay.
+    // Old session rows keep its key, so past time still counts (the report shows it under the key's name).
+    func canRemoveCategory(_ cat: StudyCategory) -> Bool {
+        !cat.isBuiltIn && !subjects.contains { $0.category == cat }
+    }
+
+    func removeCategory(_ cat: StudyCategory) {
+        guard canRemoveCategory(cat) else { return }
+        StudyCategory.custom.removeAll { $0.key == cat.rawValue }
+        store.saveCategories(StudyCategory.custom)
+        categories = StudyCategory.allCases
+        if category == cat { category = .academic }
+        reportSoon()
     }
 
     func addSubject() {
@@ -855,6 +971,7 @@ struct StudyStatusRow: View {
 struct StudyPicker: View {
     @ObservedObject var study: StudyModel
     @FocusState private var nameFocused: Bool
+    @State private var categoryProblem: String? = nil   // why a new category name was refused
 
     var body: some View {
         if study.editing != nil {
@@ -958,6 +1075,25 @@ struct StudyPicker: View {
                 pill("Cancel", .white.opacity(0.25)) { study.choosing = nil; study.choosingTick = false }
             }
             .padding(.top, 6)
+        } else if study.addingCategory {
+            HStack(spacing: 8) {
+                Image(systemName: "square.grid.2x2.fill").foregroundColor(.white.opacity(0.8)).font(.system(size: 12))
+                TextField("New category, e.g. Quran Club", text: $study.newCategoryName)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 10).padding(.vertical, 7)
+                    .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.12)))
+                    .frame(width: 200)
+                    .focused($nameFocused)
+                    .onSubmit { categoryProblem = study.addCategory() }
+                    .onAppear { nameFocused = true; categoryProblem = nil }
+                pill("Add", studyGreen) { categoryProblem = study.addCategory() }
+                pill("Cancel", .white.opacity(0.25)) { study.newCategoryName = ""; study.addingCategory = false }
+            }
+            if let categoryProblem {
+                Text(categoryProblem).font(.system(size: 10.5, weight: .medium, design: .rounded)).foregroundColor(studyOrange)
+            }
         } else if study.adding {
             HStack(spacing: 8) {
                 Image(systemName: study.category.icon).foregroundColor(study.category.color).font(.system(size: 12))
@@ -976,14 +1112,34 @@ struct StudyPicker: View {
             }
         } else {
             VStack(spacing: 6) {
-                // Category tabs: Academic · Health · Soul · Personal
-                HStack(spacing: 6) {
-                    ForEach(StudyCategory.allCases) { cat in
-                        CategoryTab(category: cat, selected: study.category == cat,
-                                    count: study.subjects.filter { $0.category == cat }.count) {
-                            study.category = cat
+                // Category tabs: Academic · Health · Soul · Personal · the user's own · +
+                // Scrolls sideways once there are more tabs than fit.
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(study.categories) { cat in
+                            CategoryTab(category: cat, selected: study.category == cat,
+                                        count: study.subjects.filter { $0.category == cat }.count) {
+                                study.category = cat
+                            }
+                            .contextMenu {
+                                if !cat.isBuiltIn {
+                                    Button(study.canRemoveCategory(cat) ? "Remove \(cat.label)" : "Remove \(cat.label) (move or remove its activities first)") {
+                                        study.removeCategory(cat)
+                                    }
+                                    .disabled(!study.canRemoveCategory(cat))
+                                }
+                            }
                         }
+                        Button { study.beginAddingCategory() } label: {
+                            Image(systemName: "plus").font(.system(size: 10, weight: .bold)).foregroundColor(.white.opacity(0.75))
+                                .frame(width: 24, height: 22)
+                                .background(Capsule().fill(Color.white.opacity(0.10)))
+                                .overlay(Capsule().strokeBorder(Color.white.opacity(0.22), lineWidth: 0.8))
+                        }
+                        .buttonStyle(LivelyButtonStyle())
+                        .help("Add a category")
                     }
+                    .padding(.horizontal, 14)
                 }
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {

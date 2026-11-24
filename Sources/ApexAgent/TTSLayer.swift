@@ -1,5 +1,6 @@
 import Foundation
 import AVFoundation
+import NotchCore
 
 // MARK: - Text-to-Speech Layer (Phase 5)
 // Hybrid approach: Deepgram Aura-2 (online) + AVSpeechSynthesizer (offline)

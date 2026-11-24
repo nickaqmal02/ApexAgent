@@ -1,0 +1,38 @@
+# Builds all three parts (NotchCore, ApexAgent, StudyNotch) and runs the tests on every push and PR.
+# GitHub's macOS runners have full Xcode, so plain `swift test` finds the Testing framework there
+# (on this Mac, with only the Command Line Tools, use scripts/test.sh instead).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    # Package.swift needs Swift 6.3 (swift-tools-version: 6.3), which ships with Xcode 26.4 or later
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pick the newest Xcode on the runner
+        run: |
+          XCODE=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$XCODE" ]; then sudo xcode-select -s "$XCODE"; fi
+          swift --version
+      - name: Cache SwiftPM build
+        uses: actions/cache@v4
+        with:
+          path: .build
+          key: spm-${{ runner.os }}-${{ hashFiles('Package.swift', 'Package.resolved') }}
+      - name: Build everything
+        run: swift build
+      - name: Run tests
+        run: swift test

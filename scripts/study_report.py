@@ -31,7 +31,23 @@ CATEGORIES = [
     ("soul", "Soul", float(os.environ.get("STUDY_GOAL_SOUL", 25))),
     ("personal", "Personal", float(os.environ.get("STUDY_GOAL_PERSONAL", 30))),
 ]
+CATEGORIES_PATH = ROOT / "data" / "categories.json"
+
+
+def custom_categories():
+    """The user's own categories from the notch (data/categories.json): key, label, icon, color. [] if none."""
+    try:
+        return [c for c in json.loads(CATEGORIES_PATH.read_text()) if isinstance(c, dict) and c.get("key")]
+    except (OSError, ValueError, TypeError):
+        return []
+
+
+CUSTOM = custom_categories()
+# Custom categories come after the four built-in ones, like the notch tabs. Their daily goal defaults
+# to 30 min (STUDY_GOAL_DEFAULT changes it for all of them).
+CATEGORIES += [(c["key"], c.get("label") or c["key"], float(os.environ.get("STUDY_GOAL_DEFAULT", 30))) for c in CUSTOM]
 CAT_KEYS = [k for k, _, _ in CATEGORIES]
+CAT_COLOR = {c["key"]: c.get("color", "#8e8e93") for c in CUSTOM}   # built-in colours live in the template
 
 
 def subject_list():
@@ -47,7 +63,8 @@ def subject_categories():
     return {s["name"]: s.get("category", "academic") for s in subject_list()}
 
 
-HABIT_CATS = {"health", "soul", "personal"}   # one card per activity; academic gets one combined Study card
+# One card per activity in every category except academic, which gets one combined Study card
+HABIT_CATS = set(CAT_KEYS) - {"academic"}
 
 
 def week_of(today):
@@ -83,6 +100,13 @@ def habit_card(name, category, mine, today, target, options=(), studied_counts=F
     while d in done:
         streak, d = streak + 1, d - timedelta(days=1)
     week = week_of(today)
+    prev = [x - timedelta(days=7) for x in week]   # last week, for cards that get a full-width row
+
+    def day(x):
+        return {"wd": x.strftime("%a"), "d": x.strftime("%a %d %b"), "m": round(mins[x], 1),
+                "n": len(finished[x] & set(options)) if options else None,
+                "future": x > today, "today": x == today,
+                "s": 2 if x in done else (1 if x in partial else 0)}
     return {
         "name": name,
         "category": category,
@@ -94,10 +118,10 @@ def habit_card(name, category, mine, today, target, options=(), studied_counts=F
         "options": list(options),
         "needsAll": needs_all,
         "todayOptions": [o for o in options if o in finished[today]],
-        "days": [{"wd": x.strftime("%a"), "d": x.strftime("%a %d %b"), "m": round(mins[x], 1),
-                  "n": len(finished[x] & set(options)) if options else None,
-                  "future": x > today, "today": x == today,
-                  "s": 2 if x in done else (1 if x in partial else 0)} for x in week],
+        "days": [day(x) for x in week],
+        "prevDays": [day(x) for x in prev],
+        "prevDone": sum(1 for x in prev if x in done),
+        "prevMin": round(sum(mins[x] for x in prev), 1),
         "_done": done,   # every done day, for the big all-habits grid; removed before the JSON is written
     }
 
@@ -236,7 +260,7 @@ def summarise(rows):
         "subjectCategory": {**subject_categories(), **subject_cat},
         "habits": (cards := habits(rows, today)),
         "heat": habit_heat(cards, today),
-        "categories": [{"key": k, "label": label, "goal": goal,
+        "categories": [{"key": k, "label": label, "goal": goal, "color": CAT_COLOR.get(k),
                         "today": round(per_day_cat[today][k], 1),
                         "week": cat_window(k, 0, 6),
                         "total": round(sum(r["actual"] for r in rows if r["category"] == k), 1),

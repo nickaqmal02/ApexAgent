@@ -432,14 +432,14 @@ final class NotchPanel: NSPanel {
 
 // Owns the floating window over the notch and forwards state changes to the view.
 @MainActor
-final class NotchController {
-    static let shared: NotchController = NotchController()
+public final class NotchController {
+    public static let shared: NotchController = NotchController()
     private var panel: NotchPanel?
     private var model: NotchModel?
     private var hoverTimer: Timer?
     private var screenFrame: NSRect = .zero
 
-    func start() {
+    public func start(config: NotchConfig) {
         guard let screen = NSScreen.main else { return }
         // On notched Macs the top safe-area inset is the notch height, and the notch width is the gap
         // between the two auxiliary top areas. Without a notch, use a menu-bar-sized pill.
@@ -449,7 +449,7 @@ final class NotchController {
             notchWidth = right.minX - left.maxX
         }
 
-        let study = StudyModel()
+        let study = StudyModel(store: StudyStore(folder: config.dataFolder), onReportNeeded: config.onReportNeeded)
         let model = NotchModel(notchWidth: notchWidth, notchHeight: notchHeight, study: study)
         let width: CGFloat = notchPanelWidth
         let height: CGFloat = notchHeight + notchPanelExtraHeight
