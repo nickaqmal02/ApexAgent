@@ -2,6 +2,25 @@
 
 > A macOS native voice agent built in Swift. Local LLM inference. Online/offline fallback. 100% terminal-built. One week, hardcore mode.
 
+## Package layout
+
+One Swift package, three parts:
+
+| Part | What it is | Run it |
+|---|---|---|
+| `NotchCore` | The notch window, the study timer, habits and categories, and their data files. Shared library. | (used by the two apps) |
+| `ApexAgent` | The voice agent: mic, LLM, TTS, Mac actions. Shows its state in the notch. Study data in `data/`. | `swift run ApexAgent` |
+| `StudyNotch` | The study notch on its own, for other Mac users. No mic, no API keys, no shell. Menu-bar icon to find the data or quit. Data in `~/Library/Application Support/StudyNotch/`. | `swift run StudyNotch` |
+
+Categories: Academic, Health, Soul and Personal are built in. Add your own with the **+** after the tabs in the notch
+(saved in `categories.json`); right-click a custom tab to remove it once it has no activities. The web report picks them up.
+
+Tests: `./scripts/test.sh` (this Mac has only the Command Line Tools). CI runs `swift build` and `swift test` on GitHub's macOS runner
+(`.github/workflows/ci.yml`). Reviewer agents for Claude Code are in `.claude/agents/` (`swift-reviewer`, `aws-cost-guard`).
+
+Not done yet for StudyNotch: the habit report is still built by `scripts/study_report.py` (ApexAgent only), and launch at login
+needs a real `.app` bundle.
+
 ## How to Use
 
 ### 1. Set up once
@@ -31,7 +50,7 @@ Screenshots ask for **Screen Recording** the first time, and dark mode asks to c
 Always run from this folder, so it finds `.env`:
 
 ```
-swift run
+swift run ApexAgent
 ```
 
 You get a typed prompt (`ApexAgent>`) and the notch animation at the top of the screen.
@@ -49,21 +68,21 @@ Type a request, or turn on the mic:
 
 ### 3. Choose the mode (environment variables)
 
-Put these in front of `swift run`. They can be combined.
+Put these in front of `swift run ApexAgent`. They can be combined.
 
 | Variable | Effect | Example |
 |---|---|---|
-| `APEX_STT=apple` | **Apple on-device mic**: Apple's speech recognition on your Mac instead of Deepgram. No audio leaves the Mac, and it was more accurate on quiet, noisy speech in our tests; about 0.7 s slower to respond. | `APEX_STT=apple swift run` |
-| `APEX_FORCE_OFFLINE=1` | Local brain: uses Ollama (qwen3:8b) instead of the cloud LLM, and the built-in macOS voice instead of Deepgram's. | `APEX_FORCE_OFFLINE=1 swift run` |
-| `APEX_VOICE_PROCESSING=1` | Turns on macOS noise suppression and echo cancellation for the mic. | `APEX_VOICE_PROCESSING=1 swift run` |
-| `APEX_NOTCH=0` | No notch animation, terminal only. | `APEX_NOTCH=0 swift run` |
+| `APEX_STT=apple` | **Apple on-device mic**: Apple's speech recognition on your Mac instead of Deepgram. No audio leaves the Mac, and it was more accurate on quiet, noisy speech in our tests; about 0.7 s slower to respond. | `APEX_STT=apple swift run ApexAgent` |
+| `APEX_FORCE_OFFLINE=1` | Local brain: uses Ollama (qwen3:8b) instead of the cloud LLM, and the built-in macOS voice instead of Deepgram's. | `APEX_FORCE_OFFLINE=1 swift run ApexAgent` |
+| `APEX_VOICE_PROCESSING=1` | Turns on macOS noise suppression and echo cancellation for the mic. | `APEX_VOICE_PROCESSING=1 swift run ApexAgent` |
+| `APEX_NOTCH=0` | No notch animation, terminal only. | `APEX_NOTCH=0 swift run ApexAgent` |
 
 Common setups:
 
 ```
-swift run                                          # default: Deepgram mic + DeepSeek + Deepgram voice
-APEX_STT=apple swift run                           # Apple mic (recommended if you get misheard)
-APEX_STT=apple APEX_FORCE_OFFLINE=1 swift run      # fully on-device: Apple mic + Ollama + macOS voice
+swift run ApexAgent                                          # default: Deepgram mic + DeepSeek + Deepgram voice
+APEX_STT=apple swift run ApexAgent                           # Apple mic (recommended if you get misheard)
+APEX_STT=apple APEX_FORCE_OFFLINE=1 swift run ApexAgent      # fully on-device: Apple mic + Ollama + macOS voice
 ```
 
 Then type `/mic` and talk.

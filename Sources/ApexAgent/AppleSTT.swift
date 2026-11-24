@@ -1,6 +1,7 @@
 import AVFoundation
 import Foundation
 import Speech
+import NotchCore
 
 // On-device speech recognition, selected with APEX_STT=apple. Works offline.
 // Apple's live recognizer does not mark where one spoken command ends, so we treat
