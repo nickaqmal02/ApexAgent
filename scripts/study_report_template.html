@@ -334,6 +334,8 @@ section{animation:fade .25s ease-out}
 
 <script>
 const D = __DATA__;
+// A shared copy (StudyNotch "Share my report") carries no raw sessions: hide the Sessions tab there
+if (D.shared) { const a = document.querySelector('.tabbar a[href="#sessions"]'); if (a) a.remove(); }
 const NS = "http://www.w3.org/2000/svg";
 const T = D.totals;
 // Colour follows the category, never the subject's rank, so it means the same thing on every view

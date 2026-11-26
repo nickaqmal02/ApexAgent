@@ -1,0 +1,274 @@
+<title>What cdk deploy Does</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: the command on top, split into its parts; below, a replay of the deploy: the terminal output on
+   the left, the same moment drawn as a pipeline on the right, then what can go wrong. */
+:root{
+  --bg:#eef1f5; --paper:#ffffff; --ink:#151a22; --ink2:#4b5563; --ink3:#8a94a3; --line:#d5dbe4;
+  --accent:#d9480f; --accent-soft:#fde7dc; --ok:#1d7a46; --ok-soft:#e3f4e9; --warn:#a15c00; --warn-soft:#fff2d9;
+  --term:#0f141a; --term-ink:#d7dee7; --term-dim:#7d8896; --term-ok:#5fd394; --term-acc:#ff9a66;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1318; --paper:#171c23; --ink:#e7ebf0; --ink2:#a7b0bd; --ink3:#6b7684; --line:#2a313b;
+  --accent:#ff7a3d; --accent-soft:#3a2216; --ok:#5fd394; --ok-soft:#14281c; --warn:#f0b45a; --warn-soft:#2e2410;
+  --term:#0a0d11; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1318; --paper:#171c23; --ink:#e7ebf0; --ink2:#a7b0bd; --ink3:#6b7684; --line:#2a313b;
+  --accent:#ff7a3d; --accent-soft:#3a2216; --ok:#5fd394; --ok-soft:#14281c; --warn:#f0b45a; --warn-soft:#2e2410;
+  --term:#0a0d11; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans)}
+.wrap{max-width:1180px;margin:0 auto;padding-block:24px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+.eyebrow{font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+h1{margin:4px 0 0;font:700 clamp(24px,3.2vw,34px)/1.15 var(--sans);letter-spacing:-.01em;text-wrap:balance}
+h2{margin:0 0 10px;font:700 19px/1.3 var(--sans)}
+.lede{margin:6px 0 0;color:var(--ink2);max-width:70ch}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
+
+/* the command, part by part */
+.cmd{font:500 clamp(14px,2vw,19px)/1.6 var(--mono);background:var(--term);color:var(--term-ink);border-radius:10px;padding:14px 16px;overflow-x:auto;white-space:nowrap}
+.cmd .p{color:var(--term-dim)}
+.tok{border:0;background:transparent;color:inherit;font:inherit;padding:2px 3px;border-radius:5px;cursor:pointer;border-bottom:2px solid transparent}
+.tok:hover,.tok[aria-pressed="true"]{background:rgba(255,154,102,.18);border-bottom-color:var(--term-acc);color:#fff}
+.tok:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.explain{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;margin-top:14px;align-items:baseline}
+.explain code{font:600 14px var(--mono);color:var(--accent)}
+.explain p{margin:0;color:var(--ink2)}
+.callout{margin-top:14px;border-radius:10px;padding:12px 14px;background:var(--warn-soft);color:var(--ink);font-size:14px}
+.callout b{color:var(--warn)}
+.callout code{font:500 13px var(--mono)}
+
+/* the replay */
+.replay{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:880px){.replay{grid-template-columns:1fr}}
+.term{background:var(--term);color:var(--term-ink);border-radius:10px;font:12.5px/1.6 var(--mono);padding:12px 14px;height:420px;overflow:auto}
+.term .l{white-space:pre-wrap;word-break:break-word}
+.term .dim{color:var(--term-dim)} .term .ok{color:var(--term-ok)} .term .acc{color:var(--term-acc)}
+.term .caret{display:inline-block;width:8px;height:14px;background:var(--term-ink);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.stages{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.stage{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:start;padding:9px 10px;border-radius:9px;border:1px solid var(--line);background:var(--paper)}
+.stage .dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font:600 11px var(--mono);color:var(--ink3);margin-top:1px}
+.stage .t{font-weight:600}
+.stage .d{font-size:13.5px;color:var(--ink2)}
+.stage .w{font:500 11px var(--mono);color:var(--ink3);white-space:nowrap;padding-top:3px}
+.stage.now{border-color:var(--accent);background:var(--accent-soft)}
+.stage.now .dot{border-color:var(--accent);color:var(--accent);animation:pulse 1.2s ease-in-out infinite}
+.stage.done .dot{background:var(--ok);border-color:var(--ok);color:#fff}
+.stage.done .w{color:var(--ok)}
+@keyframes pulse{50%{box-shadow:0 0 0 5px var(--accent-soft)}}
+.res{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.res span{font:500 11.5px var(--mono);padding:2px 7px;border-radius:6px;border:1px solid var(--line);color:var(--ink3);background:var(--paper)}
+.res span.mk{border-color:var(--accent);color:var(--accent)}
+.res span.ok{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.btn{font:600 14px var(--sans);padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.clock{margin-left:auto;font:600 13px var(--mono);color:var(--ink2);font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+@media (prefers-reduced-motion:reduce){.stage.now .dot{animation:none}.term .caret{animation:none}}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+td code{font:500 12.5px var(--mono);overflow-wrap:anywhere}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:880px){.two{grid-template-columns:1fr}}
+footer{font-size:13px;color:var(--ink3)}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">StudyNotch · report sharing · deploying it</div>
+    <h1>What happens when you run this command</h1>
+    <p class="lede">Click each part of the command to see what it means. Then press Play to watch a deploy happen: the terminal on the left, what AWS is doing on the right. The replay is sped up; the real one takes about 5 to 10 minutes.</p>
+  </header>
+
+  <section class="card">
+    <div class="cmd" role="group" aria-label="The command, part by part"><span class="p">~/degree/ApexAgent/cloud % </span><button class="tok" data-k="npx" type="button">npx</button> <button class="tok" data-k="y" type="button">-y</button> <button class="tok" data-k="pkg" type="button">aws-cdk@2.1148.0</button> <button class="tok" data-k="deploy" type="button">deploy</button> <button class="tok" data-k="c" type="button">-c alertEmail=you@example.com</button></div>
+    <div class="explain" id="explain" aria-live="polite"></div>
+    <div class="callout"><b>Type your real email, without the &lt; &gt;.</b> In the terminal, <code>&lt;your email&gt;</code> means “read from a file called <i>your</i>”, so zsh stops with <code>no such file or directory: your</code>. Write it like this: <code>-c alertEmail=you@gmail.com</code>. The email only goes into your own AWS account (for the $20 budget alert) and is not saved in the repo.</div>
+  </section>
+
+  <section class="card">
+    <h2>The deploy, step by step</h2>
+    <div class="replay">
+      <div class="term" id="term" role="log" aria-label="Terminal output"></div>
+      <ol class="stages" id="stages"></ol>
+    </div>
+    <div class="bar" aria-hidden="true"><i id="progress"></i></div>
+    <div class="controls">
+      <button class="btn primary" id="play" type="button">▶ Play</button>
+      <button class="btn" id="step" type="button">Next step</button>
+      <button class="btn" id="reset" type="button">Reset</button>
+      <span class="clock" id="clock">real time ≈ 0:00</span>
+    </div>
+  </section>
+
+  <div class="two">
+    <section class="card">
+      <h2>If it stops with an error</h2>
+      <table>
+        <thead><tr><th>You see</th><th>Why, and the fix</th></tr></thead>
+        <tbody>
+          <tr><td><code>zsh: no such file or directory: your</code></td><td>The <code>&lt; &gt;</code> were typed. Use <code>alertEmail=you@gmail.com</code>.</td></tr>
+          <tr><td><code>SSM parameter /cdk-bootstrap/hnb659fds/version not found</code></td><td>CDK was never bootstrapped in Singapore. Run the bootstrap command once in CloudShell as the admin.</td></tr>
+          <tr><td><code>not authorized to perform: sts:AssumeRole</code></td><td>The <code>cdk-deploy</code> inline policy is missing on nick-aerocare. Add it from <code>cloud/iam/nick-aerocare-cdk-deploy.json</code>.</td></tr>
+          <tr><td><code>Unable to resolve AWS account</code></td><td>No credentials in this terminal. Check <code>aws sts get-caller-identity</code>.</td></tr>
+          <tr><td>Stuck on <code>Distribution … CREATE_IN_PROGRESS</code></td><td>Normal. CloudFront takes 5 to 10 minutes to reach every edge location. Leave it running.</td></tr>
+          <tr><td><code>ROLLBACK_COMPLETE</code></td><td>Something failed and CloudFormation undid everything, so nothing is left billing. Read the first red line above it, fix, run deploy again.</td></tr>
+        </tbody>
+      </table>
+    </section>
+    <section class="card">
+      <h2>Good to know</h2>
+      <table>
+        <tbody>
+          <tr><th>Cost of deploying</th><td>About $0. CloudFormation is free; the resources cost nothing while nobody uses them.</td></tr>
+          <tr><th>Run it again?</th><td>Safe. CDK compares with what is already there and only changes the difference. <code>cdk diff</code> shows that difference first.</td></tr>
+          <tr><th>Undo everything</th><td><code>npx -y aws-cdk@2.1148.0 destroy</code> deletes the whole stack, including the bucket's files.</td></tr>
+          <tr><th>Where to watch</th><td>AWS console → CloudFormation → Singapore → <code>StudyNotchShare</code> → Events.</td></tr>
+          <tr><th>After it finishes</th><td>Send the <code>ApiUrl</code> line. It goes into the app, then the smoke test and the v0.2.0 release.</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+  <footer>The terminal lines are a faithful sketch of CDK's output for this stack, shortened; ids like <code>dxxxx</code> and <code>abc123</code> are placeholders. Files: <code>cloud/app.py</code>, <code>cloud/stack.py</code>, <code>cloud/lambda/handler.py</code>, <code>cloud/README.md</code>.</footer>
+</div>
+
+<script>
+const PARTS = {
+  npx: ["npx", "Runs a Node.js program without installing it permanently. It downloads the program into a cache, runs it, and keeps nothing else around."],
+  y: ["-y", "“Yes, download it”. Without it, npx stops and asks before downloading."],
+  pkg: ["aws-cdk@2.1148.0", "The CDK command-line tool, pinned to one exact version so every run behaves the same. It reads your Python CDK app and talks to AWS for you."],
+  deploy: ["deploy", "The action: turn the code in app.py and stack.py into real AWS resources. Other actions: synth (only build the template), diff (show what would change), destroy (remove it all)."],
+  c: ["-c alertEmail=…", "-c sets a “context” value the app can read. app.py reads alertEmail and, if it is there, adds a budget that emails you at $5 and $20 a month. Leave it out and the stack has no budget."],
+};
+const exp = document.getElementById("explain");
+function explain(k) {
+  document.querySelectorAll(".tok").forEach(t => t.setAttribute("aria-pressed", String(t.dataset.k === k)));
+  exp.innerHTML = `<code>${PARTS[k][0]}</code><p>${PARTS[k][1]}</p>`;
+}
+document.querySelectorAll(".tok").forEach(t => t.addEventListener("click", () => explain(t.dataset.k)));
+explain("deploy");
+
+// Each stage: what it is, where it runs, roughly how long for real, and the terminal lines it prints.
+// Lines: [text, class]; class "acc" for the current action, "ok" for success, "dim" for detail.
+const STAGES = [
+  {t: "Get the CDK tool", d: "npx downloads aws-cdk 2.1148.0 the first time, then reuses it.", w: "your Mac", secs: 15,
+   lines: [["$ npx -y aws-cdk@2.1148.0 deploy -c alertEmail=you@gmail.com", ""], ["(downloading aws-cdk@2.1148.0 …)", "dim"]]},
+  {t: "Run your Python app", d: "cdk.json says: run .venv/bin/python app.py. app.py first rebuilds the public page (build_site.py) from the report template.", w: "your Mac", secs: 5,
+   lines: [["wrote cloud/site/app/index.html", "dim"]]},
+  {t: "Synthesize the template", d: "stack.py becomes one CloudFormation template (JSON): the full list of resources and how they connect.", w: "your Mac", secs: 5,
+   lines: [["✨  Synthesis time: 4.2s", "ok"]]},
+  {t: "Package and upload the assets", d: "The Lambda code (handler.py) is zipped, the page folder is zipped, and both go to the bootstrap bucket, using the CDK file-publishing role.", w: "Mac → S3", secs: 20,
+   lines: [["StudyNotchShare: start: Publishing assets", "acc"], ["StudyNotchShare: success: Published lambda.zip (abc123)", "ok"], ["StudyNotchShare: success: Published site (def456)", "ok"]]},
+  {t: "Hand over to CloudFormation", d: "CDK assumes the deploy role (that is what the cdk-deploy policy allows) and asks CloudFormation to create the stack.", w: "AWS", secs: 10,
+   lines: [["StudyNotchShare: deploying... [1/1]", "acc"], ["StudyNotchShare: creating CloudFormation changeset...", "dim"]]},
+  {t: "Create the resources", d: "CloudFormation builds everything in order, each part as soon as what it needs exists. CloudFront is the slow one.", w: "AWS", secs: 420, res: true,
+   lines: [], resLines: true},
+  {t: "Copy the page and print the outputs", d: "A helper copies app/index.html into the private bucket and clears the CloudFront cache. Then CDK prints the addresses you need.", w: "AWS → you", secs: 40,
+   lines: [["✅  StudyNotchShare", "ok"], ["", ""], ["Outputs:", ""],
+           ["StudyNotchShare.ApiUrl = https://abc123xyz.lambda-url.ap-southeast-1.on.aws/", "acc"],
+           ["StudyNotchShare.SiteUrl = https://dxxxx.cloudfront.net", "acc"],
+           ["StudyNotchShare.BucketName = studynotchshare-reports…", "dim"], ["", ""], ["✨  Total time: 8m 35s", "ok"]]},
+];
+// Resources CloudFormation creates in stage 6, in a realistic order, with their share of the time
+const RES = [["S3 bucket", 6], ["DynamoDB table", 8], ["Log group", 3], ["Lambda role", 10], ["Lambda function", 8], ["Function URL", 3],
+             ["CloudFront function", 6], ["Origin access control", 3], ["CloudFront distribution", 340], ["Bucket policy", 4], ["Budget", 6], ["Page copy", 23]];
+
+const term = document.getElementById("term"), list = document.getElementById("stages");
+STAGES.forEach((s, i) => {
+  const li = document.createElement("li"); li.className = "stage"; li.id = "st" + i;
+  li.innerHTML = `<span class="dot">${i + 1}</span><div><div class="t">${s.t}</div><div class="d">${s.d}</div>${s.res ? `<div class="res" id="res">${RES.map((r, j) => `<span id="r${j}">${r[0]}</span>`).join("")}</div>` : ""}</div><span class="w">${s.w}</span>`;
+  list.appendChild(li);
+});
+const totalSecs = STAGES.reduce((a, s) => a + s.secs, 0);
+
+let stage = -1, timer = null, realSecs = 0;
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function print(text, cls) {
+  const d = document.createElement("div"); d.className = "l " + (cls || ""); d.textContent = text || " ";
+  term.querySelector(".caret")?.parentElement?.remove();
+  term.appendChild(d);
+  const c = document.createElement("div"); c.className = "l"; c.innerHTML = '<span class="caret"></span>'; term.appendChild(c);
+  term.scrollTop = term.scrollHeight;
+}
+function clock() {
+  const m = Math.floor(realSecs / 60), s = Math.round(realSecs % 60);
+  document.getElementById("clock").textContent = `real time ≈ ${m}:${String(s).padStart(2, "0")}`;
+  document.getElementById("progress").style.width = `${100 * realSecs / totalSecs}%`;
+}
+function setStage(i) {
+  for (let j = 0; j < STAGES.length; j++) {
+    const li = document.getElementById("st" + j);
+    li.classList.toggle("done", j < i); li.classList.toggle("now", j === i);
+  }
+}
+const wait = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
+let running = false, stopRequested = false;
+
+async function runStage(i) {
+  stage = i; setStage(i);
+  const s = STAGES[i];
+  for (const [t, c] of s.lines) { print(t, c); await wait(380); }
+  if (s.resLines) {
+    let used = 0;
+    for (let j = 0; j < RES.length; j++) {
+      const el = document.getElementById("r" + j); el.className = "mk";
+      print(`StudyNotchShare | CREATE_IN_PROGRESS | ${RES[j][0]}`, "dim");
+      await wait(RES[j][1] > 100 ? 2200 : 420);
+      el.className = "ok"; used += RES[j][1]; realSecs += RES[j][1]; clock();
+      print(`StudyNotchShare | CREATE_COMPLETE    | ${RES[j][0]}`, "ok");
+    }
+    realSecs += s.secs - used;
+  } else {
+    realSecs += s.secs;
+  }
+  clock();
+  setStage(i + 1);
+}
+async function play() {
+  if (running) { stopRequested = true; return; }
+  if (stage >= STAGES.length - 1) reset();
+  running = true; stopRequested = false;
+  document.getElementById("play").textContent = "❚❚ Pause";
+  while (stage < STAGES.length - 1 && !stopRequested) await runStage(stage + 1);
+  running = false;
+  document.getElementById("play").textContent = stage >= STAGES.length - 1 ? "↻ Play again" : "▶ Play";
+}
+async function step() {
+  if (running) return;
+  if (stage >= STAGES.length - 1) reset();
+  running = true; await runStage(stage + 1); running = false;
+  if (stage >= STAGES.length - 1) document.getElementById("play").textContent = "↻ Play again";
+}
+function reset() {
+  stopRequested = true; stage = -1; realSecs = 0; term.innerHTML = "";
+  print("~/degree/ApexAgent/cloud %", "dim");
+  RES.forEach((_, j) => { const el = document.getElementById("r" + j); if (el) el.className = ""; });
+  setStage(-1); clock();
+  document.getElementById("play").textContent = "▶ Play";
+}
+document.getElementById("play").addEventListener("click", play);
+document.getElementById("step").addEventListener("click", step);
+document.getElementById("reset").addEventListener("click", () => { if (!running) reset(); else { stopRequested = true; setTimeout(reset, 2600); } });
+
+// First frame: a finished run, so the page shows the whole journey before anyone presses Play
+(function showFinished() {
+  print("~/degree/ApexAgent/cloud %", "dim");
+  STAGES.forEach(s => {
+    s.lines.forEach(([t, c]) => print(t, c));
+    if (s.resLines) RES.forEach(r => print(`StudyNotchShare | CREATE_COMPLETE    | ${r[0]}`, "ok"));
+  });
+  RES.forEach((r, j) => { document.getElementById("r" + j).className = "ok"; });
+  stage = STAGES.length - 1; realSecs = totalSecs; setStage(STAGES.length); clock();
+  document.getElementById("play").textContent = "▶ Watch it run";
+})();
+</script>

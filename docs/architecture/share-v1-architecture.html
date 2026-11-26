@@ -1,0 +1,335 @@
+<title>StudyNotch and KaizeNotch Setup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a deployment drawing. The student's computer (Mac or Windows) on the left, AWS in the middle, the friend's browser on the right.
+   Scenarios replay real requests over it; the panel underneath shows the payload, the check and the cost. */
+:root{
+  --bg:#eef1f5; --paper:#ffffff; --ink:#151a22; --ink2:#4b5563; --ink3:#8a94a3; --line:#d5dbe4;
+  --accent:#d9480f; --accent-soft:#fde7dc; --mac:#e3ecfa; --mac-ink:#1f4f99; --aws:#fdf0e1; --aws-ink:#9a4a07;
+  --web:#e6f4ea; --web-ink:#1d6b3a; --code:#f4f6f9;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1318; --paper:#171c23; --ink:#e7ebf0; --ink2:#a7b0bd; --ink3:#6b7684; --line:#2a313b;
+  --accent:#ff7a3d; --accent-soft:#3a2216; --mac:#17243a; --mac-ink:#8fb4ee; --aws:#2c2014; --aws-ink:#f0b27a;
+  --web:#13281b; --web-ink:#7fd39d; --code:#11161c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1318; --paper:#171c23; --ink:#e7ebf0; --ink2:#a7b0bd; --ink3:#6b7684; --line:#2a313b;
+  --accent:#ff7a3d; --accent-soft:#3a2216; --mac:#17243a; --mac-ink:#8fb4ee; --aws:#2c2014; --aws-ink:#f0b27a;
+  --web:#13281b; --web-ink:#7fd39d; --code:#11161c; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans)}
+.wrap{max-width:1300px;margin:0 auto;padding-block:24px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:16px}
+.eyebrow{font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+h1{margin:0;font:700 clamp(24px,3.2vw,34px)/1.15 var(--sans);letter-spacing:-.01em;text-wrap:balance}
+.lede{margin:0;color:var(--ink2);max-width:72ch}
+header{display:grid;gap:6px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{font:500 14px var(--sans);border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.chip .k{font:600 12px var(--mono);color:var(--ink3)}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.chip[aria-pressed="true"] .k{color:var(--accent)}
+.chip:focus-visible,.btn:focus-visible,[role=button]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.scroll{overflow-x:auto}
+svg.arch{display:block;width:100%;min-width:900px;height:auto}
+.arch text{font-family:var(--sans);fill:var(--ink)}
+.zone rect{stroke:none}
+.zone text{font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.zone.mac rect{fill:var(--mac)} .zone.mac text{fill:var(--mac-ink)}
+.zone.aws rect{fill:var(--aws)} .zone.aws text{fill:var(--aws-ink)}
+.zone.web rect{fill:var(--web)} .zone.web text{fill:var(--web-ink)}
+.comp{cursor:pointer}
+.comp rect.box{fill:var(--paper);stroke:var(--ink3);stroke-width:1.3}
+.comp .t{font-weight:700;font-size:14px}
+.comp .s{font-size:12px;fill:var(--ink2)}
+.comp .m{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.comp:hover rect.box{stroke:var(--accent)}
+.comp.on rect.box{stroke:var(--accent);stroke-width:2.6}
+.wire{fill:none;stroke:var(--ink3);stroke-width:1.4}
+.wlab{font-family:var(--mono);font-size:11px;fill:var(--ink2);paint-order:stroke;stroke:var(--paper);stroke-width:5px;stroke-linejoin:round}
+.wg.on .wire{stroke:var(--accent);stroke-width:2.6;stroke-dasharray:8 6;animation:dash .9s linear infinite}
+.wg.on .wlab{fill:var(--accent);font-weight:600}
+.dim{opacity:.35}
+.token{fill:var(--accent)}
+@keyframes dash{to{stroke-dashoffset:-14}}
+@media (prefers-reduced-motion:reduce){.wg.on .wire{animation:none;stroke-dasharray:none}.token{display:none}}
+
+.panel{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px}
+@media (max-width:900px){.panel{grid-template-columns:1fr}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.step-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.count{font:600 12px var(--mono);color:var(--ink3)}
+.where{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
+.where.mac{background:var(--mac);color:var(--mac-ink)} .where.aws{background:var(--aws);color:var(--aws-ink)} .where.web{background:var(--web);color:var(--web-ink)}
+.card h2{margin:6px 0 4px;font:700 19px/1.3 var(--sans);text-wrap:balance}
+.card p{margin:0 0 8px;color:var(--ink2);max-width:66ch}
+pre{margin:8px 0 0;font:12.5px/1.55 var(--mono);background:var(--code);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto;white-space:pre;color:var(--ink)}
+.costline{margin-top:10px;font-size:13px;color:var(--ink2)}
+.costline b{color:var(--ink);font-weight:600}
+.nav{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.btn{font:600 14px var(--sans);padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+.hint{font-size:13px;color:var(--ink3);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.total td{font-weight:700;border-bottom:0}
+.guards{margin:10px 0 0;padding-left:18px;color:var(--ink2);font-size:13.5px}
+.guards li{margin:3px 0}
+footer{font-size:13px;color:var(--ink3)}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">StudyNotch (Mac) · KaizeNotch (Windows) · one share service · as deployed</div>
+    <h1>How the apps are installed, and how a habit report gets to a friend's browser</h1>
+    <p class="lede">Two apps, one AWS service. Each part, the exact requests between them, and what every step costs. Pick a scenario and step through it, or click any part to see how it is configured.</p>
+  </header>
+
+  <div class="bar" role="group" aria-label="Scenarios" id="scen"></div>
+
+  <div class="stage">
+    <div class="scroll"><svg class="arch" id="arch" viewBox="0 0 1500 640" role="img" aria-label="Deployment diagram: Homebrew and Scoop installs, the Mac and Windows apps, AWS Lambda, DynamoDB, S3, CloudFront, and the friend's browser"></svg></div>
+  </div>
+
+  <div class="panel">
+    <section class="card" aria-live="polite">
+      <div class="step-top"><span class="count" id="count"></span><span class="where" id="where"></span></div>
+      <h2 id="stitle"></h2>
+      <p id="stext"></p>
+      <pre id="scode"></pre>
+      <div class="costline" id="scost"></div>
+      <div class="nav">
+        <button class="btn" id="prev" type="button">← Back</button>
+        <button class="btn primary" id="next" type="button">Next step →</button>
+        <button class="btn" id="play" type="button">▶ Play</button>
+      </div>
+      <div class="hint">Keys: ← → to step, space to play or pause.</div>
+    </section>
+    <section class="card">
+      <div class="eyebrow" style="margin-bottom:8px">Monthly cost (estimate)</div>
+      <table>
+        <thead><tr><th>Part</th><th class="n">100 users</th><th class="n">1,000 users</th></tr></thead>
+        <tbody>
+          <tr><td>Lambda (≈12k / 120k calls)</td><td class="n">$0</td><td class="n">$0</td></tr>
+          <tr><td>DynamoDB on demand</td><td class="n">$0</td><td class="n">$0</td></tr>
+          <tr><td>S3 PUTs + storage</td><td class="n">$0.07</td><td class="n">$0.70</td></tr>
+          <tr><td>CloudFront (2k / 20k views)</td><td class="n">$0</td><td class="n">$0</td></tr>
+          <tr><td>CloudWatch logs, 14-day</td><td class="n">$0</td><td class="n">$0.50</td></tr>
+          <tr class="total"><td>Total</td><td class="n">≈ $0–1</td><td class="n">≈ $1–3</td></tr>
+        </tbody>
+      </table>
+      <ul class="guards">
+        <li>Uploads at most every 15 minutes, only when the report changed (about 4 a day).</li>
+        <li>Uploads are refused under 60 seconds apart and over 200 KB; a concurrency cap can be set at deploy time (reserveConcurrency).</li>
+        <li>Budget alerts at $5 and $20; nothing bills while idle.</li>
+        <li>Optional custom domain: about $12 a year plus $0.50 a month.</li>
+      </ul>
+    </section>
+  </div>
+  <footer>Assumptions: AWS Singapore region, free tiers on Lambda, DynamoDB and CloudFront; about 20 views per shared report per month. Example ids and secrets on this page are made up; the two service addresses are the deployed ones. The logical view of the same design is the Gane &amp; Sarson DFD in docs/architecture/share-v1-gane-sarson.drawio.</footer>
+</div>
+
+<script>
+const NS = "http://www.w3.org/2000/svg", svg = document.getElementById("arch");
+const el = (t, a, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); (p || svg).appendChild(e); return e; };
+const tx = (s, a, p) => { const t = el("text", a, p); t.textContent = s; return t; };
+
+// ---------- Parts ----------
+const COMP = {
+  app: {x: 40, y: 80, w: 340, h: 92, zone: "mac", t: "StudyNotch (Mac) · KaizeNotch (Windows)", s: ["Swift menu bar · Rust/Tauri tray and panel", "uploads ≤ every 15 min, only if changed"],
+    info: "The same app on two systems. StudyNotch lives in the MacBook notch (Swift). KaizeNotch is a pill at the top of a Windows screen (Rust + Tauri). Both own the share toggle, keep the share id, and call the same API. Neither holds AWS keys.",
+    code: "Mac:     Sources/NotchCore/Share.swift     (ShareManager, URLSession)\nWindows: src-tauri/src/share.rs            (Share, reqwest)\n  POST /register  → { shareId, secret, url }\n  PUT  /report    (Bearer secret)\n  POST /stop      (Bearer secret)\n15 s timeout, one retry after a 502–504 or a dropped connection"},
+  builder: {x: 40, y: 220, w: 160, h: 80, zone: "mac", t: "Report builder", s: ["Swift and Rust ports", "same output"],
+    info: "Turns the local files into the report JSON: habits, weeks, streaks, the 26-week grid and totals. Raw session rows are left out of the shared copy.",
+    code: "Mac:     ReportBuilder.swift\nWindows: report.rs   (0 differences on 175 real sessions)\nbuild(store) → report data\n// same fields the HTML template reads today:\n// habits, heat, categories, days, totals\n// minus: sessions (raw rows stay on the computer)"},
+  keychain: {x: 220, y: 220, w: 160, h: 80, zone: "mac", t: "Credential store", s: ["Keychain · Cred. Manager", "secret never in a file"],
+    info: "The upload secret is kept by the system: macOS Keychain for StudyNotch, Windows Credential Manager for KaizeNotch. It is not in the data folder and not in backups as plain text.",
+    code: "Mac:     Keychain generic password\n         service \"StudyNotch.share\", account <shareId>\nWindows: Credential Manager (keyring crate)\n         service \"KaizeNotch.share\", account <shareId>\nvalue:   <secret, 32 random bytes, base64url>"},
+  files: {x: 40, y: 340, w: 340, h: 80, zone: "mac", t: "Local data", s: ["subjects.json · categories.json", "study_sessions.csv"],
+    info: "The source of truth, in the same format on both systems, so a folder can move between them. Sharing never uploads these files.",
+    code: "Mac:     ~/Library/Application Support/StudyNotch/\nWindows: %APPDATA%\\KaizeNotch\\\n  subjects.json\n  categories.json\n  study_sessions.csv\n  report.html   (local report)\n  share.json    (share id and link, no secret)"},
+  brew: {x: 40, y: 470, w: 160, h: 100, zone: "mac", t: "Homebrew tap", s: ["Mac: StudyNotch", "builds from source"], m: ["brew install", "  studynotch"],
+    info: "How a Mac user gets StudyNotch. The tap repo holds one formula that downloads the tagged source from GitHub and compiles it with Swift on the user's Mac.",
+    code: "brew tap nickaqmal02/tap\nbrew install studynotch\nbrew services start studynotch   # now and at login\n\nrepo:    github.com/nickaqmal02/homebrew-tap\nformula: Formula/studynotch.rb → ApexAgent tag tarball + sha256"},
+  scoop: {x: 220, y: 470, w: 160, h: 100, zone: "mac", t: "Scoop / Release", s: ["Windows: KaizeNotch", "ready-made .exe"], m: ["scoop install", "  kaizenotch"],
+    info: "How a Windows user gets KaizeNotch. Pushing a version tag makes GitHub Actions build the installers and publish a Release; the Scoop bucket points at the portable zip in that Release. Nothing is compiled on the user's PC.",
+    code: "scoop bucket add nickaqmal02 https://github.com/nickaqmal02/scoop-bucket\nscoop install kaizenotch\n# or run KaizeNotch_<version>_x64-setup.exe from the Release\n\nrepo:    github.com/nickaqmal02/KaizeNotch  (release.yml)\nfiles:   .msi · setup .exe · portable .zip · SHA256SUMS.txt\nbucket:  github.com/nickaqmal02/scoop-bucket"},
+  lambda: {x: 500, y: 80, w: 290, h: 130, zone: "aws", t: "Lambda · share-api", s: ["Function URL (HTTPS), Python 3.12, arm64"], m: ["POST /register", "PUT  /report", "POST /stop"],
+    info: "One small function behind a Lambda Function URL (no API Gateway). It checks the secret, validates the JSON, and writes to S3 and DynamoDB. 256 MB memory, 15 s timeout.",
+    code: "Runtime python3.12 · arm64 · 256 MB · timeout 15 s\nFunctionUrl: AuthType NONE (the secret is checked in code)\nPermissions for \"*\": InvokeFunctionUrl + InvokeFunction (via the URL only)\nhttps://hsjsnyta2wxq6c5xrbgefn5jde0yqonm.lambda-url.ap-southeast-1.on.aws/\nEnv: TABLE=share_keys  BUCKET=studynotch-reports"},
+  ddb: {x: 560, y: 290, w: 230, h: 100, zone: "aws", t: "DynamoDB · share_keys", s: ["on demand, one tiny row per link"], m: ["shareId (PK)", "secretHash, revoked, lastUpload"],
+    info: "One row per share link. Stores only a SHA-256 hash of the secret, so a leaked table does not reveal secrets.",
+    code: "Table share_keys (PAY_PER_REQUEST)\n  shareId     S  (partition key)\n  secretHash  S  sha256(secret)\n  createdAt   S\n  lastUpload  N  epoch seconds\n  revoked     BOOL"},
+  logs: {x: 500, y: 470, w: 290, h: 90, zone: "aws", t: "CloudWatch + Budgets", s: ["logs kept 14 days", "budget alerts at $5 and $20"],
+    info: "Lambda writes one line per request (route, shareId, result, ms). No report content is logged. An AWS Budget emails at $5 and $20.",
+    code: "LogGroup /aws/lambda/share-api  retention 14 days\nAWS::Budgets::Budget  limit $20/month\n  alerts: 25% ($5), 100% ($20) → your email"},
+  cf: {x: 870, y: 80, w: 280, h: 130, zone: "aws", t: "CloudFront", s: ["d1d0bflw5rdpts.cloudfront.net"], m: ["/r/<id>  → app/index.html", "/data/*  cache 60 s", "/app/*   cache 1 day"],
+    info: "The public front door. A CloudFront Function rewrites /r/<id> to the one report page. It reads S3 through Origin Access Control, so the bucket stays private.",
+    code: "Origin: S3 (Origin Access Control)\nCloudFront Function (viewer-request):\n  /r/*  → /app/index.html\nCache: /data/* max-age 60 s, /app/* 1 day\nPriceClass_200 (includes Asia)"},
+  s3: {x: 870, y: 290, w: 280, h: 140, zone: "aws", t: "S3 · studynotch-reports", s: ["Block Public Access: on"], m: ["app/index.html   (your template)", "data/<id>.json   (one per user)", "lifecycle: delete after 90 days idle"],
+    info: "Private bucket. app/ holds the one report page you deploy; data/ holds each user's JSON. Users can only ever write their own data/<id>.json, and only JSON.",
+    code: "Bucket studynotch-reports\n  BlockPublicAccess: all on\n  Versioning: off\n  Lifecycle: expire data/* 90 days after last write\nPolicy: GetObject only for the CloudFront distribution\nLambda role: PutObject + DeleteObject on data/* only"},
+  iam: {x: 870, y: 470, w: 280, h: 90, zone: "aws", t: "IAM role · share-api", s: ["least privilege"], m: ["dynamodb: Get/Put/UpdateItem", "s3: Put/DeleteObject data/*"],
+    info: "The only permissions the Lambda has. It cannot read app/, list the bucket, or touch any other table.",
+    code: "Allow dynamodb:GetItem, PutItem, UpdateItem\n  on table/share_keys\nAllow s3:PutObject, s3:DeleteObject\n  on studynotch-reports/data/*\nAllow logs:CreateLogStream, PutLogEvents"},
+  browser: {x: 1250, y: 80, w: 220, h: 130, zone: "web", t: "Friend's browser", s: ["opens the share link", "phone or laptop"], m: ["/r/k9Q2xT8eLm4W"],
+    info: "Anyone with the link. They get the report page and that one user's JSON, nothing else.",
+    code: "GET https://d1d0bflw5rdpts.cloudfront.net/r/k9Q2xT8eLm4W\n→ app/index.html\n→ fetch(\"/data/k9Q2xT8eLm4W.json\")"},
+};
+
+// ---------- Wires: id, from, to, label, points, label position ----------
+const WIRES = [
+  ["brewi", "brew", "app", "install", [[40, 520], [27, 520], [27, 110], [40, 110]], [46, 462, "start"]],
+  ["scoopi", "scoop", "app", "install", [[380, 520], [392, 520], [392, 440], [33, 440], [33, 140], [40, 140]], [374, 462, "end"]],
+  ["reg", "app", "lambda", "POST /register", [[380, 100], [500, 100]], [440, 95, "middle"]],
+  ["resp", "lambda", "app", "response", [[500, 128], [380, 128]], [440, 123, "middle"]],
+  ["up", "app", "lambda", "PUT /report", [[380, 156], [500, 156]], [440, 151, "middle"]],
+  ["stop", "app", "lambda", "POST /stop", [[380, 165], [455, 165], [455, 190], [500, 190]], [440, 205, "middle"]],
+  ["kc", "app", "keychain", "secret", [[300, 172], [300, 220]], [306, 200, "start"]],
+  ["build", "files", "builder", "read", [[120, 340], [120, 300]], [126, 324, "start"]],
+  ["bapp", "builder", "app", "report JSON", [[120, 220], [120, 172]], [126, 200, "start"]],
+  ["ddb", "lambda", "ddb", "Get/Put/UpdateItem", [[650, 210], [650, 290]], [656, 254, "start"]],
+  ["s3w", "lambda", "s3", "PutObject data/<id>.json", [[790, 180], [830, 180], [830, 360], [870, 360]], [836, 270, "start"]],
+  ["logs", "lambda", "logs", "log line", [[520, 210], [520, 470]], [526, 440, "start"]],
+  ["view", "browser", "cf", "GET /r/<id>", [[1250, 112], [1150, 112]], [1200, 107, "middle"]],
+  ["page", "cf", "browser", "page + JSON", [[1150, 178], [1250, 178]], [1200, 173, "middle"]],
+  ["cfs3", "cf", "s3", "GET via OAC", [[1010, 210], [1010, 290]], [1016, 254, "start"]],
+];
+
+// ---------- Scenarios ----------
+const SCEN = [
+  {label: "Install the app", steps: [
+    {w: ["brewi"], c: ["brew", "app"], where: "mac", t: "On a Mac: Homebrew builds StudyNotch", x: "The tap holds one formula. Homebrew downloads the tagged source from GitHub, checks its sha256, and compiles it with Swift on the user's Mac. No Apple developer account is needed.", code: "brew tap nickaqmal02/tap\nbrew install studynotch\nbrew services start studynotch   # now and at every login", cost: "Free: GitHub hosts the source and the tap."},
+    {w: ["scoopi"], c: ["scoop", "app"], where: "mac", t: "On Windows: Scoop or the installer fetches KaizeNotch", x: "Nothing is compiled on the PC. A version tag makes GitHub Actions build the .msi, the setup .exe and a portable zip, and publish them as a Release. Scoop downloads the zip and checks its hash.", code: "scoop bucket add nickaqmal02 https://github.com/nickaqmal02/scoop-bucket\nscoop install kaizenotch\n\n# or: download KaizeNotch_<version>_x64-setup.exe and run it\n# (unsigned: SmartScreen → More info → Run anyway)", cost: "Free: GitHub Actions and Releases are free for public repos."},
+    {w: [], c: ["app", "files"], where: "mac", t: "First run: the data folder is created", x: "The app writes its starter activities and an empty report. Everything works offline from here; sharing stays off until the user turns it on.", code: "Mac:     ~/Library/Application Support/StudyNotch/\nWindows: %APPDATA%\\KaizeNotch\\\n  subjects.json · categories.json · study_sessions.csv · report.html", cost: "Free: nothing has left the computer."},
+  ]},
+  {label: "Turn on sharing", steps: [
+    {w: [], c: ["app"], where: "mac", t: "You click “Share my report”", x: "In the menu bar (Mac) or the tray icon or panel (Windows). The app has no share id yet, so it asks the API to make one.", code: "// first time only\nif shareId == nil { try await client.register() }", cost: "Free: nothing has left the computer yet."},
+    {w: ["reg"], c: ["app", "lambda"], where: "aws", t: "The app asks for a new link", x: "One HTTPS request to the Lambda Function URL. No login: v1 uses a per-device secret instead of accounts.", code: "POST https://<id>.lambda-url.ap-southeast-1.on.aws/register\nContent-Type: application/json\n\n{ \"app\": \"studynotch\", \"version\": \"0.2.0\" }", cost: "1 Lambda call: inside the 1 million free a month."},
+    {w: ["ddb"], c: ["lambda", "ddb"], where: "aws", t: "Lambda makes the id and the secret", x: "A random 12-character share id (public, goes in the link) and a 32-byte secret (private). Only the secret's SHA-256 hash is stored. The write fails if the id somehow exists already.", code: "shareId = base62(secrets.token_bytes(9))    # k9Q2xT8eLm4W\nsecret  = base64url(secrets.token_bytes(32))\n\nPutItem share_keys {\n  shareId, secretHash: sha256(secret),\n  createdAt, lastUpload: 0, revoked: false }\nConditionExpression: attribute_not_exists(shareId)", cost: "1 DynamoDB write: free tier."},
+    {w: ["resp"], c: ["lambda", "app"], where: "aws", t: "The app gets its link", x: "The secret is sent once, over HTTPS, and never again in a response.", code: "200 OK\n{ \"shareId\": \"k9Q2xT8eLm4W\",\n  \"secret\":  \"q3P…(43 chars)\",\n  \"url\":     \"https://d1d0bflw5rdpts.cloudfront.net/r/k9Q2xT8eLm4W\" }", cost: "Free."},
+    {w: ["kc"], c: ["app", "keychain"], where: "mac", t: "The secret goes into the credential store", x: "Keychain on a Mac, Credential Manager on Windows. Not into a file. The link is shown with a Copy button; the first upload follows straight away.", code: "SecItemAdd([kSecClass: kSecClassGenericPassword,\n            kSecAttrService: \"StudyNotch.share\",\n            kSecAttrAccount: shareId,\n            kSecValueData: secret])", cost: "Free."},
+  ]},
+  {label: "Upload after a session", steps: [
+    {w: ["build"], c: ["files", "builder"], where: "mac", t: "A session ends; the report data is rebuilt", x: "The report builder (Swift on Mac, Rust on Windows) reads the three local files and computes habits, weeks, streaks and the 26-week grid.", code: "let data = ReportBuilder.build(store)   // ~20–60 KB JSON\n// raw session rows are not included in the shared copy", cost: "Free: runs on the computer."},
+    {w: ["bapp"], c: ["builder", "app"], where: "mac", t: "Upload only if it changed, at most every 15 minutes", x: "The app hashes the JSON. Same hash as last time, or less than 15 minutes since the last upload: it waits. This keeps uploads to about 4 a day per person.", code: "guard hash(data) != lastHash,\n      now - lastUpload >= 15 * 60 else { scheduleLater(); return }", cost: "Free. This rule is what keeps the S3 bill tiny."},
+    {w: ["up"], c: ["app", "lambda"], where: "aws", t: "The app sends the JSON with its secret", x: "One PUT with the share id and the secret in the Authorization header.", code: "PUT /report\nAuthorization: Bearer q3P…\nX-Share-Id: k9Q2xT8eLm4W\nContent-Type: application/json\n\n{ \"habits\": [...], \"heat\": {...}, \"categories\": [...], \"totals\": {...} }", cost: "1 Lambda call (~40 ms): free tier."},
+    {w: ["ddb"], c: ["lambda", "ddb"], where: "aws", t: "Lambda checks who is uploading", x: "Reads the row, compares hashes in constant time, refuses revoked links and uploads less than 60 seconds apart.", code: "item = GetItem(shareId)\nif not item or item.revoked:              return 404\nif not hmac.compare_digest(item.secretHash, sha256(secret)):\n                                          return 403\nif now - item.lastUpload < 60:            return 429", cost: "1 DynamoDB read: free tier."},
+    {w: ["s3w"], c: ["lambda", "s3"], where: "aws", t: "Lambda checks the JSON, then saves it", x: "Only JSON with the expected top-level keys and under 200 KB is accepted, so nobody can host their own pages or files on your domain.", code: "if len(body) > 200_000:            return 413\ndata = json.loads(body)\nif set(data) - ALLOWED_KEYS:       return 400\nPutObject studynotch-reports/data/k9Q2xT8eLm4W.json\n  ContentType application/json\n  CacheControl max-age=60\nUpdateItem lastUpload = now", cost: "1 S3 PUT: $0.0000055. 4 a day × 100 users × 30 days ≈ $0.07."},
+    {w: ["logs"], c: ["lambda", "logs"], where: "aws", t: "One log line, no content", x: "Route, share id, status and time taken. Kept 14 days, then deleted automatically.", code: "{\"route\":\"PUT /report\",\"shareId\":\"k9Q2…\",\"status\":200,\"ms\":38}", cost: "Fractions of a cent."},
+  ]},
+  {label: "A friend opens the link", steps: [
+    {w: ["view"], c: ["browser", "cf"], where: "web", t: "Your friend opens the link", x: "CloudFront receives it. A tiny CloudFront Function rewrites every /r/<id> address to the same report page.", code: "GET /r/k9Q2xT8eLm4W\n// CloudFront Function (viewer-request)\nif (uri.startsWith('/r/')) request.uri = '/app/index.html';", cost: "CloudFront: 10 million requests a month free."},
+    {w: ["cfs3"], c: ["cf", "s3"], where: "aws", t: "The page and the JSON come from the private bucket", x: "CloudFront reads S3 through Origin Access Control. The page is cached for a day, the JSON for 60 seconds, so most views never touch S3.", code: "GET app/index.html          (cache 1 day)\nGET data/k9Q2xT8eLm4W.json  (cache 60 s)\n// bucket policy: s3:GetObject only for this distribution", cost: "Mostly served from cache: about $0."},
+    {w: ["page"], c: ["cf", "browser"], where: "web", t: "The report draws itself", x: "The page reads the id from the address, fetches that JSON and draws the same glass cards and habit grid you see in the local report. A missing JSON shows “This link is not active”.", code: "const id = location.pathname.split('/').pop();\nconst r = await fetch(`/data/${id}.json`);\nif (!r.ok) return showInactive();\nrender(await r.json());", cost: "1 TB a month free from CloudFront."},
+  ]},
+  {label: "Stop sharing", steps: [
+    {w: ["stop"], c: ["app", "lambda"], where: "aws", t: "You click “Stop sharing”", x: "The app sends the stop request with its secret.", code: "POST /stop\nAuthorization: Bearer q3P…\nX-Share-Id: k9Q2xT8eLm4W", cost: "1 Lambda call: free tier."},
+    {w: ["ddb"], c: ["lambda", "ddb"], where: "aws", t: "The link is marked revoked", x: "After the same secret check as an upload. A revoked id can never upload again.", code: "UpdateItem share_keys k9Q2xT8eLm4W SET revoked = true", cost: "1 DynamoDB write: free tier."},
+    {w: ["s3w"], c: ["lambda", "s3"], where: "aws", t: "The JSON is deleted", x: "Because the JSON is cached for only 60 seconds, the link stops working within a minute. No CloudFront invalidation is needed (those cost money after 1,000 a month).", code: "DeleteObject studynotch-reports/data/k9Q2xT8eLm4W.json", cost: "Free (S3 deletes cost nothing)."},
+    {w: ["resp", "kc"], c: ["lambda", "app", "keychain"], where: "mac", t: "The app forgets the link", x: "The secret is removed from the credential store. Turning sharing on again makes a brand-new link.", code: "200 OK { \"stopped\": true }\nSecItemDelete(service: \"StudyNotch.share\", account: shareId)", cost: "Free."},
+  ]},
+];
+const ALL = SCEN.flatMap((s, si) => s.steps.map((st, i) => ({...st, si, i})));
+
+// ---------- Draw ----------
+const defs = el("defs", {});
+for (const [id, fill] of [["ah", "var(--ink3)"], ["ahOn", "var(--accent)"]]) {
+  const m = el("marker", {id, viewBox: "0 0 10 10", refX: "10", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto-start-reverse"}, defs);
+  el("path", {d: "M0,0 L10,5 L0,10 z", style: `fill:${fill}`}, m);
+}
+const zones = [["mac", 20, 30, 380, 590, "Student's computer · Mac or Windows"], ["aws", 470, 30, 700, 590, "AWS · ap-southeast-1"], ["web", 1230, 30, 255, 200, "Anyone with the link"]];
+for (const [k, x, y, w, h, label] of zones) { const g = el("g", {class: "zone " + k}); el("rect", {x, y, width: w, height: h, rx: 14}, g); tx(label, {x: x + 14, y: y + 22}, g); }
+
+const wireG = {}, compG = {};
+for (const [id, a, b, label, pts, [lx, ly, anchor]] of WIRES) {
+  const g = el("g", {class: "wg"});
+  const path = el("path", {d: "M" + pts.map(p => p.join(",")).join(" L"), class: "wire", "marker-end": "url(#ah)"}, g);
+  tx(label, {x: lx, y: ly, "text-anchor": anchor, class: "wlab"}, g);
+  wireG[id] = {g, path};
+}
+for (const [k, c] of Object.entries(COMP)) {
+  const g = el("g", {class: "comp", tabindex: "0", role: "button", "aria-label": c.t});
+  el("rect", {x: c.x, y: c.y, width: c.w, height: c.h, rx: 10, class: "box"}, g);
+  tx(c.t, {x: c.x + 12, y: c.y + 22, class: "t"}, g);
+  let y = c.y + 40;
+  (c.s || []).forEach(s => { tx(s, {x: c.x + 12, y, class: "s"}, g); y += 16; });
+  (c.m || []).forEach(s => { tx(s, {x: c.x + 12, y: y + 2, class: "m"}, g); y += 15; });
+  g.addEventListener("click", () => info(k));
+  g.addEventListener("keydown", e => { if (e.key === "Enter") info(k); });
+  compG[k] = g;
+}
+const tokens = el("g", {});
+
+// ---------- Behaviour ----------
+const $ = id => document.getElementById(id);
+let pos = 0, timer = null, raf = null;
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const scenBar = $("scen");
+SCEN.forEach((s, si) => {
+  const b = document.createElement("button"); b.className = "chip"; b.type = "button";
+  b.innerHTML = `<span class="k">${si + 1}</span>${s.label}`;
+  b.addEventListener("click", () => { stop(); go(ALL.findIndex(x => x.si === si)); });
+  scenBar.appendChild(b);
+});
+
+function light(ws, cs) {
+  for (const [id, {g, path}] of Object.entries(wireG)) { const on = ws.includes(id);
+    g.classList.toggle("on", on); g.classList.toggle("dim", !on); path.setAttribute("marker-end", on ? "url(#ahOn)" : "url(#ah)"); }
+  for (const [k, g] of Object.entries(compG)) { const on = cs.includes(k); g.classList.toggle("on", on); g.classList.toggle("dim", !on); }
+  cancelAnimationFrame(raf); tokens.innerHTML = "";
+  if (reduce || !ws.length) return;
+  const ts = ws.map(id => ({p: wireG[id].path, c: el("circle", {r: 6, class: "token"}, tokens)}));
+  const t0 = performance.now();
+  const tick = now => { const k = ((now - t0) / 1400) % 1;
+    for (const {p, c} of ts) { const q = p.getPointAtLength(k * p.getTotalLength()); c.setAttribute("cx", q.x); c.setAttribute("cy", q.y); }
+    raf = requestAnimationFrame(tick); };
+  raf = requestAnimationFrame(tick);
+}
+function setWhere(w) { const e = $("where"); e.className = "where " + w; e.textContent = {mac: "On the computer", aws: "In AWS", web: "In the browser"}[w]; }
+function go(n) {
+  pos = Math.max(0, Math.min(ALL.length - 1, n));
+  const st = ALL[pos], sc = SCEN[st.si];
+  [...scenBar.children].forEach((b, i) => b.setAttribute("aria-pressed", String(i === st.si)));
+  light(st.w, st.c);
+  $("count").textContent = `${sc.label} · step ${st.i + 1} of ${sc.steps.length}`;
+  setWhere(st.where);
+  $("stitle").textContent = st.t; $("stext").textContent = st.x; $("scode").textContent = st.code;
+  $("scost").innerHTML = `<b>Cost:</b> ${st.cost}`;
+  $("prev").disabled = pos === 0; $("next").disabled = pos === ALL.length - 1;
+}
+function info(k) {
+  stop(); const c = COMP[k];
+  const touching = WIRES.filter(w => w[1] === k || w[2] === k).map(w => w[0]);
+  light(touching, [k]);
+  $("count").textContent = "Part"; setWhere(c.zone);
+  $("stitle").textContent = c.t; $("stext").textContent = c.info; $("scode").textContent = c.code;
+  $("scost").innerHTML = `<b>Connected to:</b> ${[...new Set(WIRES.filter(w => w[1] === k || w[2] === k).map(w => COMP[w[1] === k ? w[2] : w[1]].t))].join(", ")}`;
+}
+function stop() { clearInterval(timer); timer = null; $("play").textContent = "▶ Play"; }
+function play() {
+  if (timer) return stop();
+  if (pos === ALL.length - 1) go(0);
+  $("play").textContent = "❚❚ Pause";
+  timer = setInterval(() => { if (pos >= ALL.length - 1) return stop(); go(pos + 1); }, 3200);
+}
+$("next").addEventListener("click", () => { stop(); go(pos + 1); });
+$("prev").addEventListener("click", () => { stop(); go(pos - 1); });
+$("play").addEventListener("click", play);
+addEventListener("keydown", e => {
+  if (e.key === " " && e.target.closest && e.target.closest("button,[role=button]")) return;
+  if (e.key === "ArrowRight") { stop(); go(pos + 1); }
+  else if (e.key === "ArrowLeft") { stop(); go(pos - 1); }
+  else if (e.key === " ") { e.preventDefault(); play(); }
+});
+// Open on the first step: how the app gets onto the computer
+go(0);
+</script>

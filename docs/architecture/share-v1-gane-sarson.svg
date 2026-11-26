@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2339" height="1654" viewBox="0 0 2339 1654" font-family="Arial, Helvetica, sans-serif"><rect width="2339" height="1654" fill="#fff"/>
+<rect x="504.50" y="512.00" width="170.00" height="170.00" rx="14.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="504.50" y1="540.00" x2="674.50" y2="540.00" stroke="#000" stroke-width="2"/>
+<text x="589.50" y="531.88" font-size="16.8" font-weight="bold" text-anchor="middle">1</text>
+<text x="589.50" y="607.00" font-size="16" font-weight="bold" text-anchor="middle">Build Report</text>
+<text x="589.50" y="626.20" font-size="16" font-weight="bold" text-anchor="middle">Data</text>
+<rect x="504.50" y="872.00" width="170.00" height="170.00" rx="14.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="504.50" y1="900.00" x2="674.50" y2="900.00" stroke="#000" stroke-width="2"/>
+<text x="589.50" y="891.88" font-size="16.8" font-weight="bold" text-anchor="middle">2</text>
+<text x="589.50" y="967.00" font-size="16" font-weight="bold" text-anchor="middle">Manage</text>
+<text x="589.50" y="986.20" font-size="16" font-weight="bold" text-anchor="middle">Share Link</text>
+<rect x="1064.50" y="512.00" width="170.00" height="170.00" rx="14.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="1064.50" y1="540.00" x2="1234.50" y2="540.00" stroke="#000" stroke-width="2"/>
+<text x="1149.50" y="531.88" font-size="16.8" font-weight="bold" text-anchor="middle">3</text>
+<text x="1149.50" y="607.00" font-size="16" font-weight="bold" text-anchor="middle">Accept</text>
+<text x="1149.50" y="626.20" font-size="16" font-weight="bold" text-anchor="middle">Upload</text>
+<rect x="1764.50" y="1072.00" width="170.00" height="170.00" rx="14.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="1764.50" y1="1100.00" x2="1934.50" y2="1100.00" stroke="#000" stroke-width="2"/>
+<text x="1849.50" y="1091.88" font-size="16.8" font-weight="bold" text-anchor="middle">4</text>
+<text x="1849.50" y="1167.00" font-size="16" font-weight="bold" text-anchor="middle">Serve Report</text>
+<text x="1849.50" y="1186.20" font-size="16" font-weight="bold" text-anchor="middle">Page</text>
+<rect x="124.50" y="872.00" width="150.00" height="120.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="123.50" y1="873.50" x2="275.50" y2="873.50" stroke="#000" stroke-width="5"/>
+<line x1="126.00" y1="872.00" x2="126.00" y2="992.00" stroke="#000" stroke-width="5"/>
+<text x="199.50" y="937.60" font-size="16" font-weight="bold" text-anchor="middle">Student</text>
+<rect x="2064.50" y="1092.00" width="150.00" height="120.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="2063.50" y1="1093.50" x2="2215.50" y2="1093.50" stroke="#000" stroke-width="5"/>
+<line x1="2066.00" y1="1092.00" x2="2066.00" y2="1212.00" stroke="#000" stroke-width="5"/>
+<text x="2139.50" y="1148.00" font-size="16" font-weight="bold" text-anchor="middle">Report</text>
+<text x="2139.50" y="1167.20" font-size="16" font-weight="bold" text-anchor="middle">Viewer</text>
+<path d="M344.50,544.00 L124.50,544.00 L124.50,580.00 L344.50,580.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="164.50" y1="544.00" x2="164.50" y2="580.00" stroke="#000" stroke-width="2"/>
+<text x="144.50" y="567.60" font-size="16" font-weight="bold" text-anchor="middle">D1</text>
+<text x="254.50" y="567.60" font-size="16" text-anchor="middle">Activities</text>
+<path d="M344.50,624.00 L124.50,624.00 L124.50,660.00 L344.50,660.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="164.50" y1="624.00" x2="164.50" y2="660.00" stroke="#000" stroke-width="2"/>
+<text x="144.50" y="647.60" font-size="16" font-weight="bold" text-anchor="middle">D2</text>
+<text x="254.50" y="647.60" font-size="16" text-anchor="middle">Study Sessions</text>
+<path d="M1074.50,904.00 L854.50,904.00 L854.50,940.00 L1074.50,940.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="894.50" y1="904.00" x2="894.50" y2="940.00" stroke="#000" stroke-width="2"/>
+<text x="874.50" y="927.60" font-size="16" font-weight="bold" text-anchor="middle">D3</text>
+<text x="984.50" y="927.60" font-size="16" text-anchor="middle">Upload Secret</text>
+<path d="M1074.50,984.00 L854.50,984.00 L854.50,1020.00 L1074.50,1020.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="894.50" y1="984.00" x2="894.50" y2="1020.00" stroke="#000" stroke-width="2"/>
+<text x="874.50" y="1007.60" font-size="16" font-weight="bold" text-anchor="middle">D4</text>
+<text x="984.50" y="1007.60" font-size="16" text-anchor="middle">Share Keys</text>
+<path d="M1584.50,1134.00 L1364.50,1134.00 L1364.50,1170.00 L1584.50,1170.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="1404.50" y1="1134.00" x2="1404.50" y2="1170.00" stroke="#000" stroke-width="2"/>
+<text x="1384.50" y="1157.60" font-size="16" font-weight="bold" text-anchor="middle">D5</text>
+<text x="1494.50" y="1157.60" font-size="16" text-anchor="middle">Report Data</text>
+<path d="M1984.50,914.00 L1764.50,914.00 L1764.50,950.00 L1984.50,950.00" fill="#fff" stroke="#000" stroke-width="2"/>
+<line x1="1804.50" y1="914.00" x2="1804.50" y2="950.00" stroke="#000" stroke-width="2"/>
+<text x="1784.50" y="937.60" font-size="16" font-weight="bold" text-anchor="middle">D6</text>
+<text x="1894.50" y="937.60" font-size="16" text-anchor="middle">Report Template</text>
+<text x="124.50" y="427.60" font-size="16" font-weight="bold" text-anchor="start">DFD: sharing a habit report, v1 (device key, JSON-only uploads)</text>
+<path d="M344.50,562.00 L504.50,562.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="504.50,562.00 493.50,566.50 493.50,557.50" fill="#000"/>
+<text x="424.50" y="555.00" font-size="16" text-anchor="middle">Activity list</text>
+<path d="M344.50,642.00 L504.50,642.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="504.50,642.00 493.50,646.50 493.50,637.50" fill="#000"/>
+<text x="424.50" y="635.00" font-size="16" text-anchor="middle">Session history</text>
+<path d="M674.50,597.00 L1064.50,597.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1064.50,597.00 1053.50,601.50 1053.50,592.50" fill="#000"/>
+<text x="869.50" y="590.00" font-size="16" text-anchor="middle">Report data</text>
+<path d="M274.50,912.00 L504.50,912.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="504.50,912.00 493.50,916.50 493.50,907.50" fill="#000"/>
+<text x="389.50" y="905.00" font-size="16" text-anchor="middle">Share request</text>
+<path d="M504.50,972.00 L274.50,972.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="274.50,972.00 285.50,967.50 285.50,976.50" fill="#000"/>
+<text x="389.50" y="965.00" font-size="16" text-anchor="middle">Share link</text>
+<path d="M674.50,922.00 L854.50,922.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="854.50,922.00 843.50,926.50 843.50,917.50" fill="#000"/>
+<text x="764.50" y="915.00" font-size="16" text-anchor="middle">Upload secret</text>
+<path d="M674.50,1002.00 L854.50,1002.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="854.50,1002.00 843.50,1006.50 843.50,997.50" fill="#000"/>
+<text x="764.50" y="1020.20" font-size="16" text-anchor="middle">Share key record</text>
+<path d="M1074.50,922.00 L1104.50,922.00 L1104.50,682.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1104.50,682.00 1109.00,693.00 1100.00,693.00" fill="#000"/>
+<text x="1047.18" y="807.60" font-size="16" text-anchor="middle">Upload secret</text>
+<path d="M1074.50,1002.00 L1184.50,1002.00 L1184.50,682.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1184.50,682.00 1189.00,693.00 1180.00,693.00" fill="#000"/>
+<text x="1256.54" y="847.60" font-size="16" text-anchor="middle">Share key record</text>
+<path d="M1234.50,597.00 L1464.50,597.00 L1464.50,1134.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1464.50,1134.00 1460.00,1123.00 1469.00,1123.00" fill="#000"/>
+<text x="1513.34" y="877.60" font-size="16" text-anchor="middle">Report data</text>
+<path d="M589.50,1042.00 L589.50,1152.00 L1364.50,1152.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1364.50,1152.00 1353.50,1156.50 1353.50,1147.50" fill="#000"/>
+<text x="964.50" y="1145.00" font-size="16" text-anchor="middle">Removal notice</text>
+<path d="M1584.50,1152.00 L1764.50,1152.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1764.50,1152.00 1753.50,1156.50 1753.50,1147.50" fill="#000"/>
+<text x="1674.50" y="1145.00" font-size="16" text-anchor="middle">Stored report data</text>
+<path d="M1824.50,950.00 L1824.50,1072.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1824.50,1072.00 1820.00,1061.00 1829.00,1061.00" fill="#000"/>
+<text x="1888.86" y="1016.60" font-size="16" text-anchor="middle">Report template</text>
+<path d="M2064.50,1122.00 L1934.50,1122.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="1934.50,1122.00 1945.50,1117.50 1945.50,1126.50" fill="#000"/>
+<text x="1999.50" y="1115.00" font-size="16" text-anchor="middle">Share link</text>
+<path d="M1934.50,1182.00 L2064.50,1182.00" fill="none" stroke="#000" stroke-width="1.5"/>
+<polygon points="2064.50,1182.00 2053.50,1186.50 2053.50,1177.50" fill="#000"/>
+<text x="1999.50" y="1175.00" font-size="16" text-anchor="middle">Report page</text>
+</svg>
